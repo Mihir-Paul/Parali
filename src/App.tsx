@@ -8,6 +8,9 @@ import { FarmerDashboard } from './pages/FarmerDashboard';
 import { FarmerSell } from './pages/FarmerSell';
 import { BuyerDashboard } from './pages/BuyerDashboard';
 import { BuyerMarketplace } from './pages/BuyerMarketplace';
+import { BuyerDemand } from './pages/BuyerDemand';
+import { BuyerMatches } from './pages/BuyerMatches';
+import { BuyerRequests } from './pages/BuyerRequests';
 import { RouteOptimizer } from './pages/RouteOptimizer';
 import { BurnIntelligence } from './pages/BurnIntelligence';
 import { ImpactDashboard } from './pages/ImpactDashboard';
@@ -15,7 +18,19 @@ import { ProfilePage } from './pages/ProfilePage';
 import { useAuth } from './context/AuthContext';
 import { AuthLogin } from './pages/AuthLogin';
 import { Onboarding } from './pages/Onboarding';
-import { LayoutDashboard, Compass, Flame, Heart, ShoppingBag, Sprout, UserCheck } from 'lucide-react';
+import { BuyerDemandItem } from './types/marketplace';
+import {
+  LayoutDashboard,
+  Compass,
+  Flame,
+  Heart,
+  ShoppingBag,
+  Sprout,
+  UserCheck,
+  PlusCircle,
+  Sparkles,
+  Clock
+} from 'lucide-react';
 
 export default function App() {
   const { currentRole, setRole, demoStep } = useAppStore();
@@ -27,8 +42,11 @@ export default function App() {
   
   // Tab routing for Farmer / Buyer / Admin
   const [farmerView, setFarmerView] = useState<'dashboard' | 'sell'>('dashboard');
-  const [buyerView, setBuyerView] = useState<'dashboard' | 'marketplace'>('dashboard');
+  const [buyerView, setBuyerView] = useState<'dashboard' | 'marketplace' | 'demand' | 'matches' | 'requests'>('dashboard');
   const [adminTab, setAdminTab] = useState<'optimizer' | 'burns' | 'impact'>('optimizer');
+
+  // Active demand passed to matching engine
+  const [activeDemandForMatches, setActiveDemandForMatches] = useState<BuyerDemandItem | null>(null);
 
   // Handle OAuth callback paths
   useEffect(() => {
@@ -210,6 +228,39 @@ export default function App() {
                   <ShoppingBag className="h-4 w-4" /> Biomass Marketplace
                 </button>
 
+                <button
+                  onClick={() => setBuyerView('demand')}
+                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
+                    buyerView === 'demand' 
+                      ? 'bg-clay-600 text-white shadow-sm' 
+                      : 'text-forest-800 hover:bg-forest-50'
+                  }`}
+                >
+                  <PlusCircle className="h-4 w-4" /> Post Requirement
+                </button>
+
+                <button
+                  onClick={() => setBuyerView('matches')}
+                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
+                    buyerView === 'matches' 
+                      ? 'bg-clay-600 text-white shadow-sm' 
+                      : 'text-forest-800 hover:bg-forest-50'
+                  }`}
+                >
+                  <Sparkles className="h-4 w-4" /> Matched Farmers
+                </button>
+
+                <button
+                  onClick={() => setBuyerView('requests')}
+                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
+                    buyerView === 'requests' 
+                      ? 'bg-clay-600 text-white shadow-sm' 
+                      : 'text-forest-800 hover:bg-forest-50'
+                  }`}
+                >
+                  <Clock className="h-4 w-4" /> Purchase Requests
+                </button>
+
                 <div className="mt-auto pt-6 border-t border-forest-100">
                   <button
                     onClick={() => setCurrentView('profile')}
@@ -273,9 +324,35 @@ export default function App() {
 
               {currentRole === 'Buyer' && (
                 buyerView === 'dashboard' ? (
-                  <BuyerDashboard onNavigateToMarketplace={() => setBuyerView('marketplace')} />
+                  <BuyerDashboard
+                    onNavigateToMarketplace={() => setBuyerView('marketplace')}
+                    onNavigateToDemand={() => setBuyerView('demand')}
+                    onNavigateToMatches={() => setBuyerView('matches')}
+                    onNavigateToRequests={() => setBuyerView('requests')}
+                  />
+                ) : buyerView === 'marketplace' ? (
+                  <BuyerMarketplace
+                    onNavigateToDemand={() => setBuyerView('demand')}
+                    onNavigateToRequests={() => setBuyerView('requests')}
+                  />
+                ) : buyerView === 'demand' ? (
+                  <BuyerDemand
+                    onRequirementCreated={(createdDemand) => {
+                      setActiveDemandForMatches(createdDemand);
+                      setBuyerView('matches');
+                    }}
+                    onCancel={() => setBuyerView('dashboard')}
+                  />
+                ) : buyerView === 'matches' ? (
+                  <BuyerMatches
+                    activeDemand={activeDemandForMatches}
+                    onNavigateToMarketplace={() => setBuyerView('marketplace')}
+                    onNavigateToRequests={() => setBuyerView('requests')}
+                  />
                 ) : (
-                  <BuyerMarketplace onBack={() => setBuyerView('dashboard')} />
+                  <BuyerRequests
+                    onBackToMarketplace={() => setBuyerView('marketplace')}
+                  />
                 )
               )}
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { useAuth } from '../context/AuthContext';
-import { Sprout, LogOut, ArrowLeftRight, User, ShieldAlert, Award, UserCheck } from 'lucide-react';
+import { Sprout, LogOut, ArrowLeftRight, UserCheck, ShieldAlert, Award } from 'lucide-react';
 
 interface NavbarProps {
   currentView?: string;
@@ -21,7 +21,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigateProfile }
   const displayAvatar = profile?.avatar_url || user?.user_metadata?.avatar_url;
 
   return (
-    <header className="sticky top-0 z-40 bg-cream-50/90 backdrop-blur-md border-b border-forest-100 px-6 py-4 transition-all">
+    <header className="sticky top-0 z-40 bg-cream-50/90 backdrop-blur-md border-b border-forest-100 px-6 py-4 transition-all font-sans">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         
         {/* Brand Logo */}

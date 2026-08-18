@@ -1,15 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { useAuth } from '../context/AuthContext';
-import { IndianRupee, Sprout, ShieldCheck, CheckCircle2, ChevronRight, FileSpreadsheet, MapPin } from 'lucide-react';
+import { fetchPurchaseRequests, updatePurchaseRequestStatus } from '../services/marketplaceService';
+import { PurchaseRequestItem } from '../types/marketplace';
+import { IndianRupee, Sprout, ShieldCheck, CheckCircle2, FileSpreadsheet, MapPin, XCircle, Clock } from 'lucide-react';
 
 interface FarmerDashboardProps {
   onNavigateToSell: () => void;
 }
 
 export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSell }) => {
-  const { listings, completePickup, demoStep } = useAppStore();
+  const { listings, acceptMatch, completePickup, demoStep } = useAppStore();
   const { profile, farmerProfile, user } = useAuth();
+
+  const [incomingRequests, setIncomingRequests] = useState<PurchaseRequestItem[]>([]);
+  const [loadingRequests, setLoadingRequests] = useState(false);
+  const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
 
   const farmerName = profile?.full_name || user?.user_metadata?.full_name || 'Ramesh Kumar';
   const primaryCrop = farmerProfile?.primary_crop || 'Wheat';
@@ -23,8 +29,42 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
     burnsPrevented: Math.max(1, Math.round((estimatedTonnes || 6) * 0.8))
   };
 
-  // Get active listing for current user
-  const rameshListing = listings.find(l => l.farmerId === 'f1' || l.farmerId === 'f_new' || l.farmerId === profile?.id);
+  // Fetch incoming purchase requests from Supabase
+  const loadIncomingRequests = async () => {
+    setLoadingRequests(true);
+    try {
+      const data = await fetchPurchaseRequests(undefined, user?.id);
+      setIncomingRequests(data);
+    } catch (err) {
+      console.error('Error loading farmer purchase requests:', err);
+    } finally {
+      setLoadingRequests(false);
+    }
+  };
+
+  useEffect(() => {
+    loadIncomingRequests();
+  }, [user]);
+
+  // Demo fallback request if none exist
+  const displayRequests: PurchaseRequestItem[] = incomingRequests.length > 0 ? incomingRequests : [
+    {
+      id: 'req_demo_1',
+      buyer_id: 'b1',
+      buyer_name: 'GreenGrow Mushroom Farm',
+      residue_type: `${primaryCrop} Straw`,
+      quantity_requested: 3.0,
+      offered_price_per_tonne: 1200,
+      total_amount: 3600,
+      pickup_date_preference: '2026-08-22',
+      location: 'Rajpura, Punjab (18 km away)',
+      status: 'Pending',
+      created_at: new Date().toISOString()
+    }
+  ];
+
+  // Active listing for user
+  const rameshListing = listings.find((l) => l.farmerId === 'f1' || l.farmerId === 'f_new' || l.farmerId === profile?.id);
 
   const getTimelineStep = (status: string) => {
     switch (status) {
@@ -39,9 +79,50 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
 
   const timelineStep = rameshListing ? getTimelineStep(rameshListing.status) : 0;
 
+  // Accept Purchase Request Handler
+  const handleAcceptRequest = async (request: PurchaseRequestItem) => {
+    try {
+      await updatePurchaseRequestStatus(request.id, 'Confirmed');
+
+      // Update Zustand state for demo flow
+      if (rameshListing) {
+        acceptMatch(rameshListing.id);
+      }
+
+      setIncomingRequests((prev) =>
+        prev.map((r) => (r.id === request.id ? { ...r, status: 'Confirmed' } : r))
+      );
+
+      setActionSuccessMsg(`Offer from ${request.buyer_name || 'Buyer'} accepted! Pickup contract generated.`);
+      setTimeout(() => setActionSuccessMsg(null), 5000);
+    } catch (err) {
+      console.error('Error accepting request:', err);
+    }
+  };
+
+  // Reject Purchase Request Handler
+  const handleRejectRequest = async (request: PurchaseRequestItem) => {
+    try {
+      await updatePurchaseRequestStatus(request.id, 'Rejected');
+      setIncomingRequests((prev) =>
+        prev.map((r) => (r.id === request.id ? { ...r, status: 'Rejected' } : r))
+      );
+    } catch (err) {
+      console.error('Error rejecting request:', err);
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10 font-sans">
+    <div className="max-w-7xl mx-auto px-6 py-10 font-sans selection:bg-forest-200">
       
+      {/* Action Success Toast Banner */}
+      {actionSuccessMsg && (
+        <div className="bg-forest-900 text-white p-4 rounded-2xl mb-6 shadow-lg border border-forest-700 flex items-center gap-3">
+          <CheckCircle2 className="h-5 w-5 text-forest-400 shrink-0" />
+          <span className="text-xs font-bold">{actionSuccessMsg}</span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
@@ -53,7 +134,7 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
             Good morning, {farmerName} 👋
           </h2>
           <p className="text-sm text-forest-700 mt-1">
-            Here is what's happening with your agricultural residue.
+            Here is what's happening with your agricultural residue listings.
           </p>
         </div>
         <button
@@ -88,11 +169,11 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
 
         <div className="bg-white border border-forest-100 p-6 rounded-3xl shadow-sm hover:translate-y-[-2px] hover:shadow-md transition-all duration-300">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-[10px] font-bold text-forest-600 uppercase tracking-wider">Active Buyers</span>
+            <span className="text-[10px] font-bold text-forest-600 uppercase tracking-wider">Active Requests</span>
             <div className="p-2.5 bg-forest-50 text-forest-600 rounded-xl"><FileSpreadsheet className="h-4 w-4" /></div>
           </div>
-          <h3 className="text-2xl font-black text-forest-950">3 Interested</h3>
-          <p className="text-[10px] text-forest-500 font-semibold mt-1">Matching bio-fuel factories</p>
+          <h3 className="text-2xl font-black text-forest-950">{displayRequests.length} Buyer Offers</h3>
+          <p className="text-[10px] text-forest-500 font-semibold mt-1">Matching bio-energy factories</p>
         </div>
 
         <div className="bg-white border border-forest-100 p-6 rounded-3xl shadow-sm hover:translate-y-[-2px] hover:shadow-md transition-all duration-300">
@@ -191,68 +272,86 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
         </div>
       )}
 
-      {/* Buyer Matches */}
-      {rameshListing && rameshListing.status === 'Listed' && (
-        <div className="bg-white border border-forest-100 rounded-3xl p-6 shadow-sm">
-          <h4 className="font-extrabold text-base text-forest-950 mb-4 flex items-center gap-2">
-            <span>🤖</span> AI-Matched Buyers Interested
-          </h4>
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="border border-forest-100 p-5 rounded-2xl hover:border-forest-300 transition-all flex flex-col justify-between">
-              <div>
-                <div className="flex justify-between items-start">
-                  <h5 className="font-bold text-sm text-forest-950">GreenGrow Mushroom Farm</h5>
-                  <span className="text-[10px] font-extrabold bg-forest-100 text-forest-800 px-2 py-0.5 rounded-full">
-                    94% Match
-                  </span>
-                </div>
-                <p className="text-xs text-forest-600 mt-2">Rajpura, Punjab • 18 km away</p>
-                <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-50">
-                  <div>
-                    <span className="text-[10px] text-slate-400 block font-semibold">Offer Price</span>
-                    <span className="text-sm font-extrabold text-forest-850">₹1,200 / Tonne</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 block font-semibold">Pickup Date</span>
-                    <span className="text-sm font-extrabold text-slate-800">22 Aug 2026</span>
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => useAppStore.getState().acceptMatch(rameshListing.id)}
-                className="mt-5 w-full bg-forest-50 hover:bg-forest-100 text-forest-800 text-xs font-bold py-2 rounded-lg border border-forest-200 transition-all"
-              >
-                Accept Offer
-              </button>
-            </div>
+      {/* ============================================================ */}
+      {/* INCOMING BUYER PURCHASE REQUESTS SECTION */}
+      {/* ============================================================ */}
+      <div className="bg-white border border-forest-100 rounded-3xl p-6 shadow-sm mb-10">
+        <h4 className="font-extrabold text-base text-forest-950 mb-4 flex items-center gap-2">
+          <span>📨</span> Incoming Buyer Purchase Requests
+        </h4>
 
-            <div className="border border-slate-100 p-5 rounded-2xl opacity-60 flex flex-col justify-between">
+        <div className="grid md:grid-cols-2 gap-4">
+          {displayRequests.map((req) => (
+            <div
+              key={req.id}
+              className="border border-forest-150 bg-cream-50/50 p-5 rounded-2xl hover:border-forest-300 transition-all flex flex-col justify-between"
+            >
               <div>
                 <div className="flex justify-between items-start">
-                  <h5 className="font-bold text-sm text-slate-800">EcoFiber Paper Mills</h5>
-                  <span className="text-[10px] font-extrabold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">
-                    89% Match
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-wider text-forest-700 bg-forest-100 px-2.5 py-0.5 rounded-full">
+                      {req.residue_type || 'Crop Residue'}
+                    </span>
+                    <h5 className="font-extrabold text-sm text-forest-950 mt-1.5">
+                      {req.buyer_name || 'Verified Biomass Buyer'}
+                    </h5>
+                  </div>
+
+                  <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                    req.status === 'Confirmed' ? 'bg-forest-600 text-white' :
+                    req.status === 'Rejected' ? 'bg-clay-200 text-clay-800' :
+                    'bg-clay-100 text-clay-800'
+                  }`}>
+                    {req.status}
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 mt-2">Ludhiana Outer • 43 km away</p>
-                <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-50">
+
+                <p className="text-xs text-forest-600 mt-2 font-medium">
+                  {req.location || 'Punjab Hub'}
+                </p>
+
+                <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-forest-100/60 text-xs">
                   <div>
-                    <span className="text-[10px] text-slate-400 block font-semibold">Offer Price</span>
-                    <span className="text-sm font-bold text-slate-700">₹1,150 / Tonne</span>
+                    <span className="text-[10px] text-slate-400 block font-semibold">Requested Quantity</span>
+                    <span className="text-sm font-extrabold text-forest-900">{req.quantity_requested} tonnes</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-slate-400 block font-semibold">Pickup Date</span>
-                    <span className="text-sm font-bold text-slate-700">24 Aug 2026</span>
+                    <span className="text-[10px] text-slate-400 block font-semibold">Offer Rate</span>
+                    <span className="text-sm font-extrabold text-forest-900">₹{req.offered_price_per_tonne} / tonne</span>
                   </div>
                 </div>
+
+                <div className="mt-3 pt-2 text-[10px] text-forest-700 font-bold">
+                  Total Contract Value: <span className="text-forest-950 font-black text-xs">₹{req.total_amount || req.quantity_requested * req.offered_price_per_tonne}</span>
+                </div>
               </div>
-              <button disabled className="mt-5 w-full bg-slate-50 text-slate-400 text-xs font-bold py-2 rounded-lg border border-slate-100 cursor-not-allowed">
-                Accept Offer
-              </button>
+
+              {/* Action Buttons for Farmer */}
+              {req.status === 'Pending' ? (
+                <div className="flex gap-2 mt-5 pt-3 border-t border-forest-100">
+                  <button
+                    onClick={() => handleAcceptRequest(req)}
+                    className="flex-1 bg-forest-600 hover:bg-forest-700 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm transition-all flex items-center justify-center gap-1"
+                  >
+                    <CheckCircle2 className="h-3.5 w-3.5" /> Accept Offer
+                  </button>
+                  <button
+                    onClick={() => handleRejectRequest(req)}
+                    className="bg-clay-100 hover:bg-clay-200 text-clay-800 text-xs font-bold px-4 py-2.5 rounded-xl border border-clay-300 transition-all flex items-center gap-1"
+                  >
+                    <XCircle className="h-3.5 w-3.5" /> Decline
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-4 pt-3 border-t border-forest-100 text-center text-xs font-bold text-forest-800">
+                  ✓ Request {req.status}
+                </div>
+              )}
             </div>
-          </div>
+          ))}
         </div>
-      )}
+      </div>
+
     </div>
   );
 };

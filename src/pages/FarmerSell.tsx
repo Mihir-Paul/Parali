@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { Sprout, IndianRupee, MapPin, Calendar, Camera, Info, ArrowLeft } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { createResidueListing } from '../services/marketplaceService';
+import { Sprout, IndianRupee, MapPin, Calendar, Camera, Info, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 interface FarmerSellProps {
   onBack: () => void;
@@ -8,13 +10,16 @@ interface FarmerSellProps {
 
 export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
   const { addListing, demoStep } = useAppStore();
+  const { user, profile, farmerProfile } = useAuth();
+
   const [crop, setCrop] = useState<'Wheat' | 'Rice' | 'Maize' | 'Sugarcane' | 'Other'>('Wheat');
   const [residueType, setResidueType] = useState('Wheat Straw (Tudi)');
   const [quantity, setQuantity] = useState<number>(3);
-  const [pickupLocation, setPickupLocation] = useState('Sangrur Fields Block A');
+  const [pickupLocation, setPickupLocation] = useState(profile?.village ? `${profile.village}, ${profile.district}` : 'Sangrur Fields Block A');
   const [pickupDate, setPickupDate] = useState('2026-08-22');
   const [valuationMin, setValuationMin] = useState(2400);
   const [valuationMax, setValuationMax] = useState(2800);
+  const [submitting, setSubmitting] = useState(false);
 
   // Recalculate AI valuation based on inputs
   useEffect(() => {
@@ -41,20 +46,47 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
     }
   }, [demoStep]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addListing({
-      cropType: crop,
-      residueType,
-      quantity,
-      pickupLocation,
-      coordinates: [31, 46],
-      pickupDate,
-      images: [],
-      estimatedPriceMin: valuationMin,
-      estimatedPriceMax: valuationMax
-    });
-    onBack();
+    setSubmitting(true);
+
+    const pricePerTonne = Math.round((valuationMin + valuationMax) / (2 * (quantity || 1))) || 1150;
+
+    try {
+      if (user) {
+        await createResidueListing(user, {
+          farmer_name: profile?.full_name || 'Verified Farmer',
+          crop_type: crop,
+          residue_type: residueType,
+          quantity,
+          price_per_tonne: pricePerTonne,
+          pickup_location: pickupLocation,
+          state: profile?.state || 'Punjab',
+          district: profile?.district || 'Sangrur',
+          village: profile?.village || '',
+          pickup_ready_date: pickupDate
+        });
+      }
+
+      addListing({
+        cropType: crop,
+        residueType,
+        quantity,
+        pickupLocation,
+        coordinates: [31, 46],
+        pickupDate,
+        images: [],
+        estimatedPriceMin: valuationMin,
+        estimatedPriceMax: valuationMax
+      });
+
+      onBack();
+    } catch (err) {
+      console.error('Error creating residue listing:', err);
+      onBack();
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -180,9 +212,10 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
 
           <button
             type="submit"
-            className="w-full bg-clay-500 hover:bg-clay-600 text-white font-extrabold text-sm py-4 rounded-2xl shadow-lg transition-all"
+            disabled={submitting}
+            className="w-full bg-clay-500 hover:bg-clay-600 text-white font-extrabold text-sm py-4 rounded-2xl shadow-lg transition-all disabled:opacity-50"
           >
-            Confirm & List Residue
+            {submitting ? 'Creating Listing...' : 'Confirm & List Residue'}
           </button>
         </div>
       </form>
