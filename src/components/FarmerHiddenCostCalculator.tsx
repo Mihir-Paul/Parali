@@ -35,8 +35,13 @@ export const FarmerHiddenCostCalculator: React.FC<FarmerHiddenCostCalculatorProp
             <span className="px-2 py-0.5 rounded-card text-[10px] font-mono font-medium uppercase tracking-wide bg-pine-100 text-pine-700">
               Agronomic economics
             </span>
+<<<<<<< HEAD
             <span className="px-2 py-0.5 rounded-card text-[10px] font-mono text-ink-500 bg-paper-50 border border-line-200">
               PAU / ICAR benchmark model
+=======
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-slate-100 text-slate-700">
+              Modelled Agronomic Estimate (PAU / ICAR Data)
+>>>>>>> f7391a733238352f574b4261a62f7a0c2e310651
             </span>
           </div>
           <h3 className="text-xl md:text-2xl font-display font-bold text-ink-900 mt-2">Burn or sell? See the real difference</h3>
@@ -56,6 +61,7 @@ export const FarmerHiddenCostCalculator: React.FC<FarmerHiddenCostCalculatorProp
 
       {/* Expandable How Calculated Methodology Box */}
       {showHowCalculated && (
+<<<<<<< HEAD
         <div className="mb-6 p-4 bg-pine-900 text-white rounded-card text-xs space-y-3 border border-pine-700">
           <div className="flex items-center justify-between">
             <h4 className="font-display font-semibold uppercase tracking-wide text-paper-50 text-xs">Methodology & formula breakdown</h4>
@@ -76,6 +82,45 @@ export const FarmerHiddenCostCalculator: React.FC<FarmerHiddenCostCalculatorProp
             <div className="bg-pine-900 p-3 rounded-card border border-pine-700">
               <strong className="block text-white font-medium">3. Total net advantage</strong>
               <span className="text-pine-100 font-mono block mt-1">Parali revenue + Avoided soil loss</span>
+=======
+        <div className="mb-8 p-6 bg-forest-900 text-cream-50 rounded-2xl text-xs space-y-4 shadow-inner border border-forest-800">
+          <div className="flex items-center justify-between">
+            <h4 className="font-extrabold uppercase tracking-wider text-cream-100 text-xs">Methodology & Formula Breakdown</h4>
+            <span className="text-[10px] bg-forest-800 text-clay-300 font-bold px-2.5 py-0.5 rounded-full">Transparent Agronomic Model</span>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-4 text-[11px]">
+            <div className="bg-forest-950/70 p-4 rounded-xl border border-forest-800/80 space-y-2">
+              <strong className="block text-amber-300 font-extrabold uppercase text-[10px] tracking-wider">Formula & Math Model</strong>
+              <div className="space-y-1 text-slate-200 font-mono">
+                <p>• Gross Payout (₹) = Q × P</p>
+                <p>• Nutrient Loss (₹) = Q × L</p>
+                <p>• Net Advantage (₹) = Gross Payout + Nutrient Loss</p>
+              </div>
+            </div>
+
+            <div className="bg-forest-950/70 p-4 rounded-xl border border-forest-800/80 space-y-2">
+              <strong className="block text-emerald-400 font-extrabold uppercase text-[10px] tracking-wider">Variables & Units</strong>
+              <div className="space-y-1 text-slate-200">
+                <p>• <strong>Q (Quantity):</strong> Tonnes (t), range 1.0t to 30.0t</p>
+                <p>• <strong>P (Selling Price):</strong> ₹/tonne, range ₹800 to ₹2,500/t</p>
+                <p>• <strong>L (Loss Factor):</strong> ₹/tonne (Rice Straw: ₹{activeFactors.npkLossPerTonne}/t; Estimated range: ₹800–₹900/t [Model assumption])</p>
+              </div>
+            </div>
+
+            <div className="bg-forest-950/70 p-4 rounded-xl border border-forest-800/80 space-y-2">
+              <strong className="block text-sky-300 font-extrabold uppercase text-[10px] tracking-wider">Data Source & Reference</strong>
+              <p className="text-slate-300 leading-relaxed">
+                PAU (Punjab Agricultural University) & ICAR crop residue composition studies (1t rice straw contains ~5.5kg N, 2.3kg P₂O₅, 25kg K₂O, 1.2kg S, 400kg C). Replacement value computed using market chemical fertilizer prices (Urea, DAP, MOP).
+              </p>
+            </div>
+
+            <div className="bg-forest-950/70 p-4 rounded-xl border border-forest-800/80 space-y-2">
+              <strong className="block text-clay-300 font-extrabold uppercase text-[10px] tracking-wider">Model Assumptions</strong>
+              <p className="text-slate-300 leading-relaxed">
+                Open field burning leads to 100% loss of N & soil organic carbon, and 70–80% loss/immobilization of P & K (Model assumption). Parali sale assumes ₹0 pickup cost to farmer (Marketplace assumption: pickup/logistics cost borne by buyer or logistics partner).
+              </p>
+>>>>>>> f7391a733238352f574b4261a62f7a0c2e310651
             </div>
           </div>
         </div>
@@ -219,9 +264,15 @@ export const FarmerHiddenCostCalculator: React.FC<FarmerHiddenCostCalculatorProp
                 <span className="text-ink-500 font-medium">Soil N-P-K nutrients retained</span>
                 <span className="font-mono text-pine-700">+₹{calcResult.burning_scenario.estimated_nutrient_loss_inr.toLocaleString('en-IN')} saved</span>
               </div>
+<<<<<<< HEAD
               <div className="flex justify-between items-center text-xs pb-2 border-b border-line-200">
                 <span className="text-ink-500 font-medium">Farmgate pickup transport</span>
                 <span className="font-medium text-pine-700">Managed (₹0)</span>
+=======
+              <div className="flex justify-between items-start text-xs pb-2 border-b border-emerald-200/60 gap-2">
+                <span className="font-semibold text-slate-700">Farmgate Pickup Transport</span>
+                <span className="font-bold text-emerald-800 text-right">₹0 <span className="text-[10px] text-emerald-700 font-semibold block">(Marketplace assumption: pickup/logistics cost borne by buyer or logistics partner.)</span></span>
+>>>>>>> f7391a733238352f574b4261a62f7a0c2e310651
               </div>
             </div>
           </div>

@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { useAuth } from '../context/AuthContext';
-import { fetchPurchaseRequests, updatePurchaseRequestStatus } from '../services/marketplaceService';
+import {
+  acceptPurchaseRequest,
+  declinePurchaseRequest,
+  fetchFarmerPurchaseRequests
+} from '../services/purchaseRequestService';
 import { PurchaseRequestItem } from '../types/marketplace';
-import { IndianRupee, Sprout, ShieldCheck, CheckCircle2, FileSpreadsheet, MapPin, XCircle, Clock, Calculator } from 'lucide-react';
+import { IndianRupee, Sprout, ShieldCheck, CheckCircle2, FileSpreadsheet, MapPin, XCircle, Clock, Calculator, AlertTriangle } from 'lucide-react';
 import { FarmerHiddenCostCalculator } from '../components/FarmerHiddenCostCalculator';
 
 interface FarmerDashboardProps {
@@ -16,7 +20,9 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
 
   const [incomingRequests, setIncomingRequests] = useState<PurchaseRequestItem[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
+  const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [actionSuccessMsg, setActionSuccessMsg] = useState<string | null>(null);
+  const [actionErrorMsg, setActionErrorMsg] = useState<string | null>(null);
 
   const farmerName = profile?.full_name || user?.user_metadata?.full_name || 'Ramesh Kumar';
   const primaryCrop = farmerProfile?.primary_crop || 'Wheat';
@@ -34,7 +40,7 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
   const loadIncomingRequests = async () => {
     setLoadingRequests(true);
     try {
-      const data = await fetchPurchaseRequests(undefined, user?.id);
+      const data = await fetchFarmerPurchaseRequests(user?.id);
       setIncomingRequests(data);
     } catch (err) {
       console.error('Error loading farmer purchase requests:', err);
@@ -47,22 +53,7 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
     loadIncomingRequests();
   }, [user]);
 
-  // Demo fallback request if none exist
-  const displayRequests: PurchaseRequestItem[] = incomingRequests.length > 0 ? incomingRequests : [
-    {
-      id: 'req_demo_1',
-      buyer_id: 'b1',
-      buyer_name: 'GreenGrow Mushroom Farm',
-      residue_type: `${primaryCrop} Straw`,
-      quantity_requested: 3.0,
-      offered_price_per_tonne: 1200,
-      total_amount: 3600,
-      pickup_date_preference: '2026-08-22',
-      location: 'Rajpura, Punjab (18 km away)',
-      status: 'Pending',
-      created_at: new Date().toISOString()
-    }
-  ];
+  const displayRequests: PurchaseRequestItem[] = incomingRequests;
 
   // Active listing for user
   const rameshListing = listings.find((l) => l.farmerId === 'f1' || l.farmerId === 'f_new' || l.farmerId === profile?.id);
@@ -82,34 +73,49 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
 
   // Accept Purchase Request Handler
   const handleAcceptRequest = async (request: PurchaseRequestItem) => {
+    if (submittingId) return;
+    setSubmittingId(request.id);
+    setActionErrorMsg(null);
     try {
-      await updatePurchaseRequestStatus(request.id, 'Confirmed');
+      const result = await acceptPurchaseRequest(request.id, user ? { id: user.id, name: farmerName } : undefined);
 
-      // Update Zustand state for demo flow
       if (rameshListing) {
         acceptMatch(rameshListing.id);
       }
 
       setIncomingRequests((prev) =>
-        prev.map((r) => (r.id === request.id ? { ...r, status: 'Confirmed' } : r))
+        prev.map((r) => (r.id === request.id ? { ...r, status: 'Accepted' } : r))
       );
 
       setActionSuccessMsg(`Offer from ${request.buyer_name || 'Buyer'} accepted! Pickup contract generated.`);
-      setTimeout(() => setActionSuccessMsg(null), 5000);
-    } catch (err) {
+      setTimeout(() => setActionSuccessMsg(null), 6000);
+    } catch (err: any) {
       console.error('Error accepting request:', err);
+      setActionErrorMsg(err.message || 'Failed to accept purchase request.');
+      setTimeout(() => setActionErrorMsg(null), 7000);
+    } finally {
+      setSubmittingId(null);
     }
   };
 
   // Reject Purchase Request Handler
   const handleRejectRequest = async (request: PurchaseRequestItem) => {
+    if (submittingId) return;
+    setSubmittingId(request.id);
+    setActionErrorMsg(null);
     try {
-      await updatePurchaseRequestStatus(request.id, 'Rejected');
+      await declinePurchaseRequest(request.id, user ? { id: user.id, name: farmerName } : undefined);
       setIncomingRequests((prev) =>
-        prev.map((r) => (r.id === request.id ? { ...r, status: 'Rejected' } : r))
+        prev.map((r) => (r.id === request.id ? { ...r, status: 'Declined' } : r))
       );
-    } catch (err) {
+      setActionSuccessMsg('Purchase request declined.');
+      setTimeout(() => setActionSuccessMsg(null), 4000);
+    } catch (err: any) {
       console.error('Error rejecting request:', err);
+      setActionErrorMsg(err.message || 'Failed to decline purchase request.');
+      setTimeout(() => setActionErrorMsg(null), 7000);
+    } finally {
+      setSubmittingId(null);
     }
   };
 
@@ -119,8 +125,16 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
       {/* Action Success Toast Banner */}
       {actionSuccessMsg && (
         <div className="bg-forest-900 text-white p-4 rounded-2xl mb-6 shadow-lg border border-forest-700 flex items-center gap-3">
-          <CheckCircle2 className="h-5 w-5 text-forest-400 shrink-0" />
+          <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
           <span className="text-xs font-bold">{actionSuccessMsg}</span>
+        </div>
+      )}
+
+      {/* Action Error Toast Banner */}
+      {actionErrorMsg && (
+        <div className="bg-red-900 text-white p-4 rounded-2xl mb-6 shadow-lg border border-red-700 flex items-center gap-3">
+          <AlertTriangle className="h-5 w-5 text-red-400 shrink-0" />
+          <span className="text-xs font-bold">{actionErrorMsg}</span>
         </div>
       )}
 
@@ -299,11 +313,13 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
                   </div>
 
                   <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
-                    req.status === 'Confirmed' ? 'bg-forest-600 text-white' :
-                    req.status === 'Rejected' ? 'bg-clay-200 text-clay-800' :
-                    'bg-clay-100 text-clay-800'
+                    req.status === 'Accepted' || req.status === 'Confirmed' ? 'bg-emerald-600 text-white' :
+                    req.status === 'Declined' || req.status === 'Rejected' ? 'bg-red-100 text-red-800 border border-red-200' :
+                    'bg-amber-100 text-amber-900 border border-amber-200'
                   }`}>
-                    {req.status}
+                    {req.status === 'Accepted' || req.status === 'Confirmed' ? 'Accepted ✓' :
+                     req.status === 'Declined' || req.status === 'Rejected' ? 'Declined ✗' :
+                     'Pending Offer'}
                   </span>
                 </div>
 
@@ -327,25 +343,43 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
                 </div>
               </div>
 
-              {/* Action Buttons for Farmer */}
+              {/* Action Buttons & Status State */}
               {req.status === 'Pending' ? (
                 <div className="flex gap-2 mt-5 pt-3 border-t border-forest-100">
                   <button
                     onClick={() => handleAcceptRequest(req)}
-                    className="flex-1 bg-forest-600 hover:bg-forest-700 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm transition-all flex items-center justify-center gap-1"
+                    disabled={submittingId === req.id}
+                    className="flex-1 bg-forest-600 hover:bg-forest-700 disabled:opacity-50 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm transition-all flex items-center justify-center gap-1 cursor-pointer"
                   >
-                    <CheckCircle2 className="h-3.5 w-3.5" /> Accept Offer
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    {submittingId === req.id ? 'Processing...' : 'Accept Offer'}
                   </button>
                   <button
                     onClick={() => handleRejectRequest(req)}
-                    className="bg-clay-100 hover:bg-clay-200 text-clay-800 text-xs font-bold px-4 py-2.5 rounded-xl border border-clay-300 transition-all flex items-center gap-1"
+                    disabled={submittingId === req.id}
+                    className="bg-clay-100 hover:bg-clay-200 disabled:opacity-50 text-clay-800 text-xs font-bold px-4 py-2.5 rounded-xl border border-clay-300 transition-all flex items-center gap-1 cursor-pointer"
                   >
                     <XCircle className="h-3.5 w-3.5" /> Decline
                   </button>
                 </div>
+              ) : req.status === 'Accepted' || req.status === 'Confirmed' ? (
+                <div className="mt-4 pt-3 border-t border-emerald-100 text-xs font-semibold text-emerald-900 bg-emerald-50/70 p-3 rounded-xl">
+                  <div className="flex items-center gap-1.5 font-bold text-emerald-900">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Accepted ✓
+                  </div>
+                  <p className="text-[11px] text-emerald-800 mt-1">
+                    Buyer: <strong>{req.buyer_name || 'GreenGrow Bio-Energy Plant'}</strong> • {req.quantity_requested} tonnes @ ₹{req.offered_price_per_tonne}/tonne
+                  </p>
+                  <span className="text-[10px] text-emerald-700 font-bold block mt-1 uppercase tracking-wide">
+                    Pickup planning pending
+                  </span>
+                </div>
               ) : (
-                <div className="mt-4 pt-3 border-t border-forest-100 text-center text-xs font-bold text-forest-800">
-                  ✓ Request {req.status}
+                <div className="mt-4 pt-3 border-t border-red-100 text-xs font-semibold text-red-800 bg-red-50/50 p-3 rounded-xl">
+                  <div className="flex items-center gap-1.5 font-bold text-red-800">
+                    <XCircle className="h-4 w-4 text-red-600" /> Declined ✗
+                  </div>
+                  <p className="text-[11px] text-red-700 mt-0.5">Declined by farmer</p>
                 </div>
               )}
             </div>

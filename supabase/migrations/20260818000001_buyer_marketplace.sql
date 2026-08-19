@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS public.purchase_requests (
     total_amount NUMERIC NOT NULL,
     pickup_date_preference DATE,
     note TEXT,
-    status TEXT CHECK (status IN ('Pending', 'Confirmed', 'Rejected', 'Completed')) DEFAULT 'Pending',
+    status TEXT CHECK (status IN ('Pending', 'Accepted', 'Confirmed', 'Declined', 'Rejected', 'Pickup_Planned', 'Completed')) DEFAULT 'Pending',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

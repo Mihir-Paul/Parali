@@ -3,6 +3,7 @@ import { useAppStore } from '../store/useAppStore';
 import { MapViewer } from '../components/MapViewer';
 import { fetchOptimizedRoute } from '../services/routeService';
 import { fetchPurchaseRequests, fetchResidueListings } from '../services/marketplaceService';
+import { fetchAcceptedSuppliersForRoute } from '../services/purchaseRequestService';
 import { OptimizeRouteResponse, VehicleRoute, FarmPickupInput } from '../types/route';
 import { 
   Compass, 
@@ -10,7 +11,17 @@ import {
   Play, 
   RefreshCw, 
   CheckCircle2, 
+<<<<<<< HEAD
   Layers
+=======
+  TrendingDown, 
+  Layers, 
+  ChevronRight, 
+  MapPin, 
+  Sparkles,
+  AlertCircle,
+  AlertTriangle
+>>>>>>> f7391a733238352f574b4261a62f7a0c2e310651
 } from 'lucide-react';
 
 interface RouteOptimizerProps {
@@ -20,32 +31,63 @@ interface RouteOptimizerProps {
 export const RouteOptimizer: React.FC<RouteOptimizerProps> = () => {
   const [routeData, setRouteData] = useState<OptimizeRouteResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+<<<<<<< HEAD
   const [selectedVehicleIndex, setSelectedVehicleIndex] = useState<number | null>(null);
+=======
+  const [selectedVehicleIndex, setSelectedVehicleIndex] = useState<number | null>(null); // null = All trucks
+  const [acceptedFarmsCount, setAcceptedFarmsCount] = useState<number>(0);
+  const [lastFingerprint, setLastFingerprint] = useState<string>('');
+  const [isStale, setIsStale] = useState<boolean>(false);
+>>>>>>> f7391a733238352f574b4261a62f7a0c2e310651
 
   // Load route data on component mount
   const loadRouteOptimization = async () => {
     setLoading(true);
     try {
+<<<<<<< HEAD
       const requests = await fetchPurchaseRequests();
       const listings = await fetchResidueListings();
+=======
+      // 1. Fetch strictly accepted suppliers from Supabase purchase_requests
+      let farmPickups = await fetchAcceptedSuppliersForRoute();
+>>>>>>> f7391a733238352f574b4261a62f7a0c2e310651
 
-      const acceptedRequests = requests.filter(r => (r.status as string) === 'Accepted' || r.status === 'Pending' || r.status === 'Confirmed');
+      // If database returned empty, fallback to accepted requests from marketplaceService
+      if (farmPickups.length === 0) {
+        const requests = await fetchPurchaseRequests();
+        const listings = await fetchResidueListings();
+        const acceptedRequests = requests.filter(r => (r.status as string) === 'Accepted' || r.status === 'Confirmed');
 
-      const farmPickups: FarmPickupInput[] = acceptedRequests.map((req, index) => {
-        const listing = listings.find(l => l.id === req.listing_id);
-        return {
-          farmer_id: req.farmer_id || `farmer_${index + 1}`,
-          farmer_name: req.farmer_name || `Supplier ${index + 1}`,
-          listing_id: req.listing_id || `listing_${index + 1}`,
-          purchase_request_id: req.id,
-          latitude: listing?.latitude || (30.31 + (index * 0.04)),
-          longitude: listing?.longitude || (76.35 + (index * 0.05)),
-          accepted_quantity_tonnes: req.quantity_requested || 5.0,
-          residue_type: listing?.residue_type || 'Rice Straw',
-          price_per_tonne: req.offered_price_per_tonne || 1100
-        };
-      });
+        farmPickups = acceptedRequests.map((req, index) => {
+          const listing = listings.find(l => l.id === req.listing_id);
+          return {
+            farmer_id: req.farmer_id || `farmer_${index + 1}`,
+            farmer_name: req.farmer_name || `Supplier ${index + 1}`,
+            listing_id: req.listing_id || `listing_${index + 1}`,
+            purchase_request_id: req.id,
+            latitude: listing?.latitude || (30.31 + (index * 0.04)),
+            longitude: listing?.longitude || (76.35 + (index * 0.05)),
+            accepted_quantity_tonnes: req.quantity_requested || 5.0,
+            residue_type: listing?.residue_type || 'Rice Straw',
+            price_per_tonne: req.offered_price_per_tonne || 1100
+          };
+        });
+      }
 
+<<<<<<< HEAD
+=======
+      setAcceptedFarmsCount(farmPickups.length);
+
+      const currentFingerprint = farmPickups.map(f => f.purchase_request_id).sort().join('|');
+      if (lastFingerprint && lastFingerprint !== currentFingerprint) {
+        setIsStale(true);
+      } else {
+        setIsStale(false);
+      }
+      setLastFingerprint(currentFingerprint);
+
+      // 2. Call backend optimize-route service
+>>>>>>> f7391a733238352f574b4261a62f7a0c2e310651
       const res = await fetchOptimizedRoute({
         buyer_demand_id: 'demand_active',
         buyer_depot: {
@@ -93,6 +135,22 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 font-sans">
       
+      {/* Stale Supplier Set Warning Banner */}
+      {isStale && (
+        <div className="bg-amber-900 text-white p-4 rounded-2xl mb-6 shadow-lg border border-amber-700 flex items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 font-bold">
+            <AlertTriangle className="h-5 w-5 text-amber-300 shrink-0" />
+            <span>Supplier set changed — accepted requests modified since last route solve.</span>
+          </div>
+          <button
+            onClick={handleRunOptimizer}
+            className="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black px-4 py-1.5 rounded-xl transition-all"
+          >
+            Recalculate Route
+          </button>
+        </div>
+      )}
+
       {/* Page Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
@@ -113,16 +171,33 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = () => {
           <button
             onClick={loadRouteOptimization}
             disabled={loading}
+<<<<<<< HEAD
             className="p-2 border border-line-200 hover:bg-paper-50 rounded-card text-xs font-medium text-ink-900 transition-all flex items-center gap-1.5"
+=======
+            className="p-3 border border-forest-200 hover:bg-forest-50 rounded-2xl text-xs font-bold text-forest-800 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+>>>>>>> f7391a733238352f574b4261a62f7a0c2e310651
           >
             <RefreshCw className={`h-4 w-4 text-pine-700 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
           <button
             onClick={handleRunOptimizer}
+<<<<<<< HEAD
             disabled={loading}
             className="bg-pine-900 hover:bg-pine-700 text-white font-semibold px-4 py-2 rounded-card shadow-card transition-all text-xs flex items-center gap-1.5"
           >
             <Play className="h-3.5 w-3.5 fill-white" /> Recalculate routes
+=======
+            disabled={loading || acceptedFarmsCount === 0}
+            className={`font-extrabold px-5 py-3 rounded-2xl shadow-md transition-all text-xs flex items-center gap-2 ${
+              acceptedFarmsCount > 0
+                ? 'bg-forest-600 hover:bg-forest-700 text-white cursor-pointer'
+                : 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300'
+            }`}
+            title={acceptedFarmsCount === 0 ? 'No accepted suppliers yet.' : 'Recalculate optimized pickup route'}
+          >
+            <Play className="h-4 w-4 fill-current" />
+            {acceptedFarmsCount > 0 ? (isStale ? 'Recalculate Route' : 'Optimize Pickup Route') : 'No accepted suppliers yet'}
+>>>>>>> f7391a733238352f574b4261a62f7a0c2e310651
           </button>
         </div>
       </div>
