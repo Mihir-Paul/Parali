@@ -285,7 +285,7 @@ export default function App() {
               <BottomNavButton active={farmerView === 'dashboard'} onClick={() => setFarmerView('dashboard')} icon={LayoutDashboard} label="Farm" />
               <BottomNavButton active={farmerView === 'sell'} onClick={() => setFarmerView('sell')} icon={Sprout} label="List" />
               <BottomNavButton active={farmerView === 'impact'} onClick={() => setFarmerView('impact')} icon={Heart} label="Impact" />
-              <BottomNavButton active={currentView === 'profile'} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Profile" />
+              <BottomNavButton active={(currentView as string) === 'profile'} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Profile" />
             </>
           )}
           {currentRole === 'Buyer' && (
@@ -294,7 +294,7 @@ export default function App() {
               <BottomNavButton active={buyerView === 'marketplace'} onClick={() => setBuyerView('marketplace')} icon={ShoppingBag} label="Market" />
               <BottomNavButton active={buyerView === 'demand'} onClick={() => setBuyerView('demand')} icon={PlusCircle} label="Post" />
               <BottomNavButton active={buyerView === 'matches'} onClick={() => setBuyerView('matches')} icon={Sparkles} label="Matches" />
-              <BottomNavButton active={currentView === 'profile'} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Profile" />
+              <BottomNavButton active={(currentView as string) === 'profile'} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Profile" />
             </>
           )}
           {currentRole === 'Admin' && (
@@ -302,7 +302,7 @@ export default function App() {
               <BottomNavButton active={adminTab === 'optimizer'} onClick={() => setAdminTab('optimizer')} icon={Compass} label="Routes" />
               <BottomNavButton active={adminTab === 'burns'} onClick={() => setAdminTab('burns')} icon={Flame} label="Burns" />
               <BottomNavButton active={adminTab === 'impact'} onClick={() => setAdminTab('impact')} icon={Heart} label="Impact" />
-              <BottomNavButton active={currentView === 'profile'} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Profile" />
+              <BottomNavButton active={(currentView as string) === 'profile'} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Profile" />
             </>
           )}
         </nav>
