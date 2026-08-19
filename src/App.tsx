@@ -41,7 +41,7 @@ export default function App() {
   
   // Tab routing for Farmer / Buyer / Admin
   const [farmerView, setFarmerView] = useState<'dashboard' | 'sell' | 'impact'>('dashboard');
-  const [buyerView, setBuyerView] = useState<'dashboard' | 'marketplace' | 'demand' | 'matches' | 'requests' | 'impact'>('dashboard');
+  const [buyerView, setBuyerView] = useState<'dashboard' | 'marketplace' | 'demand' | 'matches' | 'requests' | 'optimizer' | 'impact'>('dashboard');
   const [adminTab, setAdminTab] = useState<'optimizer' | 'burns' | 'impact'>('optimizer');
 
   // Active demand passed to matching engine
@@ -351,7 +351,10 @@ export default function App() {
                 ) : buyerView === 'requests' ? (
                   <BuyerRequests
                     onBackToMarketplace={() => setBuyerView('marketplace')}
+                    onNavigateToOptimizer={() => setBuyerView('optimizer')}
                   />
+                ) : buyerView === 'optimizer' ? (
+                  <RouteOptimizer />
                 ) : (
                   <ImpactDashboard />
                 )

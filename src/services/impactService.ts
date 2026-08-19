@@ -122,17 +122,17 @@ export function calculateLocalHiddenCost(
       gross_income_inr: grossIncomeInr,
       pickup_transport_cost_inr: 0,
       net_financial_outcome_inr: sellingNetOutcome,
-      description: 'Selling via Parali provides guaranteed monetary revenue with managed farmgate collection.'
+      description: 'Marketplace assumption: pickup/logistics cost borne by buyer or logistics partner.'
     },
     comparative_advantage_inr: advantageInr,
     verdict_headline: `You are approximately ₹${advantageInr.toLocaleString('en-IN')} better off by selling instead of burning.`,
-    disclaimer: 'Nutrient replacement loss estimates are based on ICAR/PAU agronomic benchmark studies (N, P, K & soil organic matter).'
+    disclaimer: 'Modelled agronomic estimates based on PAU/ICAR crop nutrient composition data (N, P, K & organic matter) at fertilizer replacement costs.'
   };
 }
 
 /**
   Dynamically calculates impact metrics from client Zustand store if backend API is offline.
-  DOES NOT HARDCODE CONSTANTS.
+  DOES NOT HARDCODE CONSTANTS OR MANUFACTURE DISTANCE FALLBACKS.
  */
 export function calculateDynamicImpactFromStore(listings: any[], farmers: any[]): ImpactSummaryResponse {
   const completedListings = listings.filter(l => l.status === 'Collected' || l.status === 'Confirmed' || l.status === 'Paid');
@@ -148,13 +148,17 @@ export function calculateDynamicImpactFromStore(listings: any[], farmers: any[])
   const farmers_benefited = distinctFarmerIds.size || (completedListings.length > 0 ? 1 : 0);
 
   const estimated_emissions_avoided_tco2e = Math.round(residue_diverted_tonnes * EMISSIONS_FACTOR_TCO2E_PER_TONNE * 10) / 10;
+  
+  // Real route-savings data unavailable in un-routed client store fallback
+  const distance_saved_km = 0;
+  const average_route_reduction_percent = 0;
 
   return {
     residue_diverted_tonnes,
     farmer_income_inr,
     farmers_benefited,
-    distance_saved_km: 36.1,
-    average_route_reduction_percent: 34.5,
+    distance_saved_km,
+    average_route_reduction_percent,
     estimated_emissions_avoided_tco2e,
     potential_burning_prevented_tonnes: residue_diverted_tonnes,
     average_income_per_farmer_inr: farmers_benefited > 0 ? Math.round(farmer_income_inr / farmers_benefited) : 0,
