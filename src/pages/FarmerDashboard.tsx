@@ -3,7 +3,8 @@ import { useAppStore } from '../store/useAppStore';
 import { useAuth } from '../context/AuthContext';
 import { fetchPurchaseRequests, updatePurchaseRequestStatus } from '../services/marketplaceService';
 import { PurchaseRequestItem } from '../types/marketplace';
-import { IndianRupee, Sprout, ShieldCheck, CheckCircle2, FileSpreadsheet, MapPin, XCircle, Clock } from 'lucide-react';
+import { IndianRupee, Sprout, ShieldCheck, CheckCircle2, FileSpreadsheet, MapPin, XCircle, Clock, Calculator } from 'lucide-react';
+import { FarmerHiddenCostCalculator } from '../components/FarmerHiddenCostCalculator';
 
 interface FarmerDashboardProps {
   onNavigateToSell: () => void;
@@ -350,6 +351,14 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
             </div>
           ))}
         </div>
+      </div>
+
+      {/* Integrated Hidden Cost Calculator */}
+      <div className="mt-12">
+        <FarmerHiddenCostCalculator
+          initialResidueType={`${primaryCrop} Straw`}
+          initialQuantity={estimatedTonnes > 0 ? Number(estimatedTonnes) : 5.0}
+        />
       </div>
 
     </div>

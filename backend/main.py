@@ -12,6 +12,7 @@ from models.route_models import (
 )
 from services.routing_service import RoutingOptimizerService
 from services.firms_service import FirmsService, FirmsRateLimitError
+from services.impact_service import ImpactService
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -31,6 +32,7 @@ app.add_middleware(
 
 optimizer_service = RoutingOptimizerService()
 firms_service = FirmsService()
+impact_service = ImpactService()
 
 
 # Authentication dependency to verify Supabase Bearer JWT tokens
@@ -147,6 +149,57 @@ def optimize_route(request: Optional[OptimizeRouteRequest] = None):
         return response
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/api/impact/summary")
+def get_impact_summary(
+    farmer_id: Optional[str] = None,
+    buyer_id: Optional[str] = None
+):
+    """
+    Returns platform-wide or role-specific derived impact metrics from backend.
+    """
+    try:
+        return impact_service.calculate_impact_summary(farmer_id=farmer_id, buyer_id=buyer_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to calculate impact summary: {str(e)}")
+
+@app.get("/api/impact/history")
+def get_impact_history():
+    """
+    Returns historical cumulative impact data series.
+    """
+    try:
+        return impact_service.calculate_impact_history()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch impact history: {str(e)}")
+
+@app.get("/api/impact/farmer/{farmer_id}")
+def get_farmer_impact(farmer_id: str):
+    """
+    Returns personalized impact metrics for a specific farmer.
+    """
+    try:
+        return impact_service.calculate_impact_summary(farmer_id=farmer_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch farmer impact: {str(e)}")
+
+@app.get("/api/impact/calculator")
+def calculate_hidden_cost(
+    residue_type: str = "Rice Straw",
+    quantity_tonnes: float = 5.0,
+    price_per_tonne: float = 1200.0
+):
+    """
+    Returns side-by-side financial and soil nutrient breakdown (Burn vs Sell).
+    """
+    try:
+        return impact_service.calculate_farmer_hidden_cost(
+            residue_type=residue_type,
+            quantity_tonnes=quantity_tonnes,
+            selling_price_per_tonne=price_per_tonne
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to compute hidden cost: {str(e)}")
 
 
 if __name__ == "__main__":

@@ -40,8 +40,8 @@ export default function App() {
   const [currentView, setCurrentView] = useState<'main' | 'profile'>('main');
   
   // Tab routing for Farmer / Buyer / Admin
-  const [farmerView, setFarmerView] = useState<'dashboard' | 'sell'>('dashboard');
-  const [buyerView, setBuyerView] = useState<'dashboard' | 'marketplace' | 'demand' | 'matches' | 'requests'>('dashboard');
+  const [farmerView, setFarmerView] = useState<'dashboard' | 'sell' | 'impact'>('dashboard');
+  const [buyerView, setBuyerView] = useState<'dashboard' | 'marketplace' | 'demand' | 'matches' | 'requests' | 'impact'>('dashboard');
   const [adminTab, setAdminTab] = useState<'optimizer' | 'burns' | 'impact'>('optimizer');
 
   // Active demand passed to matching engine
@@ -236,6 +236,17 @@ export default function App() {
                   <Clock className="h-4 w-4" /> Purchase Requests
                 </button>
 
+                <button
+                  onClick={() => setBuyerView('impact')}
+                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
+                    buyerView === 'impact' 
+                      ? 'bg-clay-600 text-white shadow-sm' 
+                      : 'text-forest-800 hover:bg-forest-50'
+                  }`}
+                >
+                  <Heart className="h-4 w-4" /> Impact & Offsets
+                </button>
+
                 <div className="mt-auto pt-6 border-t border-forest-100">
                   <button
                     onClick={() => setCurrentView('profile')}
@@ -276,6 +287,17 @@ export default function App() {
                   <Sprout className="h-4 w-4" /> Sell Residue
                 </button>
 
+                <button
+                  onClick={() => setFarmerView('impact')}
+                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
+                    farmerView === 'impact' 
+                      ? 'bg-forest-600 text-white shadow-sm' 
+                      : 'text-forest-800 hover:bg-forest-50'
+                  }`}
+                >
+                  <Heart className="h-4 w-4" /> Impact & Offsets
+                </button>
+
                 <div className="mt-auto pt-6 border-t border-forest-100">
                   <button
                     onClick={() => setCurrentView('profile')}
@@ -292,8 +314,10 @@ export default function App() {
               {currentRole === 'Farmer' && (
                 farmerView === 'dashboard' ? (
                   <FarmerDashboard onNavigateToSell={() => setFarmerView('sell')} />
-                ) : (
+                ) : farmerView === 'sell' ? (
                   <FarmerSell onBack={() => setFarmerView('dashboard')} />
+                ) : (
+                  <ImpactDashboard />
                 )
               )}
 
@@ -324,10 +348,12 @@ export default function App() {
                     onNavigateToMarketplace={() => setBuyerView('marketplace')}
                     onNavigateToRequests={() => setBuyerView('requests')}
                   />
-                ) : (
+                ) : buyerView === 'requests' ? (
                   <BuyerRequests
                     onBackToMarketplace={() => setBuyerView('marketplace')}
                   />
+                ) : (
+                  <ImpactDashboard />
                 )
               )}
 
