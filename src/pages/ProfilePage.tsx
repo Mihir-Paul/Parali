@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { updateFullUserProfile } from '../services/profileService';
+import { UserAvatar } from '../components/UserAvatar';
 import { User, Sprout, Briefcase, MapPin, Phone, Mail, Edit3, X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { FarmType, BuyerType } from '../types/profile';
 
@@ -113,17 +114,13 @@ export const ProfilePage: React.FC = () => {
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
           <div className="flex items-center gap-5">
-            {profile.avatar_url ? (
-              <img
-                src={profile.avatar_url}
-                alt={profile.full_name}
-                className="w-20 h-20 rounded-3xl border-2 border-forest-200 object-cover shadow-sm"
-              />
-            ) : (
-              <div className="w-20 h-20 rounded-3xl bg-forest-100 text-forest-700 flex items-center justify-center text-2xl font-bold">
-                <User className="h-10 w-10" />
-              </div>
-            )}
+            <UserAvatar
+              profileAvatarUrl={profile.avatar_url}
+              userMetadata={user?.user_metadata}
+              name={profile.full_name}
+              email={profile.email}
+              size="xl"
+            />
 
             <div>
               <div className="flex items-center gap-2.5">

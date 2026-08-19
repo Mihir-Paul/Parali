@@ -1,7 +1,8 @@
 import React from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { useAuth } from '../context/AuthContext';
-import { Sprout, LogOut, ArrowLeftRight, UserCheck, ShieldAlert, Award } from 'lucide-react';
+import { UserAvatar } from './UserAvatar';
+import { Sprout, LogOut, ArrowLeftRight, ShieldAlert, Award } from 'lucide-react';
 
 interface NavbarProps {
   currentView?: string;
@@ -17,8 +18,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigateProfile }
     setRole('none');
   };
 
-  const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Authenticated User';
-  const displayAvatar = profile?.avatar_url || user?.user_metadata?.avatar_url;
+  const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Authenticated User';
 
   return (
     <header className="sticky top-0 z-40 bg-cream-50/90 backdrop-blur-md border-b border-forest-100 px-6 py-4 transition-all font-sans">
@@ -75,17 +75,19 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigateProfile }
           {user && onNavigateProfile && (
             <button
               onClick={onNavigateProfile}
-              className={`flex items-center gap-2 text-xs font-bold px-3 py-2 rounded-xl transition-all border ${
+              className={`flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl transition-all border ${
                 currentView === 'profile'
                   ? 'bg-forest-600 text-white border-forest-600 shadow-sm'
                   : 'bg-white text-forest-850 border-forest-200 hover:bg-forest-50'
               }`}
             >
-              {displayAvatar ? (
-                <img src={displayAvatar} alt={displayName} className="w-5 h-5 rounded-full object-cover border border-forest-300" />
-              ) : (
-                <UserCheck className="h-4 w-4 text-forest-600" />
-              )}
+              <UserAvatar
+                profileAvatarUrl={profile?.avatar_url}
+                userMetadata={user?.user_metadata}
+                name={displayName}
+                email={user?.email}
+                size="sm"
+              />
               <span>My Profile</span>
             </button>
           )}
