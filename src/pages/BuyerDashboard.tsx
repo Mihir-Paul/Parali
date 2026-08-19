@@ -27,7 +27,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
   onNavigateToMatches,
   onNavigateToRequests
 }) => {
-  const { requirements, demoStep, listings, confirmBuyerRequirement } = useAppStore();
+  const { requirements, listings, confirmBuyerRequirement } = useAppStore();
   const { profile, buyerProfile, user } = useAuth();
 
   const buyerName = buyerProfile?.business_name || profile?.full_name || user?.user_metadata?.full_name || 'GreenGrow Bio-Energy Plant';
@@ -108,8 +108,8 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
         </div>
       </div>
 
-      {/* Demo Action: Accept matched farmer stubble (Ramesh) */}
-      {rameshListing && demoStep === 4 && (
+      {/* Match Action Alert */}
+      {rameshListing && (
         <div className="bg-clay-50 border-2 border-clay-300 rounded-3xl p-6 mb-10 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
             <span className="text-[10px] bg-clay-100 text-clay-800 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppStore } from './store/useAppStore';
 import { Navbar } from './components/Navbar';
-import { DemoController } from './components/DemoController';
 import { LandingPage } from './pages/LandingPage';
 import { RoleSelect } from './pages/RoleSelect';
 import { FarmerDashboard } from './pages/FarmerDashboard';
@@ -33,7 +32,7 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const { currentRole, setRole, demoStep } = useAppStore();
+  const { currentRole, setRole } = useAppStore();
   const { user, profile, onboardingCompleted, loading } = useAuth();
   
   const [showLanding, setShowLanding] = useState(true);
@@ -71,35 +70,11 @@ export default function App() {
     }
   }, [profile, setRole]);
 
-  // Demo step synchronization for judge walkthrough
   useEffect(() => {
     if (currentRole !== 'none') {
       setShowLanding(false);
     }
-    
-    if (demoStep === 1) {
-      setFarmerView('dashboard');
-    } else if (demoStep === 2) {
-      setFarmerView('sell');
-    } else if (demoStep === 3) {
-      setFarmerView('dashboard');
-    } else if (demoStep === 4) {
-      setBuyerView('dashboard');
-    } else if (demoStep === 5) {
-      setAdminTab('optimizer');
-    } else if (demoStep === 6) {
-      setAdminTab('optimizer');
-    } else if (demoStep === 7) {
-      setFarmerView('dashboard');
-      setRole('Farmer');
-    } else if (demoStep === 8) {
-      setAdminTab('impact');
-      setRole('Admin');
-    } else if (demoStep === 9) {
-      setAdminTab('burns');
-      setRole('Admin');
-    }
-  }, [demoStep, currentRole, setRole]);
+  }, [currentRole]);
 
   const handleStart = () => {
     setShowLanding(false);
@@ -369,9 +344,6 @@ export default function App() {
           </div>
         )}
       </main>
-
-      {/* Floating Demo Control panel */}
-      {!showLanding && <DemoController />}
     </div>
   );
 }

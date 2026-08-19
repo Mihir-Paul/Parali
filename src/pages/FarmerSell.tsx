@@ -9,7 +9,7 @@ interface FarmerSellProps {
 }
 
 export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
-  const { addListing, demoStep } = useAppStore();
+  const { addListing } = useAppStore();
   const { user, profile, farmerProfile } = useAuth();
 
   const [crop, setCrop] = useState<'Wheat' | 'Rice' | 'Maize' | 'Sugarcane' | 'Other'>('Wheat');
@@ -34,17 +34,6 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
     setValuationMin(min);
     setValuationMax(max);
   }, [crop, quantity]);
-
-  // Sync state if demo step changes to simulate Ramesh's listing
-  useEffect(() => {
-    if (demoStep === 2) {
-      setCrop('Wheat');
-      setResidueType('Wheat Straw');
-      setQuantity(3);
-      setPickupLocation('Sangrur Fields Block A');
-      setPickupDate('2026-08-22');
-    }
-  }, [demoStep]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

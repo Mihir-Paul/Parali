@@ -35,7 +35,7 @@ export interface ResidueListing {
   images: string[];
   estimatedPriceMin: number;
   estimatedPriceMax: number;
-  status: 'Listed' | 'Matched' | 'Confirmed' | 'Pickup' | 'Paid';
+  status: 'Listed' | 'Matched' | 'Confirmed' | 'Pickup' | 'Paid' | 'Collected';
   matchScore?: number;
   matchedBuyerId?: string;
   matchedBuyerName?: string;

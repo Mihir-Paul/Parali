@@ -9,12 +9,12 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigateProfile }) => {
-  const { currentRole, setRole, resetDemo } = useAppStore();
+  const { currentRole, setRole } = useAppStore();
   const { profile, user, signOut } = useAuth();
 
   const handleLogout = async () => {
     await signOut();
-    resetDemo();
+    setRole('none');
   };
 
   const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Authenticated User';
@@ -26,7 +26,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigateProfile }
         
         {/* Brand Logo */}
         <div
-          onClick={resetDemo}
+          onClick={() => setRole('none')}
           className="flex items-center gap-2 cursor-pointer group"
         >
           <div className="p-2 bg-forest-100 text-forest-700 rounded-xl group-hover:bg-forest-600 group-hover:text-white transition-all">

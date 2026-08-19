@@ -10,7 +10,7 @@ interface FarmerDashboardProps {
 }
 
 export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSell }) => {
-  const { listings, acceptMatch, completePickup, demoStep } = useAppStore();
+  const { listings, acceptMatch, completePickup } = useAppStore();
   const { profile, farmerProfile, user } = useAuth();
 
   const [incomingRequests, setIncomingRequests] = useState<PurchaseRequestItem[]>([]);
@@ -244,8 +244,8 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
             })}
           </div>
 
-          {/* Prompt to mark pickup complete during demo */}
-          {rameshListing.status === 'Confirmed' && demoStep === 7 && (
+          {/* Prompt to mark pickup complete */}
+          {rameshListing.status === 'Confirmed' && (
             <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end">
               <button
                 onClick={() => completePickup(rameshListing.id)}

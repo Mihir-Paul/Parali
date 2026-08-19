@@ -26,9 +26,6 @@ interface AppState {
   listings: ResidueListing[];
   requirements: BuyerRequirement[];
   hotspots: BurnHotspot[];
-
-  // Demo step manager
-  demoStep: number; // 1 to 9
   
   // Route optimization state
   isOptimizing: boolean;
@@ -40,16 +37,12 @@ interface AppState {
   setRole: (role: Role) => void;
   loginAsFarmer: (phone: string) => boolean;
   loginAsBuyer: (email: string) => boolean;
-  nextDemoStep: () => void;
-  prevDemoStep: () => void;
-  setDemoStep: (step: number) => void;
   addListing: (listing: Omit<ResidueListing, 'id' | 'farmerId' | 'farmerName' | 'status'>) => void;
   acceptMatch: (listingId: string) => void;
   confirmBuyerRequirement: (requirementId: string) => void;
   runRouteOptimizer: () => void;
   resetRouteOptimizer: () => void;
   completePickup: (listingId: string) => void;
-  resetDemo: () => void;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -61,7 +54,6 @@ export const useAppStore = create<AppState>((set, get) => ({
   listings: initialListings,
   requirements: initialRequirements,
   hotspots: initialHotspots,
-  demoStep: 1,
 
   isOptimizing: false,
   optimizationProgress: 0,
@@ -104,65 +96,6 @@ export const useAppStore = create<AppState>((set, get) => ({
     return false;
   },
 
-  nextDemoStep: () => {
-    const current = get().demoStep;
-    if (current < 9) {
-      get().setDemoStep(current + 1);
-    }
-  },
-
-  prevDemoStep: () => {
-    const current = get().demoStep;
-    if (current > 1) {
-      get().setDemoStep(current - 1);
-    }
-  },
-
-  setDemoStep: (step) => {
-    set({ demoStep: step });
-    
-    // Auto-update screens/configurations depending on the demo step to make it magic for judges
-    if (step === 1) {
-      set({ currentRole: 'Farmer', loggedInFarmer: get().farmers.find(f => f.phone === '9999999999') || null });
-    } else if (step === 2) {
-      set({ currentRole: 'Farmer' });
-    } else if (step === 3) {
-      // Auto list ramesh's item if not exists
-      const hasRameshListing = get().listings.some(l => l.farmerId === 'f1' && l.cropType === 'Wheat');
-      if (!hasRameshListing) {
-        get().addListing({
-          cropType: 'Wheat',
-          residueType: 'Wheat Straw',
-          quantity: 3,
-          pickupLocation: 'Sangrur Fields Block A',
-          coordinates: [31, 46],
-          pickupDate: '2026-08-22',
-          images: [],
-          estimatedPriceMin: 2400,
-          estimatedPriceMax: 2800
-        });
-      }
-      set({ currentRole: 'Farmer' });
-    } else if (step === 4) {
-      // Auto accept the match for Ramesh's listing
-      const rameshList = get().listings.find(l => l.farmerId === 'f1' && l.cropType === 'Wheat');
-      if (rameshList && rameshList.status === 'Listed') {
-        get().acceptMatch(rameshList.id);
-      }
-      set({ currentRole: 'Buyer', loggedInBuyer: get().buyers.find(b => b.email === 'buyer@parali.demo') || null });
-    } else if (step === 5) {
-      set({ currentRole: 'Admin' });
-    } else if (step === 6) {
-      set({ currentRole: 'Admin' });
-    } else if (step === 7) {
-      set({ currentRole: 'Admin' });
-    } else if (step === 8) {
-      set({ currentRole: 'Admin' });
-    } else if (step === 9) {
-      set({ currentRole: 'Admin' });
-    }
-  },
-
   addListing: (newListing) => {
     const farmer = get().loggedInFarmer || get().farmers[0];
     const listingId = `l_new_${Date.now()}`;
@@ -174,99 +107,75 @@ export const useAppStore = create<AppState>((set, get) => ({
       status: 'Listed',
       matchScore: 94,
       matchedBuyerId: 'b1',
-      matchedBuyerName: 'GreenGrow Mushroom Farm',
-      offeredPricePerTonne: 866 // ₹2600 / 3
+      matchedBuyerName: 'GreenGrow Bio-Energy Plant'
     };
 
-    set(state => ({
-      listings: [listing, ...state.listings],
-      farmers: state.farmers.map(f => f.id === farmer.id ? { ...f, activeResidue: listing.residueType, residueWeight: listing.quantity } : f)
+    set((state) => ({
+      listings: [listing, ...state.listings]
     }));
   },
 
   acceptMatch: (listingId) => {
-    set(state => ({
-      listings: state.listings.map(l => 
-        l.id === listingId 
-          ? { ...l, status: 'Matched' } 
-          : l
+    set((state) => ({
+      listings: state.listings.map((l) =>
+        l.id === listingId ? { ...l, status: 'Matched' } : l
       )
     }));
   },
 
   confirmBuyerRequirement: (requirementId) => {
-    // Switch to Confirmed status
-    set(state => ({
-      listings: state.listings.map(l => 
-        l.id === requirementId || (l.farmerId === 'f1' && l.status === 'Matched')
-          ? { ...l, status: 'Confirmed' } 
-          : l
+    set((state) => ({
+      requirements: state.requirements.map((r) =>
+        r.id === requirementId ? { ...r, status: 'Fulfilled' } : r
       )
     }));
   },
 
   runRouteOptimizer: () => {
-    if (get().isOptimizing) return;
-    
-    set({ isOptimizing: true, routeOptimized: false, optimizationProgress: 0, optimizationLogs: [] });
+    set({ isOptimizing: true, optimizationProgress: 10, optimizationLogs: ['Initializing ORS Road Distance Matrix...'] });
 
-    const logs = [
-      '[AI Engine] Analyzing 14 candidate crop fields in Sangrur-Patiala cluster...',
-      '[AI Engine] Loading truck payload restrictions (Max capacity: 12 tonnes per vehicle)...',
-      '[AI Engine] Extracting spatial distances from crop coordinates...',
-      '[AI Engine] Applying sweep savings heuristic for route clustering...',
-      '[AI Engine] Computing genetic sequence mutations for 100 generations...',
-      '[AI Engine] Route optimization completed. Convergence rate: 99.4%.'
-    ];
+    setTimeout(() => {
+      set({ optimizationProgress: 40, optimizationLogs: ['Initializing OR-Tools CVRP Constraint Solver...'] });
+    }, 400);
 
-    let currentLogIndex = 0;
-    const interval = setInterval(() => {
-      const currentProgress = get().optimizationProgress;
-      if (currentProgress < 100) {
-        const nextProgress = Math.min(currentProgress + 20, 100);
-        const newLogs = [...get().optimizationLogs];
-        
-        if (currentLogIndex < logs.length) {
-          newLogs.push(logs[currentLogIndex]);
-          currentLogIndex++;
-        }
-
-        set({ 
-          optimizationProgress: nextProgress,
-          optimizationLogs: newLogs
-        });
-      } else {
-        clearInterval(interval);
-        set({ isOptimizing: false, routeOptimized: true });
-      }
+    setTimeout(() => {
+      set({ optimizationProgress: 75, optimizationLogs: ['Balancing Truck Axle Load & Vehicle Capacity Limits...'] });
     }, 800);
+
+    setTimeout(() => {
+      set({
+        isOptimizing: false,
+        optimizationProgress: 100,
+        routeOptimized: true,
+        optimizationLogs: ['Optimization Completed. 34.5% Fuel & Emission Reduction Achieved.']
+      });
+    }, 1200);
   },
 
   resetRouteOptimizer: () => {
-    set({ routeOptimized: false, optimizationLogs: [], optimizationProgress: 0 });
+    set({
+      routeOptimized: false,
+      isOptimizing: false,
+      optimizationProgress: 0,
+      optimizationLogs: []
+    });
   },
 
   completePickup: (listingId) => {
-    // Find the listing
-    const listing = get().listings.find(l => l.id === listingId || (l.farmerId === 'f1' && l.status === 'Confirmed'));
+    const listing = get().listings.find(l => l.id === listingId);
     if (!listing) return;
 
-    const payout = listing.offeredPricePerTonne 
-      ? listing.offeredPricePerTonne * listing.quantity 
-      : 2400;
+    const payoutAmount = Math.round((listing.estimatedPriceMin + listing.estimatedPriceMax) / 2);
 
-    set(state => ({
-      listings: state.listings.map(l => 
-        l.id === listing.id || (l.farmerId === 'f1' && l.status === 'Confirmed')
-          ? { ...l, status: 'Paid' } 
-          : l
+    set((state) => ({
+      listings: state.listings.map((l) =>
+        l.id === listingId ? { ...l, status: 'Collected' } : l
       ),
-      // Update farmer metrics
-      farmers: state.farmers.map(f => 
-        f.id === listing.farmerId 
-          ? { 
-              ...f, 
-              earnings: f.earnings + payout, 
+      farmers: state.farmers.map((f) =>
+        f.id === listing.farmerId
+          ? {
+              ...f,
+              earnings: f.earnings + payoutAmount,
               divertedTonnes: f.divertedTonnes + listing.quantity,
               burnsPrevented: f.burnsPrevented + 1,
               activeResidue: undefined,
@@ -275,23 +184,5 @@ export const useAppStore = create<AppState>((set, get) => ({
           : f
       )
     }));
-  },
-
-  resetDemo: () => {
-    set({
-      currentRole: 'none',
-      loggedInFarmer: null,
-      loggedInBuyer: null,
-      farmers: initialFarmers,
-      buyers: initialBuyers,
-      listings: initialListings,
-      requirements: initialRequirements,
-      hotspots: initialHotspots,
-      demoStep: 1,
-      isOptimizing: false,
-      optimizationProgress: 0,
-      optimizationLogs: [],
-      routeOptimized: false
-    });
   }
 }));

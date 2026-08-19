@@ -1,246 +1,596 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import * as maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import { OptimizeRouteResponse, VehicleRoute, RouteStop } from '../types/route';
 import { useAppStore } from '../store/useAppStore';
-import { Flame, Landmark, Truck, Home, MapPin } from 'lucide-react';
+import { FirmsFireRecord, normalizeFirmsConfidence } from '../services/firmsService';
+import { Layers, ChevronDown, ChevronUp, Maximize2, Flame } from 'lucide-react';
 
 interface MapViewerProps {
+  routeData?: OptimizeRouteResponse | null;
+  selectedVehicleIndex?: number | null; // null = All trucks
   showHotspots?: boolean;
+  firmsHotspots?: FirmsFireRecord[];
+  selectedHotspotIndex?: number | null;
   showRoutes?: boolean;
   highlightedFarmId?: string;
   onFarmClick?: (farmId: string) => void;
-  onHotspotClick?: (hotspotId: string) => void;
+  onHotspotClick?: (index: number) => void;
+  isLoading?: boolean;
 }
 
+// Parali earthy color palette for vehicle routes (no neon)
+const ROUTE_COLORS = [
+  '#2d6a4f', // Truck 1: Deep Forest Green
+  '#b45309', // Truck 2: Warm Terracotta / Burnt Amber
+  '#1d4ed8', // Truck 3: Royal Navy Blue
+  '#7e22ce', // Truck 4: Deep Purple
+  '#0284c7', // Truck 5: Muted Teal Blue
+];
+
+// OpenStreetMap Raster Basemap Specification for MapLibre GL
+const BASEMAP_STYLE_SPEC: maplibregl.StyleSpecification = {
+  version: 8,
+  sources: {
+    'osm-tiles': {
+      type: 'raster',
+      tiles: [
+        'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        'https://c.tile.openstreetmap.org/{z}/{x}/{y}.png'
+      ],
+      tileSize: 256,
+      minzoom: 0,
+      maxzoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }
+  },
+  layers: [
+    {
+      id: 'background',
+      type: 'background',
+      paint: {
+        'background-color': '#f8f9fa'
+      }
+    },
+    {
+      id: 'osm-tiles-layer',
+      type: 'raster',
+      source: 'osm-tiles',
+      minzoom: 0,
+      maxzoom: 19
+    }
+  ]
+};
+
 export const MapViewer: React.FC<MapViewerProps> = ({
+  routeData,
+  selectedVehicleIndex = null,
   showHotspots = false,
-  showRoutes = false,
+  firmsHotspots = [],
+  selectedHotspotIndex = null,
+  showRoutes = true,
   highlightedFarmId,
   onFarmClick,
-  onHotspotClick
+  onHotspotClick,
+  isLoading = false
 }) => {
-  const { farmers, buyers, hotspots, listings, routeOptimized } = useAppStore();
-  const [selectedPoint, setSelectedPoint] = useState<{
-    type: 'farm' | 'buyer' | 'hotspot';
-    name: string;
-    detail: string;
-    x: number;
-    y: number;
-  } | null>(null);
+  const { farmers } = useAppStore();
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+  const markersRef = useRef<maplibregl.Marker[]>([]);
 
-  // SVG grid limits: width 600, height 400
-  const transformCoords = (coords: [number, number]): { x: number; y: number } => {
-    // coordinates are 0 to 100
-    // x maps from coords[1] (lng approximation), y maps from coords[0] (lat approximation)
-    const x = 50 + (coords[1] / 100) * 500;
-    const y = 350 - (coords[0] / 100) * 300;
-    return { x, y };
+  const [legendOpen, setLegendOpen] = useState<boolean>(true);
+  const [mapLoaded, setMapLoaded] = useState<boolean>(false);
+
+  // Initialize MapLibre GL Map once on mount
+  useEffect(() => {
+    if (!mapContainerRef.current || mapRef.current) return;
+
+    // Punjab central default center: [longitude, latitude]
+    const initialCenter: [number, number] = [75.8000, 30.8000];
+
+    const map = new maplibregl.Map({
+      container: mapContainerRef.current,
+      style: BASEMAP_STYLE_SPEC,
+      center: initialCenter,
+      zoom: 8,
+      minZoom: 6,
+      maxZoom: 18,
+      pitch: 0,
+      attributionControl: false
+    });
+
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
+    map.addControl(
+      new maplibregl.AttributionControl({
+        compact: true,
+        customAttribution: '© OpenStreetMap contributors'
+      }),
+      'bottom-left'
+    );
+
+    map.on('load', () => {
+      setMapLoaded(true);
+      setTimeout(() => {
+        if (mapRef.current) mapRef.current.resize();
+      }, 150);
+    });
+
+    const handleResize = () => {
+      if (mapRef.current) mapRef.current.resize();
+    };
+    window.addEventListener('resize', handleResize);
+
+    mapRef.current = map;
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      markersRef.current.forEach(m => m.remove());
+      markersRef.current = [];
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
+  // Update Vector GeoJSON Routes, Markers, and Camera Bounds
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded) return;
+
+    // Remove previous markers
+    markersRef.current.forEach(m => m.remove());
+    markersRef.current = [];
+
+    const bounds = new maplibregl.LngLatBounds();
+    let hasValidBounds = false;
+
+    // Clean previous dynamic route layers
+    const existingStyle = map.getStyle();
+    if (existingStyle && existingStyle.layers) {
+      existingStyle.layers.forEach((layer: any) => {
+        if (layer.id.startsWith('route-line-') || layer.id.startsWith('route-casing-')) {
+          if (map.getLayer(layer.id)) map.removeLayer(layer.id);
+        }
+      });
+    }
+
+    // Render Routes if present
+    if (showRoutes && routeData && routeData.routes && routeData.routes.length > 0) {
+      routeData.routes.forEach((route: VehicleRoute) => {
+        const vIndex = route.vehicle_index;
+        const color = ROUTE_COLORS[(vIndex - 1) % ROUTE_COLORS.length];
+        const sourceId = `route-source-${vIndex}`;
+        const casingLayerId = `route-casing-${vIndex}`;
+        const lineLayerId = `route-line-${vIndex}`;
+
+        const isVehicleSelected = selectedVehicleIndex === null || selectedVehicleIndex === vIndex;
+
+        let geojsonFeatureCollection: any = route.geometry;
+
+        if (!geojsonFeatureCollection || !geojsonFeatureCollection.features) {
+          const stopCoords = route.stops.map(s => [s.longitude, s.latitude]);
+          geojsonFeatureCollection = {
+            type: 'FeatureCollection',
+            features: [
+              {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                  type: 'LineString',
+                  coordinates: stopCoords
+                }
+              }
+            ]
+          };
+        }
+
+        if (geojsonFeatureCollection.features) {
+          geojsonFeatureCollection.features.forEach((feat: any) => {
+            if (feat.geometry && feat.geometry.coordinates) {
+              feat.geometry.coordinates.forEach(([lng, lat]: [number, number]) => {
+                bounds.extend([lng, lat]);
+                hasValidBounds = true;
+              });
+            }
+          });
+        }
+
+        if (map.getSource(sourceId)) {
+          (map.getSource(sourceId) as maplibregl.GeoJSONSource).setData(geojsonFeatureCollection);
+        } else {
+          map.addSource(sourceId, {
+            type: 'geojson',
+            data: geojsonFeatureCollection
+          });
+        }
+
+        if (!map.getLayer(casingLayerId)) {
+          map.addLayer({
+            id: casingLayerId,
+            type: 'line',
+            source: sourceId,
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: {
+              'line-color': '#ffffff',
+              'line-width': isVehicleSelected ? 7 : 3,
+              'line-opacity': showRoutes ? (isVehicleSelected ? 0.85 : 0.15) : 0
+            }
+          });
+        }
+
+        if (!map.getLayer(lineLayerId)) {
+          map.addLayer({
+            id: lineLayerId,
+            type: 'line',
+            source: sourceId,
+            layout: { 'line-join': 'round', 'line-cap': 'round' },
+            paint: {
+              'line-color': color,
+              'line-width': isVehicleSelected ? 4.5 : 2.5,
+              'line-opacity': showRoutes ? (isVehicleSelected ? 0.95 : 0.2) : 0
+            }
+          });
+        }
+
+        // Add Stop Markers
+        route.stops.forEach((stop: RouteStop) => {
+          if (!isVehicleSelected && selectedVehicleIndex !== null) return;
+          bounds.extend([stop.longitude, stop.latitude]);
+          hasValidBounds = true;
+
+          if (stop.type === 'depot') {
+            const depotEl = document.createElement('div');
+            depotEl.innerHTML = `
+              <div style="
+                background-color: #78350f;
+                color: white;
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 18px;
+                border: 2.5px solid #ffffff;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+                cursor: pointer;
+              ">🏭</div>
+            `;
+
+            const popup = new maplibregl.Popup({ offset: 20, closeButton: false }).setHTML(`
+              <div style="font-family: system-ui, sans-serif; padding: 4px; min-width: 200px;">
+                <span style="background: #fef3c7; color: #92400e; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 12px;">Central Buyer Depot</span>
+                <h4 style="font-weight: 900; font-size: 14px; color: #0f172a; margin: 6px 0 2px 0;">${stop.name}</h4>
+                <p style="font-size: 11px; color: #475569; margin: 0;">📍 (${stop.latitude.toFixed(4)}, ${stop.longitude.toFixed(4)})</p>
+              </div>
+            `);
+
+            const marker = new maplibregl.Marker({ element: depotEl })
+              .setLngLat([stop.longitude, stop.latitude])
+              .setPopup(popup)
+              .addTo(map);
+
+            markersRef.current.push(marker);
+          } else {
+            const isHighlighted = stop.id === highlightedFarmId;
+            const farmEl = document.createElement('div');
+            farmEl.innerHTML = `
+              <div style="
+                background-color: ${isHighlighted ? '#15803d' : color};
+                color: white;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 800;
+                font-size: 13px;
+                border: 2px solid #ffffff;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+                cursor: pointer;
+                transform: ${isHighlighted ? 'scale(1.25)' : 'scale(1)'};
+              ">${stop.sequence}</div>
+            `;
+
+            if (onFarmClick) farmEl.addEventListener('click', () => onFarmClick(stop.id));
+
+            const popup = new maplibregl.Popup({ offset: 18, closeButton: false }).setHTML(`
+              <div style="font-family: system-ui, sans-serif; padding: 4px; min-width: 210px;">
+                <span style="background: #e0f2fe; color: #0369a1; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 12px;">Stop #${stop.sequence}</span>
+                <h4 style="font-weight: 900; font-size: 14px; color: #0f172a; margin: 4px 0;">${stop.name}</h4>
+                <p style="font-size: 11px; color: #166534; font-weight: 700; margin: 0;">${stop.quantity_tonnes} Tonnes ${stop.residue_type || ''}</p>
+              </div>
+            `);
+
+            const marker = new maplibregl.Marker({ element: farmEl })
+              .setLngLat([stop.longitude, stop.latitude])
+              .setPopup(popup)
+              .addTo(map);
+
+            markersRef.current.push(marker);
+          }
+        });
+      });
+    }
+
+    // Render Real NASA FIRMS Satellite Hotspots
+    if (showHotspots && firmsHotspots && firmsHotspots.length > 0) {
+      firmsHotspots.forEach((fire: FirmsFireRecord, index: number) => {
+        const normConf = normalizeFirmsConfidence(fire.confidence);
+        const isSelected = selectedHotspotIndex === index;
+
+        bounds.extend([fire.longitude, fire.latitude]);
+        hasValidBounds = true;
+
+        let markerBg = '#ea580c'; // default orange for nominal
+        let shadowColor = 'rgba(234,88,12,0.85)';
+        let badgeBg = '#ffedd5';
+        let badgeText = '#9a3412';
+        let badgeLabel = 'NOMINAL-CONFIDENCE ANOMALY';
+
+        if (normConf === 'high') {
+          markerBg = '#dc2626'; // red
+          shadowColor = 'rgba(220,38,38,0.85)';
+          badgeBg = '#fee2e2';
+          badgeText = '#991b1b';
+          badgeLabel = 'HIGH-CONFIDENCE ANOMALY';
+        } else if (normConf === 'low') {
+          markerBg = '#d97706'; // amber/yellow
+          shadowColor = 'rgba(217,119,6,0.85)';
+          badgeBg = '#fef3c7';
+          badgeText = '#92400e';
+          badgeLabel = 'LOW-CONFIDENCE ANOMALY';
+        }
+
+        const fireEl = document.createElement('div');
+        const transformScale = isSelected ? 'scale(1.35)' : 'scale(1)';
+
+        fireEl.innerHTML = `
+          <div style="
+            background-color: ${markerBg};
+            color: white;
+            width: ${isSelected ? '32px' : '26px'};
+            height: ${isSelected ? '32px' : '26px'};
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: ${isSelected ? '16px' : '13px'};
+            border: 2px solid white;
+            box-shadow: 0 0 14px ${shadowColor};
+            cursor: pointer;
+            transform: ${transformScale};
+            transition: transform 0.2s ease;
+          ">🔥</div>
+        `;
+
+        if (onHotspotClick) {
+          fireEl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            onHotspotClick(index);
+          });
+        }
+
+        const popupHTML = `
+          <div style="font-family: system-ui, sans-serif; padding: 4px; min-width: 220px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <span style="background: ${badgeBg}; color: ${badgeText}; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 12px;">
+                ${badgeLabel}
+              </span>
+            </div>
+            <h4 style="font-weight: 900; font-size: 13px; color: #0f172a; margin: 0 0 4px 0;">Satellite Thermal Anomaly</h4>
+            <p style="font-size: 11px; color: #475569; margin: 0 0 6px 0;">📍 (${fire.latitude.toFixed(4)}, ${fire.longitude.toFixed(4)})</p>
+            <div style="font-size: 11px; color: #334155; border-top: 1px solid #f1f5f9; padding-top: 6px; space-y: 2px;">
+              <div><strong>Sensor:</strong> ${fire.instrument || 'VIIRS'} (${fire.satellite || 'N'})</div>
+              <div><strong>Acquired:</strong> ${fire.acq_date} ${fire.acq_time} UTC</div>
+              <div><strong>FRP:</strong> ${fire.frp != null ? fire.frp + ' MW' : 'N/A'}</div>
+            </div>
+          </div>
+        `;
+
+        const popup = new maplibregl.Popup({ offset: 18, closeButton: false }).setHTML(popupHTML);
+
+        const marker = new maplibregl.Marker({ element: fireEl })
+          .setLngLat([fire.longitude, fire.latitude])
+          .setPopup(popup)
+          .addTo(map);
+
+        markersRef.current.push(marker);
+      });
+    }
+
+    // Render Participating Farmers if in Burn Intelligence view
+    if (showHotspots && farmers && farmers.length > 0) {
+      farmers.forEach(farmer => {
+        // Approximate Punjab farmer lat/lng if farmer has coordinates or regional offsets
+        let lat = 30.3400;
+        let lng = 76.3800;
+        if (farmer.location.includes('Sangrur')) { lat = 30.2458; lng = 75.8421; }
+        else if (farmer.location.includes('Barnala')) { lat = 30.3819; lng = 75.5468; }
+        else if (farmer.location.includes('Moga')) { lat = 30.8165; lng = 75.1717; }
+        else if (farmer.location.includes('Bathinda')) { lat = 30.2110; lng = 74.9455; }
+        else if (farmer.location.includes('Patiala')) { lat = 30.3398; lng = 76.3869; }
+        else if (farmer.location.includes('Ludhiana')) { lat = 30.9010; lng = 75.8573; }
+        else if (farmer.location.includes('Firozpur')) { lat = 30.9237; lng = 74.6122; }
+        else if (farmer.location.includes('Jalandhar')) { lat = 31.3260; lng = 75.5762; }
+        else if (farmer.location.includes('Amritsar')) { lat = 31.6340; lng = 74.8723; }
+        else if (farmer.location.includes('Rupnagar')) { lat = 30.9664; lng = 76.5231; }
+
+        bounds.extend([lng, lat]);
+        hasValidBounds = true;
+
+        const farmEl = document.createElement('div');
+        farmEl.innerHTML = `
+          <div style="
+            background-color: #059669;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+            cursor: pointer;
+          " title="${farmer.name} (${farmer.location})">🌾</div>
+        `;
+
+        const popup = new maplibregl.Popup({ offset: 14, closeButton: false }).setHTML(`
+          <div style="font-family: system-ui, sans-serif; padding: 4px; min-width: 180px;">
+            <span style="background: #d1fae5; color: #065f46; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 12px;">Parali Partner Farm</span>
+            <h4 style="font-weight: 900; font-size: 13px; color: #0f172a; margin: 4px 0 2px 0;">${farmer.name}</h4>
+            <p style="font-size: 11px; color: #475569; margin: 0;">📍 ${farmer.location}</p>
+          </div>
+        `);
+
+        const marker = new maplibregl.Marker({ element: farmEl })
+          .setLngLat([lng, lat])
+          .setPopup(popup)
+          .addTo(map);
+
+        markersRef.current.push(marker);
+      });
+    }
+
+    if (hasValidBounds) {
+      map.fitBounds(bounds, {
+        padding: { top: 60, bottom: 60, left: 60, right: 60 },
+        duration: 1000,
+        maxZoom: 13
+      });
+    }
+
+  }, [routeData, selectedVehicleIndex, showRoutes, showHotspots, firmsHotspots, selectedHotspotIndex, highlightedFarmId, mapLoaded]);
+
+  const handleRecenter = () => {
+    if (mapRef.current) {
+      if (firmsHotspots && firmsHotspots.length > 0) {
+        const bounds = new maplibregl.LngLatBounds();
+        firmsHotspots.forEach(f => bounds.extend([f.longitude, f.latitude]));
+        mapRef.current.fitBounds(bounds, { padding: 60, duration: 1000, maxZoom: 13 });
+      } else if (routeData && routeData.routes) {
+        const bounds = new maplibregl.LngLatBounds();
+        routeData.routes.forEach(r => r.stops.forEach(s => bounds.extend([s.longitude, s.latitude])));
+        mapRef.current.fitBounds(bounds, { padding: 60, duration: 1000, maxZoom: 14 });
+      }
+    }
   };
 
-  const handlePointClick = (
-    type: 'farm' | 'buyer' | 'hotspot',
-    name: string,
-    detail: string,
-    x: number,
-    y: number,
-    id: string
-  ) => {
-    setSelectedPoint({ type, name, detail, x, y });
-    if (type === 'farm' && onFarmClick) onFarmClick(id);
-    if (type === 'hotspot' && onHotspotClick) onHotspotClick(id);
-  };
-
-  // Route drawing coordinate sequence
-  const routePoints = [
-    transformCoords([22, 63]), // Start: Punjab BioEnergy Plant
-    transformCoords([20, 65]), // Baldev Singh
-    transformCoords([25, 55]), // Gurpreet
-    transformCoords([30, 45]), // Ramesh
-    transformCoords([40, 35]), // Harpreet
-    transformCoords([50, 40]), // Jagdish
-    transformCoords([52, 62]), // GreenGrow Mushroom Farm (End/Buyer)
-  ];
-
-  const pathD = routePoints.reduce((acc, pt, index) => {
-    return acc + (index === 0 ? `M ${pt.x} ${pt.y}` : ` L ${pt.x} ${pt.y}`);
-  }, '');
+  const isBurnIntelligenceView = showHotspots && (!routeData || !showRoutes);
 
   return (
-    <div className="relative w-full aspect-[3/2] bg-[#f2ebd9]/40 border border-forest-100 rounded-2xl overflow-hidden shadow-inner">
-      {/* Background contour lines simulated in SVG */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <pattern id="contourPattern" width="100" height="100" patternUnits="userSpaceOnUse">
-            <path d="M 0,50 Q 25,45 50,50 T 100,50" fill="none" stroke="#e6dcc5" strokeWidth="1" opacity="0.4" />
-            <path d="M 0,20 Q 30,25 60,15 T 100,20" fill="none" stroke="#e6dcc5" strokeWidth="0.8" opacity="0.3" />
-            <path d="M 0,80 Q 40,75 70,85 T 100,80" fill="none" stroke="#e6dcc5" strokeWidth="0.8" opacity="0.3" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#contourPattern)" />
-        
-        {/* District Grid Label Backgrounds */}
-        <text x="70" y="50" fill="#a89a7d" fontSize="12" fontWeight="bold" opacity="0.6">PUNJAB REGION</text>
-        <text x="450" y="320" fill="#a89a7d" fontSize="12" fontWeight="bold" opacity="0.6">HARYANA BORDER</text>
-      </svg>
-
-      {/* SVG Map Layer */}
-      <svg className="w-full h-full relative z-10" viewBox="0 0 600 400">
-        {/* Draw optimized route */}
-        {showRoutes && routeOptimized && (
-          <>
-            {/* Base line */}
-            <path
-              d={pathD}
-              fill="none"
-              stroke="#6d9f8a"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              opacity="0.3"
-            />
-            {/* Animated draw line */}
-            <path
-              d={pathD}
-              fill="none"
-              stroke="#3a6654"
-              strokeWidth="3.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="animate-route-draw"
-              strokeDasharray="1000"
-              strokeDashoffset="1000"
-              style={{ animationDuration: '3s' }}
-            />
-          </>
-        )}
-
-        {/* Render Buyers (Factories) */}
-        {buyers.map(b => {
-          const { x, y } = transformCoords(b.coordinates);
-          return (
-            <g 
-              key={b.id} 
-              className="cursor-pointer group"
-              onClick={() => handlePointClick('buyer', b.name, `${b.type} • Sourced: ${b.sourcedVolume}t`, x, y, b.id)}
-            >
-              <circle cx={x} cy={y} r="16" fill="#73492c" opacity="0.15" className="group-hover:scale-125 transition-transform" />
-              <rect x={x - 8} y={y - 8} width="16" height="16" rx="3" fill="#73492c" className="stroke-white stroke-2" />
-              <text x={x} y={y - 12} textAnchor="middle" fill="#5e3e26" fontSize="10" fontWeight="bold" className="opacity-0 group-hover:opacity-100 transition-opacity">
-                {b.name}
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Render Farmers */}
-        {farmers.map(f => {
-          const { x, y } = transformCoords(f.coordinates);
-          const isHighlighted = f.id === highlightedFarmId;
-          const hasListing = listings.some(l => l.farmerId === f.id && l.status !== 'Paid');
-          
-          return (
-            <g 
-              key={f.id} 
-              className="cursor-pointer group"
-              onClick={() => handlePointClick('farm', f.name, `${f.location} • Earnings: ₹${f.earnings}`, x, y, f.id)}
-            >
-              <circle 
-                cx={x} 
-                cy={y} 
-                r={isHighlighted ? "14" : "10"} 
-                fill={hasListing ? "#4c816c" : "#9bc2b1"} 
-                opacity={isHighlighted ? "0.4" : "0.2"} 
-                className={`transition-all duration-300 ${hasListing ? 'animate-pulse' : ''}`} 
-              />
-              <circle 
-                cx={x} 
-                cy={y} 
-                r={isHighlighted ? "7" : "5"} 
-                fill={hasListing ? "#3a6654" : "#6d9f8a"} 
-                className="stroke-white stroke-1.5 transition-all group-hover:scale-125" 
-              />
-              <text x={x} y={y - 10} textAnchor="middle" fill="#284338" fontSize="9" fontWeight="semibold" className="opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none bg-white">
-                {f.name}
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Render Hotspots */}
-        {showHotspots && hotspots.map(h => {
-          const { x, y } = transformCoords(h.coordinates);
-          return (
-            <g 
-              key={h.id} 
-              className="cursor-pointer group"
-              onClick={() => handlePointClick('hotspot', 'Thermal Stubble Fire Detected', `${h.location} • Conf: ${h.confidence}%`, x, y, h.id)}
-            >
-              {/* Pulsing warning ring */}
-              <circle cx={x} cy={y} r="18" fill="#b88347" opacity="0.3" className="animate-ping" style={{ animationDuration: '2s' }} />
-              <circle cx={x} cy={y} r="10" fill="#aa713b" opacity="0.4" />
-              <circle cx={x} cy={y} r="5" fill="#ba8349" className="stroke-white stroke-1" />
-            </g>
-          );
-        })}
-
-        {/* Animated truck icon tracing route if running */}
-        {showRoutes && routeOptimized && (
-          <g>
-            <circle cx={routePoints[2].x} cy={routePoints[2].y} r="12" fill="#ba8349" className="animate-bounce" />
-            <path d={`M ${routePoints[2].x - 6} ${routePoints[2].y - 6} L ${routePoints[2].x + 6} ${routePoints[2].y - 6}`} stroke="white" strokeWidth="2" />
-          </g>
-        )}
-      </svg>
-
-      {/* Floating Info Tooltip */}
-      {selectedPoint && (
-        <div 
-          className="absolute z-20 bg-white border border-clay-200 p-3 rounded-xl shadow-lg max-w-[200px] pointer-events-auto transition-all"
-          style={{ 
-            left: `${Math.min(selectedPoint.x / 600 * 100, 70)}%`, 
-            top: `${Math.min(selectedPoint.y / 400 * 100, 75)}%` 
-          }}
-        >
-          <div className="flex items-center justify-between mb-1">
-            <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${
-              selectedPoint.type === 'hotspot' ? 'bg-clay-100 text-clay-800' :
-              selectedPoint.type === 'buyer' ? 'bg-forest-100 text-forest-800' : 'bg-earth-100 text-earth-800'
-            }`}>
-              {selectedPoint.type}
-            </span>
-            <button 
-              onClick={() => setSelectedPoint(null)}
-              className="text-xs text-slate-400 hover:text-slate-600 font-bold"
-            >
-              ×
-            </button>
-          </div>
-          <h4 className="font-bold text-xs text-slate-900 leading-tight">{selectedPoint.name}</h4>
-          <p className="text-[10px] text-slate-500 mt-1">{selectedPoint.detail}</p>
+    <div className="relative w-full h-[550px] md:h-[620px] rounded-3xl overflow-hidden shadow-lg border border-forest-100/80 bg-slate-100">
+      
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 z-50 bg-forest-950/40 backdrop-blur-xs flex flex-col items-center justify-center text-white gap-3">
+          <div className="w-10 h-10 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          <span className="font-extrabold text-sm tracking-wide">
+            {isBurnIntelligenceView ? 'Fetching NASA Satellite Detections...' : 'Optimizing Road Pickup Sequence...'}
+          </span>
         </div>
       )}
 
-      {/* Map Legend */}
-      <div className="absolute bottom-3 left-3 z-10 bg-white/95 border border-forest-100/60 p-2.5 rounded-xl shadow-md flex flex-col gap-1.5 text-[10px] text-slate-700">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#6d9f8a] border border-white"></span>
-          <span>Farmer Fields</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded bg-[#73492c] border border-white"></span>
-          <span>Biomass Buyers</span>
-        </div>
-        {showHotspots && (
-          <div className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#ba8349] border border-white animate-pulse"></span>
-            <span>Stubble Fire Hotspot</span>
-          </div>
-        )}
-        {showRoutes && (
-          <div className="flex items-center gap-1.5">
-            <span className="w-6 h-0.5 bg-[#3a6654] inline-block"></span>
-            <span>Collection Route</span>
+      {/* MapLibre WebGL Canvas Container */}
+      <div ref={mapContainerRef} className="w-full h-full" />
+
+      {/* Recenter Button */}
+      <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
+        <button
+          onClick={handleRecenter}
+          className="bg-white hover:bg-slate-50 text-forest-900 border border-slate-200 p-2.5 rounded-xl shadow-md font-bold text-xs flex items-center gap-1.5 transition-all"
+          title="Recenter Map Bounds"
+        >
+          <Maximize2 className="h-4 w-4 text-forest-600" />
+          <span className="hidden sm:inline">Recenter Bounds</span>
+        </button>
+      </div>
+
+      {/* Collapsible Legend */}
+      <div className="absolute bottom-4 left-4 z-20 bg-white/95 backdrop-blur-xs border border-slate-200/80 rounded-2xl shadow-md text-xs text-slate-800 font-sans transition-all max-w-[250px]">
+        <button
+          onClick={() => setLegendOpen(!legendOpen)}
+          className="w-full p-2.5 flex items-center justify-between font-extrabold text-[11px] text-slate-600 uppercase tracking-wider hover:bg-slate-50/50 rounded-2xl gap-2"
+        >
+          <span className="flex items-center gap-1.5">
+            {isBurnIntelligenceView ? (
+              <Flame className="h-3.5 w-3.5 text-clay-650" />
+            ) : (
+              <Layers className="h-3.5 w-3.5 text-forest-600" />
+            )}
+            {isBurnIntelligenceView ? 'Satellite Intelligence' : 'Route Legend'}
+          </span>
+          {legendOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
+        </button>
+
+        {legendOpen && (
+          <div className="px-3 pb-3 space-y-2 border-t border-slate-100 pt-2 text-[11px]">
+            {isBurnIntelligenceView ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-600 shadow-xs"></div>
+                  <span className="font-semibold text-slate-700">High-confidence hotspot</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-orange-600 shadow-xs"></div>
+                  <span className="font-semibold text-slate-700">Nominal-confidence hotspot</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-amber-600 shadow-xs"></div>
+                  <span className="font-semibold text-slate-700">Low-confidence hotspot</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-emerald-600 shadow-xs"></div>
+                  <span className="font-semibold text-slate-700">Parali participating farm</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-forest-700 text-white flex items-center justify-center text-[10px] font-black shadow-xs">
+                    1
+                  </div>
+                  <span className="font-semibold text-slate-700">Accepted Farm Pickups</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-lg bg-amber-900 text-white flex items-center justify-center text-[11px] shadow-xs">
+                    🏭
+                  </div>
+                  <span className="font-semibold text-slate-700">Central Biomass Buyer Depot</span>
+                </div>
+
+                {showRoutes && routeData?.routes && (
+                  <div className="pt-1.5 border-t border-slate-100 space-y-1.5">
+                    {routeData.routes.map(r => {
+                      const color = ROUTE_COLORS[(r.vehicle_index - 1) % ROUTE_COLORS.length];
+                      return (
+                        <div key={`legend-r-${r.vehicle_index}`} className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-4 h-1 rounded" style={{ backgroundColor: color }}></span>
+                            <span className="font-medium text-slate-700">Truck #{r.vehicle_index}</span>
+                          </div>
+                          <span className="font-extrabold text-forest-900 text-[10px]">
+                            {r.distance_km} km
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
           </div>
         )}
       </div>
+
     </div>
   );
 };
+
