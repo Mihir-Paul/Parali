@@ -55,15 +55,29 @@ export interface PurchaseRequestInput {
   note?: string;
 }
 
+export type PurchaseRequestStatus =
+  | 'Pending'
+  | 'Accepted'
+  | 'Confirmed'
+  | 'Declined'
+  | 'Rejected'
+  | 'Pickup_Planned'
+  | 'Completed';
+
 export interface PurchaseRequestItem extends PurchaseRequestInput {
   id: string;
   buyer_id: string;
   buyer_name?: string;
+  farmer_id?: string | null;
   farmer_name?: string;
+  listing_id?: string;
+  demand_id?: string | null;
   residue_type?: string;
   crop_type?: string;
   location?: string;
-  status: 'Pending' | 'Confirmed' | 'Rejected' | 'Completed';
+  status: PurchaseRequestStatus;
+  accepted_at?: string;
+  declined_at?: string;
   created_at: string;
 }
 

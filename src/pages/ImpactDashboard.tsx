@@ -250,9 +250,11 @@ export const ImpactDashboard: React.FC = () => {
               </div>
               <div className="flex items-baseline gap-2">
                 <h3 className="text-3xl font-black text-slate-900">
-                  {isLoading ? '...' : (impactData?.distance_saved_km || 0)}
+                  {isLoading ? '...' : (impactData?.distance_saved_km && impactData.distance_saved_km > 0 ? `${impactData.distance_saved_km}` : 'Not available')}
                 </h3>
-                <span className="text-sm font-extrabold text-slate-700">km ({impactData?.average_route_reduction_percent || 0}%)</span>
+                {impactData?.distance_saved_km && impactData.distance_saved_km > 0 ? (
+                  <span className="text-sm font-extrabold text-slate-700">km ({impactData?.average_route_reduction_percent || 0}%)</span>
+                ) : null}
               </div>
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 text-xs">
                 <span className="text-slate-500 font-semibold">OR-Tools CVRP optimized</span>
@@ -413,7 +415,9 @@ export const ImpactDashboard: React.FC = () => {
                   <div className="flex justify-between py-2 border-b border-emerald-200/60">
                     <span className="text-slate-600 font-medium">Logistics Efficiency</span>
                     <strong className="text-emerald-900 font-extrabold">
-                      {impactData?.distance_saved_km || 0} km Saved ({impactData?.average_route_reduction_percent || 0}% Fuel Saved)
+                      {impactData?.distance_saved_km && impactData.distance_saved_km > 0
+                        ? `${impactData.distance_saved_km} km Saved (${impactData.average_route_reduction_percent || 0}% Fuel Saved)`
+                        : 'Not available'}
                     </strong>
                   </div>
                   <div className="flex justify-between py-2 border-b border-emerald-200/60">

@@ -247,9 +247,9 @@ class ImpactService:
                 "gross_income_inr": gross_residue_income_inr,
                 "pickup_transport_cost_inr": logistics_cost_inr,
                 "net_financial_outcome_inr": selling_net_benefit_inr,
-                "description": "Selling via Parali provides direct monetary revenue with managed farmgate pickup."
+                "description": "Marketplace assumption: pickup/logistics cost borne by buyer or logistics partner."
             },
             "comparative_advantage_inr": net_farmer_advantage_inr,
             "verdict_headline": f"You are approximately ₹{net_farmer_advantage_inr:,.0f} better off by selling instead of burning.",
-            "disclaimer": "Nutrient replacement loss estimates are based on ICAR/PAU agronomic benchmark studies (N, P, K & soil organic matter)."
+            "disclaimer": "Modelled agronomic estimates based on PAU/ICAR crop nutrient composition data (N, P, K & organic matter) at fertilizer replacement costs."
         }

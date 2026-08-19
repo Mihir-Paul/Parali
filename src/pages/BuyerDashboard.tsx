@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { useAuth } from '../context/AuthContext';
+import { fetchBuyerPurchaseRequests } from '../services/purchaseRequestService';
+import { PurchaseRequestItem } from '../types/marketplace';
 import {
   ArrowRight,
   Layers,
@@ -29,6 +31,11 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
 }) => {
   const { requirements, listings, confirmBuyerRequirement } = useAppStore();
   const { profile, buyerProfile, user } = useAuth();
+  const [requests, setRequests] = useState<PurchaseRequestItem[]>([]);
+
+  useEffect(() => {
+    fetchBuyerPurchaseRequests(user?.id).then((data) => setRequests(data));
+  }, [user]);
 
   const buyerName = buyerProfile?.business_name || profile?.full_name || user?.user_metadata?.full_name || 'GreenGrow Bio-Energy Plant';
   const buyerTypeFormatted = buyerProfile?.buyer_type ? buyerProfile.buyer_type.replace('_', ' ') : 'Bio-CNG Facility';
@@ -38,6 +45,9 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
 
   // Ramesh's active listing (if listed/matched) for demo matching
   const rameshListing = listings.find((l) => l.farmerId === 'f1' && l.status === 'Matched');
+
+  const pendingCount = requests.filter((r) => r.status === 'Pending').length;
+  const activeSourcingCount = requests.filter((r) => r.status === 'Accepted' || r.status === 'Confirmed' || r.status === 'Pickup_Planned').length;
 
   // Sourcing impact calculations
   const totalSourcedTonnes = 28.5;
@@ -91,7 +101,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
 
         <div className="bg-white border border-forest-100 p-6 rounded-3xl shadow-sm hover:-translate-y-1 transition-all">
           <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Active Sourcing</span>
-          <h3 className="text-2xl font-black text-slate-900 mt-2">2 contracts</h3>
+          <h3 className="text-2xl font-black text-slate-900 mt-2">{activeSourcingCount} contracts</h3>
           <p className="text-[10px] text-forest-600 font-bold mt-1">Scheduled for pickup this week</p>
         </div>
 
@@ -103,7 +113,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
 
         <div className="bg-white border border-forest-100 p-6 rounded-3xl shadow-sm hover:-translate-y-1 transition-all">
           <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Pending Requests</span>
-          <h3 className="text-2xl font-black text-slate-900 mt-2">2 pending</h3>
+          <h3 className="text-2xl font-black text-slate-900 mt-2">{pendingCount} pending</h3>
           <p className="text-[10px] text-clay-700 font-bold mt-1">Awaiting farmer confirmation</p>
         </div>
       </div>

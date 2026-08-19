@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { fetchPurchaseRequests } from '../services/marketplaceService';
+import { fetchBuyerPurchaseRequests } from '../services/purchaseRequestService';
 import { PurchaseRequestItem } from '../types/marketplace';
-import { Clock, CheckCircle2, XCircle, ShoppingBag, ArrowLeft, Calendar, MapPin } from 'lucide-react';
+import { Clock, CheckCircle2, XCircle, ShoppingBag, ArrowLeft, Calendar, MapPin, Compass } from 'lucide-react';
 
 interface BuyerRequestsProps {
   onBackToMarketplace?: () => void;
+  onNavigateToOptimizer?: () => void;
 }
 
-export const BuyerRequests: React.FC<BuyerRequestsProps> = ({ onBackToMarketplace }) => {
+export const BuyerRequests: React.FC<BuyerRequestsProps> = ({ onBackToMarketplace, onNavigateToOptimizer }) => {
   const { user } = useAuth();
   const [requests, setRequests] = useState<PurchaseRequestItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('All');
 
   const loadRequests = async () => {
-    if (!user) return;
     setLoading(true);
     try {
-      const data = await fetchPurchaseRequests(user.id);
+      const data = await fetchBuyerPurchaseRequests(user?.id);
       setRequests(data);
     } catch (err) {
       console.error('Error fetching purchase requests:', err);
@@ -60,13 +60,18 @@ export const BuyerRequests: React.FC<BuyerRequestsProps> = ({ onBackToMarketplac
       total_amount: 13300,
       pickup_date_preference: '2026-08-24',
       location: 'Bathinda, Punjab',
-      status: 'Confirmed',
+      status: 'Accepted',
+      accepted_at: new Date(Date.now() - 86400000).toISOString(),
       created_at: new Date(Date.now() - 86400000).toISOString()
     }
   ];
 
+  const acceptedCount = displayRequests.filter(r => r.status === 'Accepted' || r.status === 'Confirmed').length;
+
   const filteredRequests = displayRequests.filter((r) => {
     if (statusFilter === 'All') return true;
+    if (statusFilter === 'Accepted') return r.status === 'Accepted' || r.status === 'Confirmed';
+    if (statusFilter === 'Declined') return r.status === 'Declined' || r.status === 'Rejected';
     return r.status.toLowerCase() === statusFilter.toLowerCase();
   });
 
@@ -92,21 +97,39 @@ export const BuyerRequests: React.FC<BuyerRequestsProps> = ({ onBackToMarketplac
           </p>
         </div>
 
-        {/* Filter Status Tabs */}
-        <div className="flex bg-white rounded-2xl p-1.5 border border-forest-100 shadow-sm gap-1">
-          {['All', 'Pending', 'Confirmed', 'Completed'].map((st) => (
+        {/* Action & Filter Status Tabs */}
+        <div className="flex flex-wrap items-center gap-3">
+          {onNavigateToOptimizer && (
             <button
-              key={st}
-              onClick={() => setStatusFilter(st)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                statusFilter === st
-                  ? 'bg-forest-600 text-white shadow-sm'
-                  : 'text-forest-800 hover:bg-forest-50'
+              onClick={onNavigateToOptimizer}
+              disabled={acceptedCount === 0}
+              className={`px-4 py-2 rounded-2xl text-xs font-extrabold shadow-sm transition-all flex items-center gap-1.5 ${
+                acceptedCount > 0
+                  ? 'bg-forest-600 hover:bg-forest-700 text-white cursor-pointer'
+                  : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
               }`}
+              title={acceptedCount === 0 ? 'No accepted suppliers yet.' : 'Optimize pickup route for accepted suppliers'}
             >
-              {st}
+              <Compass className="h-4 w-4" />
+              {acceptedCount > 0 ? `Optimize Pickup Route (${acceptedCount})` : 'No accepted suppliers yet'}
             </button>
-          ))}
+          )}
+
+          <div className="flex bg-white rounded-2xl p-1.5 border border-forest-100 shadow-sm gap-1">
+            {['All', 'Pending', 'Accepted', 'Declined', 'Completed'].map((st) => (
+              <button
+                key={st}
+                onClick={() => setStatusFilter(st)}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                  statusFilter === st
+                    ? 'bg-forest-600 text-white shadow-sm'
+                    : 'text-forest-800 hover:bg-forest-50'
+                }`}
+              >
+                {st}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -130,11 +153,14 @@ export const BuyerRequests: React.FC<BuyerRequestsProps> = ({ onBackToMarketplac
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
                   <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider ${
-                    req.status === 'Confirmed' ? 'bg-forest-100 text-forest-800 border border-forest-300' :
-                    req.status === 'Pending' ? 'bg-clay-100 text-clay-800 border border-clay-300' :
+                    req.status === 'Accepted' || req.status === 'Confirmed' ? 'bg-emerald-100 text-emerald-900 border border-emerald-300' :
+                    req.status === 'Declined' || req.status === 'Rejected' ? 'bg-red-100 text-red-800 border border-red-200' :
+                    req.status === 'Pending' ? 'bg-amber-100 text-amber-900 border border-amber-300' :
                     'bg-slate-100 text-slate-700'
                   }`}>
-                    Status: {req.status}
+                    {req.status === 'Accepted' || req.status === 'Confirmed' ? 'Accepted ✓' :
+                     req.status === 'Declined' || req.status === 'Rejected' ? 'Declined ✗' :
+                     req.status}
                   </span>
                   <span className="text-xs font-bold text-slate-500">
                     Request ID: #{req.id.substring(0, 8)}
