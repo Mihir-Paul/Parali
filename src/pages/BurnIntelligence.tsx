@@ -187,6 +187,7 @@ export const BurnIntelligence: React.FC = () => {
             >
               <option value="VIIRS_SNPP_NRT">VIIRS (Suomi NPP)</option>
               <option value="VIIRS_NOAA20_NRT">VIIRS (NOAA-20)</option>
+              <option value="VIIRS_NOAA21_NRT">VIIRS (NOAA-21)</option>
               <option value="MODIS_NRT">MODIS (Terra/Aqua)</option>
             </select>
           </div>
@@ -311,6 +312,16 @@ export const BurnIntelligence: React.FC = () => {
                 <button className="w-full bg-forest-600 hover:bg-forest-700 text-white font-extrabold text-xs py-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5">
                   <Compass className="h-4 w-4" /> Find nearby Parali bio-energy buyers
                 </button>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="bg-white border border-red-200 p-8 rounded-3xl text-center text-red-600 font-semibold shadow-sm flex flex-col items-center justify-center gap-3">
+              <AlertTriangle className="h-10 w-10 text-red-500" />
+              <div>
+                <h4 className="font-extrabold text-red-800 text-sm">NASA FIRMS Connection Error</h4>
+                <p className="text-xs text-red-600 mt-1 max-w-xs">
+                  {error}
+                </p>
               </div>
             </div>
           ) : (

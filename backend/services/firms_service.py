@@ -124,7 +124,17 @@ class FirmsService:
     ) -> Dict[str, Any]:
         sensor_short = "VIIRS" if "VIIRS" in source else ("MODIS" if "MODIS" in source else source)
 
-        if not csv_content or "latitude" not in csv_content.lower():
+        csv_lower = csv_content.lower() if csv_content else ""
+
+        if "invalid map_key" in csv_lower or "invalid map key" in csv_lower or ("map key" in csv_lower and "invalid" in csv_lower):
+            logger.error("NASA FIRMS returned invalid MAP_KEY message in CSV body")
+            raise PermissionError("Invalid or unauthorized NASA FIRMS MAP_KEY.")
+
+        if "transaction limit" in csv_lower or "rate limit" in csv_lower:
+            logger.warning("NASA FIRMS transaction limit reached in CSV body")
+            raise FirmsRateLimitError("NASA FIRMS rate limit reached. Please retry shortly.")
+
+        if not csv_content or "latitude" not in csv_lower:
             # Zero detections or empty response
             return {
                 "source": "NASA FIRMS",
