@@ -28,7 +28,7 @@ export const BurnIntelligence: React.FC = () => {
       }
     } catch (err: any) {
       console.error('[BurnIntelligence] Error fetching NASA FIRMS satellite data:', err);
-      setError(err.message || 'NASA FIRMS service temporarily unavailable.');
+      setError('NASA FIRMS data temporarily unavailable.');
       setFirmsResponse(null);
       setSelectedHotspotIndex(null);
     } finally {
@@ -174,6 +174,7 @@ export const BurnIntelligence: React.FC = () => {
               <option value={1}>Last 24 Hours (1 Day)</option>
               <option value={2}>Last 48 Hours (2 Days)</option>
               <option value={3}>Last 72 Hours (3 Days)</option>
+              <option value={5}>Last 5 Days</option>
             </select>
           </div>
 
@@ -207,7 +208,7 @@ export const BurnIntelligence: React.FC = () => {
           <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
           <div>
             <strong className="block text-red-950 font-extrabold">NASA FIRMS Connection Notice</strong>
-            {error} Data fallback to previous cache or empty response. No fake detections generated.
+            {error}
           </div>
         </div>
       )}
@@ -318,7 +319,7 @@ export const BurnIntelligence: React.FC = () => {
               <div>
                 <h4 className="font-extrabold text-slate-800 text-sm">No Active Fire Observations Found</h4>
                 <p className="text-xs text-slate-500 mt-1 max-w-xs">
-                  {firmsResponse?.message || 'No satellite fire detections recorded for this region and time window.'}
+                  No active fire observations found for this region and time window.
                 </p>
               </div>
             </div>

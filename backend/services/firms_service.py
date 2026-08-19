@@ -16,7 +16,9 @@ if os.path.exists(dotenv_path):
 elif os.path.exists(backend_dotenv):
     load_dotenv(backend_dotenv, override=True)
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("firms_service")
+logger.setLevel(logging.INFO)
 
 # Supported NASA FIRMS VIIRS/MODIS sensor sources
 VALID_SOURCES = {
@@ -63,12 +65,16 @@ class FirmsService:
     ) -> Dict[str, Any]:
         map_key = self.get_map_key()
         if not map_key:
+            logger.error("NASA FIRMS key loaded: NO")
             raise ValueError("NASA FIRMS API key is not configured.")
+
+        logger.info("NASA FIRMS key loaded: YES")
 
         if source not in VALID_SOURCES:
             source = "VIIRS_SNPP_NRT"
 
-        day_range = max(1, min(day_range, 10))
+        # FIRMS NRT Area CSV API allows 1 to 5 days range
+        day_range = max(1, min(day_range, 5))
 
         url = f"{self.api_base_url}/{map_key}/{source}/{area_bbox}/{day_range}"
         headers = {
@@ -76,9 +82,14 @@ class FirmsService:
         }
 
         try:
-            logger.info("Requesting NASA FIRMS observations (source=%s, days=%d)", source, day_range)
+            logger.info("NASA FIRMS request params | Source: %s | Bounding box: %s | Day range: %d", source, area_bbox, day_range)
             response = requests.get(url, headers=headers, timeout=15)
             
+            logger.info("NASA FIRMS HTTP status code: %d", response.status_code)
+            logger.info("NASA FIRMS response content-type: %s", response.headers.get("Content-Type", "unknown"))
+            logger.info("NASA FIRMS response size: %d bytes", len(response.content))
+            logger.info("NASA FIRMS first small portion of response: %s", repr(response.text[:300]))
+
             if response.status_code in (401, 403):
                 logger.error("NASA FIRMS authentication failed (HTTP %d)", response.status_code)
                 raise PermissionError("Invalid or unauthorized NASA FIRMS MAP_KEY.")
