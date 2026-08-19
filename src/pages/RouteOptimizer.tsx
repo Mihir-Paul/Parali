@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
+import { useAuth } from '../context/AuthContext';
+import { validateCoordinates } from '../services/geolocationService';
 import { MapViewer } from '../components/MapViewer';
 import { fetchOptimizedRoute } from '../services/routeService';
 import { fetchPurchaseRequests, fetchResidueListings } from '../services/marketplaceService';
@@ -27,21 +29,41 @@ interface RouteOptimizerProps {
 export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatches }) => {
   const { isOptimizing, setRole } = useAppStore();
 
+  const { profile, buyerProfile, user } = useAuth();
+
   const [routeData, setRouteData] = useState<OptimizeRouteResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedVehicleIndex, setSelectedVehicleIndex] = useState<number | null>(null); // null = All trucks
   const [acceptedFarmsCount, setAcceptedFarmsCount] = useState<number>(0);
   const [lastFingerprint, setLastFingerprint] = useState<string>('');
   const [isStale, setIsStale] = useState<boolean>(false);
+  const [depotMissing, setDepotMissing] = useState<boolean>(false);
+  const [missingFarmsCount, setMissingFarmsCount] = useState<number>(0);
 
   // Load route data on component mount
   const loadRouteOptimization = async () => {
     setLoading(true);
+    setDepotMissing(false);
+    setMissingFarmsCount(0);
+
     try {
-      // 1. Fetch strictly accepted suppliers from Supabase purchase_requests
+      // 1. Determine buyer depot facility coordinates (use regional receiving hub if profile coordinates not set)
+      let depotLat = buyerProfile?.latitude != null ? Number(buyerProfile.latitude) : profile?.latitude != null ? Number(profile.latitude) : undefined;
+      let depotLng = buyerProfile?.longitude != null ? Number(buyerProfile.longitude) : profile?.longitude != null ? Number(profile.longitude) : undefined;
+
+      let isDepotValid = validateCoordinates(depotLat, depotLng);
+
+      if (!isDepotValid) {
+        // Control Center regional depot fallback (Rajpura Bio-Energy Hub)
+        depotLat = 30.3400;
+        depotLng = 76.3800;
+        isDepotValid = true;
+      }
+
+      // 2. Fetch strictly accepted suppliers from Supabase / canonical store
       let farmPickups = await fetchAcceptedSuppliersForRoute();
 
-      // If database returned empty, fallback to accepted requests from marketplaceService
+      // If database returned empty, fetch accepted requests from marketplaceService
       if (farmPickups.length === 0) {
         const requests = await fetchPurchaseRequests();
         const listings = await fetchResidueListings();
@@ -54,18 +76,24 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
             farmer_name: req.farmer_name || `Supplier ${index + 1}`,
             listing_id: req.listing_id || `listing_${index + 1}`,
             purchase_request_id: req.id,
-            latitude: listing?.latitude || (30.31 + (index * 0.04)),
-            longitude: listing?.longitude || (76.35 + (index * 0.05)),
-            accepted_quantity_tonnes: req.quantity_requested || 5.0,
-            residue_type: listing?.residue_type || 'Rice Straw',
+            latitude: listing?.latitude,
+            longitude: listing?.longitude,
+            accepted_quantity_tonnes: req.quantity_requested || 3.0,
+            residue_type: listing?.residue_type || 'Crop Residue',
             price_per_tonne: req.offered_price_per_tonne || 1100
           };
         });
       }
 
-      setAcceptedFarmsCount(farmPickups.length);
+      // Filter valid farm coordinates
+      const validPickups = farmPickups.filter((f) => validateCoordinates(f.latitude, f.longitude));
+      const invalidCount = farmPickups.length - validPickups.length;
 
-      const currentFingerprint = farmPickups.map(f => f.purchase_request_id).sort().join('|');
+      setAcceptedFarmsCount(validPickups.length);
+      setMissingFarmsCount(invalidCount);
+
+      // Construct fingerprint using depot lat/lng + valid farm IDs and lat/lngs
+      const currentFingerprint = `${depotLat},${depotLng}|` + validPickups.map(f => `${f.purchase_request_id}:${f.latitude},${f.longitude}`).sort().join('|');
       if (lastFingerprint && lastFingerprint !== currentFingerprint) {
         setIsStale(true);
       } else {
@@ -73,22 +101,28 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
       }
       setLastFingerprint(currentFingerprint);
 
-      // 2. Call backend optimize-route service
-      const res = await fetchOptimizedRoute({
-        buyer_demand_id: 'demand_active',
-        buyer_depot: {
-          buyer_id: 'b_demo',
-          company_name: 'GreenGrow Bio-Energy Plant',
-          latitude: 30.3400,
-          longitude: 76.3800
-        },
-        farms: farmPickups.length > 0 ? farmPickups : undefined,
-        vehicle_capacity_tonnes: 15.0,
-        vehicle_count: 2,
-        cost_per_km: 20.0
-      });
+      // Call backend optimize-route service only if depot is valid
+      const buyerDepotInput = isDepotValid ? {
+        buyer_id: user?.id || 'b_active',
+        company_name: buyerProfile?.business_name || profile?.full_name || 'Biomass Processing Plant',
+        latitude: Number(depotLat),
+        longitude: Number(depotLng)
+      } : undefined;
 
-      setRouteData(res);
+      if (buyerDepotInput) {
+        const res = await fetchOptimizedRoute({
+          buyer_demand_id: 'demand_active',
+          buyer_depot: buyerDepotInput,
+          farms: validPickups,
+          vehicle_capacity_tonnes: 15.0,
+          vehicle_count: 2,
+          cost_per_km: 20.0
+        });
+
+        setRouteData(res);
+      } else {
+        setRouteData(null);
+      }
     } catch (err) {
       console.error('Error loading route optimization:', err);
     } finally {
@@ -111,7 +145,7 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
     : activeRoutes.filter(r => r.vehicle_index === selectedVehicleIndex);
 
   // Calculated totals
-  const totalFarmsCount = activeRoutes.reduce((acc, r) => acc + r.stops.filter(s => s.type === 'farm').length, 0);
+  const totalFarmsCount = activeRoutes.reduce((acc, r) => acc + r.stops.filter(s => s.type === 'farm' || (s.type as string) === 'farm_pickup').length, 0);
   const totalTonnage = routeData?.total_quantity_tonnes || 0;
   const totalDistanceKm = routeData?.total_distance_km || 0;
   const totalDurationMin = routeData?.total_duration_minutes || 0;
@@ -123,16 +157,36 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 font-sans selection:bg-forest-200">
       
+      {/* Missing Buyer Depot Facility Warning Banner */}
+      {depotMissing && (
+        <div className="bg-red-900 text-white p-4 rounded-2xl mb-6 shadow-lg border border-red-700 flex items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 font-bold">
+            <AlertCircle className="h-5 w-5 text-red-300 shrink-0" />
+            <span>Set buyer facility location before optimizing pickups. Buyer depot GPS coordinates are missing.</span>
+          </div>
+        </div>
+      )}
+
+      {/* Missing Farm Locations Warning Banner */}
+      {missingFarmsCount > 0 && (
+        <div className="bg-amber-900 text-white p-4 rounded-2xl mb-6 shadow-lg border border-amber-700 flex items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 font-bold">
+            <AlertTriangle className="h-5 w-5 text-amber-300 shrink-0" />
+            <span>Farm location missing for {missingFarmsCount} accepted supplier(s). Update farm coordinates to include in logistics routing.</span>
+          </div>
+        </div>
+      )}
+
       {/* Stale Supplier Set Warning Banner */}
       {isStale && (
         <div className="bg-amber-900 text-white p-4 rounded-2xl mb-6 shadow-lg border border-amber-700 flex items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2 font-bold">
             <AlertTriangle className="h-5 w-5 text-amber-300 shrink-0" />
-            <span>Supplier set changed — accepted requests modified since last route solve.</span>
+            <span>Pickup locations changed — accepted requests modified since last route solve.</span>
           </div>
           <button
             onClick={handleRunOptimizer}
-            className="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black px-4 py-1.5 rounded-xl transition-all"
+            className="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black px-4 py-1.5 rounded-xl transition-all cursor-pointer"
           >
             Recalculate Route
           </button>

@@ -17,6 +17,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { useAuth } from './context/AuthContext';
 import { AuthLogin } from './pages/AuthLogin';
 import { Onboarding } from './pages/Onboarding';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { BuyerDemandItem } from './types/marketplace';
 import {
   LayoutDashboard,
@@ -59,9 +60,12 @@ export default function App() {
     }
   }, []);
 
-  // Sync role state with authenticated user's DB profile
+  const hasSyncedInitialRole = React.useRef(false);
+
+  // Sync role state with authenticated user's DB profile strictly ONCE on initial load
   useEffect(() => {
-    if (profile && profile.onboarding_completed) {
+    if (profile && profile.onboarding_completed && !hasSyncedInitialRole.current) {
+      hasSyncedInitialRole.current = true;
       const dbRole = profile.role === 'farmer' ? 'Farmer' : profile.role === 'buyer' ? 'Buyer' : 'none';
       if (dbRole !== 'none') {
         setRole(dbRole);
@@ -311,64 +315,66 @@ export default function App() {
 
             {/* Page content switcher */}
             <div className="flex-1 bg-cream-50">
-              {currentRole === 'Farmer' && (
-                farmerView === 'dashboard' ? (
-                  <FarmerDashboard onNavigateToSell={() => setFarmerView('sell')} />
-                ) : farmerView === 'sell' ? (
-                  <FarmerSell onBack={() => setFarmerView('dashboard')} />
-                ) : (
-                  <ImpactDashboard />
-                )
-              )}
+              <ErrorBoundary fallbackTitle="Operations View Unavailable">
+                {currentRole === 'Farmer' && (
+                  farmerView === 'dashboard' ? (
+                    <FarmerDashboard onNavigateToSell={() => setFarmerView('sell')} />
+                  ) : farmerView === 'sell' ? (
+                    <FarmerSell onBack={() => setFarmerView('dashboard')} />
+                  ) : (
+                    <ImpactDashboard />
+                  )
+                )}
 
-              {currentRole === 'Buyer' && (
-                buyerView === 'dashboard' ? (
-                  <BuyerDashboard
-                    onNavigateToMarketplace={() => setBuyerView('marketplace')}
-                    onNavigateToDemand={() => setBuyerView('demand')}
-                    onNavigateToMatches={() => setBuyerView('matches')}
-                    onNavigateToRequests={() => setBuyerView('requests')}
-                  />
-                ) : buyerView === 'marketplace' ? (
-                  <BuyerMarketplace
-                    onNavigateToDemand={() => setBuyerView('demand')}
-                    onNavigateToRequests={() => setBuyerView('requests')}
-                  />
-                ) : buyerView === 'demand' ? (
-                  <BuyerDemand
-                    onRequirementCreated={(createdDemand) => {
-                      setActiveDemandForMatches(createdDemand);
-                      setBuyerView('matches');
-                    }}
-                    onCancel={() => setBuyerView('dashboard')}
-                  />
-                ) : buyerView === 'matches' ? (
-                  <BuyerMatches
-                    activeDemand={activeDemandForMatches}
-                    onNavigateToMarketplace={() => setBuyerView('marketplace')}
-                    onNavigateToRequests={() => setBuyerView('requests')}
-                  />
-                ) : buyerView === 'requests' ? (
-                  <BuyerRequests
-                    onBackToMarketplace={() => setBuyerView('marketplace')}
-                    onNavigateToOptimizer={() => setBuyerView('optimizer')}
-                  />
-                ) : buyerView === 'optimizer' ? (
-                  <RouteOptimizer />
-                ) : (
-                  <ImpactDashboard />
-                )
-              )}
+                {currentRole === 'Buyer' && (
+                  buyerView === 'dashboard' ? (
+                    <BuyerDashboard
+                      onNavigateToMarketplace={() => setBuyerView('marketplace')}
+                      onNavigateToDemand={() => setBuyerView('demand')}
+                      onNavigateToMatches={() => setBuyerView('matches')}
+                      onNavigateToRequests={() => setBuyerView('requests')}
+                    />
+                  ) : buyerView === 'marketplace' ? (
+                    <BuyerMarketplace
+                      onNavigateToDemand={() => setBuyerView('demand')}
+                      onNavigateToRequests={() => setBuyerView('requests')}
+                    />
+                  ) : buyerView === 'demand' ? (
+                    <BuyerDemand
+                      onRequirementCreated={(createdDemand) => {
+                        setActiveDemandForMatches(createdDemand);
+                        setBuyerView('matches');
+                      }}
+                      onCancel={() => setBuyerView('dashboard')}
+                    />
+                  ) : buyerView === 'matches' ? (
+                    <BuyerMatches
+                      activeDemand={activeDemandForMatches}
+                      onNavigateToMarketplace={() => setBuyerView('marketplace')}
+                      onNavigateToRequests={() => setBuyerView('requests')}
+                    />
+                  ) : buyerView === 'requests' ? (
+                    <BuyerRequests
+                      onBackToMarketplace={() => setBuyerView('marketplace')}
+                      onNavigateToOptimizer={() => setBuyerView('optimizer')}
+                    />
+                  ) : buyerView === 'optimizer' ? (
+                    <RouteOptimizer />
+                  ) : (
+                    <ImpactDashboard />
+                  )
+                )}
 
-              {currentRole === 'Admin' && (
-                adminTab === 'optimizer' ? (
-                  <RouteOptimizer />
-                ) : adminTab === 'burns' ? (
-                  <BurnIntelligence />
-                ) : (
-                  <ImpactDashboard />
-                )
-              )}
+                {currentRole === 'Admin' && (
+                  adminTab === 'optimizer' ? (
+                    <RouteOptimizer />
+                  ) : adminTab === 'burns' ? (
+                    <BurnIntelligence />
+                  ) : (
+                    <ImpactDashboard />
+                  )
+                )}
+              </ErrorBoundary>
             </div>
           </div>
         )}

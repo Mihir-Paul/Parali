@@ -4,7 +4,8 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { OptimizeRouteResponse, VehicleRoute, RouteStop } from '../types/route';
 import { useAppStore } from '../store/useAppStore';
 import { FirmsFireRecord, normalizeFirmsConfidence } from '../services/firmsService';
-import { Layers, ChevronDown, ChevronUp, Maximize2, Flame } from 'lucide-react';
+import { getCurrentPosition, validateCoordinates } from '../services/geolocationService';
+import { Layers, ChevronDown, ChevronUp, Maximize2, Flame, Navigation } from 'lucide-react';
 
 interface MapViewerProps {
   routeData?: OptimizeRouteResponse | null;
@@ -87,15 +88,15 @@ export const MapViewer: React.FC<MapViewerProps> = ({
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
-    // Punjab central default center: [longitude, latitude]
-    const initialCenter: [number, number] = [75.8000, 30.8000];
+    // Neutral national default viewport: [longitude, latitude]
+    const initialCenter: [number, number] = [78.9629, 20.5937];
 
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
       style: BASEMAP_STYLE_SPEC,
       center: initialCenter,
-      zoom: 8,
-      minZoom: 6,
+      zoom: 5,
+      minZoom: 3,
       maxZoom: 18,
       pitch: 0,
       attributionControl: false
@@ -406,19 +407,14 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     // Render Participating Farmers if in Burn Intelligence view
     if (showHotspots && farmers && farmers.length > 0) {
       farmers.forEach(farmer => {
-        // Approximate Punjab farmer lat/lng if farmer has coordinates or regional offsets
-        let lat = 30.3400;
-        let lng = 76.3800;
-        if (farmer.location.includes('Sangrur')) { lat = 30.2458; lng = 75.8421; }
-        else if (farmer.location.includes('Barnala')) { lat = 30.3819; lng = 75.5468; }
-        else if (farmer.location.includes('Moga')) { lat = 30.8165; lng = 75.1717; }
-        else if (farmer.location.includes('Bathinda')) { lat = 30.2110; lng = 74.9455; }
-        else if (farmer.location.includes('Patiala')) { lat = 30.3398; lng = 76.3869; }
-        else if (farmer.location.includes('Ludhiana')) { lat = 30.9010; lng = 75.8573; }
-        else if (farmer.location.includes('Firozpur')) { lat = 30.9237; lng = 74.6122; }
-        else if (farmer.location.includes('Jalandhar')) { lat = 31.3260; lng = 75.5762; }
-        else if (farmer.location.includes('Amritsar')) { lat = 31.6340; lng = 74.8723; }
-        else if (farmer.location.includes('Rupnagar')) { lat = 30.9664; lng = 76.5231; }
+        const hasLat = (farmer as any).latitude != null;
+        const hasLng = (farmer as any).longitude != null;
+        if (!hasLat || !hasLng) return;
+
+        const lat = Number((farmer as any).latitude);
+        const lng = Number((farmer as any).longitude);
+
+        if (!validateCoordinates(lat, lng)) return;
 
         bounds.extend([lng, lat]);
         hasValidBounds = true;
@@ -482,6 +478,21 @@ export const MapViewer: React.FC<MapViewerProps> = ({
     }
   };
 
+  const handleFlyToMyLocation = async () => {
+    try {
+      const pos = await getCurrentPosition();
+      if (mapRef.current) {
+        mapRef.current.flyTo({
+          center: [pos.longitude, pos.latitude],
+          zoom: 12,
+          duration: 1500
+        });
+      }
+    } catch (err: any) {
+      alert(err.message || 'Unable to acquire current position.');
+    }
+  };
+
   const isBurnIntelligenceView = showHotspots && (!routeData || !showRoutes);
 
   return (
@@ -500,15 +511,23 @@ export const MapViewer: React.FC<MapViewerProps> = ({
       {/* MapLibre WebGL Canvas Container */}
       <div ref={mapContainerRef} className="w-full h-full" />
 
-      {/* Recenter Button */}
+      {/* Camera Viewport Controls */}
       <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
         <button
           onClick={handleRecenter}
-          className="bg-white hover:bg-slate-50 text-forest-900 border border-slate-200 p-2.5 rounded-xl shadow-md font-bold text-xs flex items-center gap-1.5 transition-all"
-          title="Recenter Map Bounds"
+          className="bg-white hover:bg-slate-50 text-forest-900 border border-slate-200 p-2.5 rounded-xl shadow-md font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+          title="Fit Route Bounds"
         >
           <Maximize2 className="h-4 w-4 text-forest-600" />
-          <span className="hidden sm:inline">Recenter Bounds</span>
+          <span className="hidden sm:inline">Fit Route</span>
+        </button>
+        <button
+          onClick={handleFlyToMyLocation}
+          className="bg-white hover:bg-slate-50 text-forest-900 border border-slate-200 p-2.5 rounded-xl shadow-md font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+          title="Fly to My Current GPS Position"
+        >
+          <Navigation className="h-4 w-4 text-emerald-600" />
+          <span className="hidden sm:inline">My Location</span>
         </button>
       </div>
 
