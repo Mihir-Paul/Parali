@@ -7,61 +7,46 @@ export default {
   theme: {
     extend: {
       colors: {
-        forest: {
-          50: '#f4f7f5',
-          100: '#e4ece7',
-          200: '#cbdbd1',
-          300: '#a3c2b1',
-          400: '#75a18a',
-          500: '#54836d',
-          600: '#416956',
-          700: '#355546',
-          800: '#2d453b',
-          900: '#273b32',
-          950: '#13211b',
+        pine: {
+          900: '#173226',
+          700: '#2C5940',
+          100: '#E4EEE6',
         },
-        clay: {
-          50: '#faf6f0',
-          100: '#f4ebd9',
-          200: '#e7d4b4',
-          300: '#d7ba8c',
-          400: '#c79d66',
-          500: '#ba8349',
-          600: '#aa713d',
-          700: '#8e5b34',
-          800: '#73492d',
-          900: '#5e3d27',
-          950: '#332014',
+        soil: {
+          700: '#8A5A2B',
+          100: '#F1E4D3',
         },
-        earth: {
-          50: '#f6f7f4',
-          100: '#e8ebdf',
-          200: '#d1dcbf',
-          300: '#afc494',
-          400: '#8ea86f',
-          500: '#6e8d4f',
-          600: '#55713b',
-          700: '#42572e',
-          800: '#374727',
-          900: '#303d24',
-          950: '#182111',
+        ash: {
+          500: '#D98A2B',
         },
-        cream: {
-          50: '#fdfcf7',
-          100: '#fbf8ee',
-          200: '#f6ecd4',
-          300: '#efdbb9',
-          400: '#e6c594',
-          500: '#dbab6e',
-          600: '#ce8f4e',
-          700: '#b8733d',
-          800: '#945c36',
-          900: '#784c2e',
-          950: '#412716',
-        }
+        ember: {
+          600: '#C1402A',
+        },
+        paper: {
+          50: '#FAF8F4',
+        },
+        surface: {
+          0: '#FFFFFF',
+        },
+        line: {
+          200: '#E3DFD5',
+        },
+        ink: {
+          900: '#211E19',
+          500: '#6B6558',
+        },
       },
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+        display: ['Fraunces', 'Georgia', 'serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'monospace'],
+      },
+      borderRadius: {
+        card: '8px',
+      },
+      boxShadow: {
+        card: '0 1px 2px rgba(0,0,0,0.04)',
+        'card-hover': '0 2px 8px rgba(0,0,0,0.08)',
       },
     },
   },
