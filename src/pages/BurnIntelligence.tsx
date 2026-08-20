@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { MapViewer } from '../components/MapViewer';
 import { fetchFirmsData, FirmsApiResponse, FirmsFireRecord, haversineDistanceKm, normalizeFirmsConfidence } from '../services/firmsService';
+import { validateCoordinates } from '../services/geolocationService';
 import { Flame, ShieldAlert, RefreshCw, Compass, AlertTriangle, CheckCircle2, Satellite } from 'lucide-react';
 
 export const BurnIntelligence: React.FC = () => {
@@ -51,18 +52,20 @@ export const BurnIntelligence: React.FC = () => {
 
     let count = 0;
     farmers.forEach(farmer => {
-      let fLat = 30.3400;
-      let fLng = 76.3800;
-      if (farmer.location.includes('Sangrur')) { fLat = 30.2458; fLng = 75.8421; }
-      else if (farmer.location.includes('Barnala')) { fLat = 30.3819; fLng = 75.5468; }
-      else if (farmer.location.includes('Moga')) { fLat = 30.8165; fLng = 75.1717; }
-      else if (farmer.location.includes('Bathinda')) { fLat = 30.2110; fLng = 74.9455; }
-      else if (farmer.location.includes('Patiala')) { fLat = 30.3398; fLng = 76.3869; }
-      else if (farmer.location.includes('Ludhiana')) { fLat = 30.9010; fLng = 75.8573; }
-      else if (farmer.location.includes('Firozpur')) { fLat = 30.9237; fLng = 74.6122; }
-      else if (farmer.location.includes('Jalandhar')) { fLat = 31.3260; fLng = 75.5762; }
-      else if (farmer.location.includes('Amritsar')) { fLat = 31.6340; fLng = 74.8723; }
-      else if (farmer.location.includes('Rupnagar')) { fLat = 30.9664; fLng = 76.5231; }
+      let fLat = (farmer as any).latitude != null ? Number((farmer as any).latitude) : 30.3400;
+      let fLng = (farmer as any).longitude != null ? Number((farmer as any).longitude) : 76.3800;
+      if (!validateCoordinates((farmer as any).latitude, (farmer as any).longitude)) {
+        if (farmer.location.includes('Sangrur')) { fLat = 30.2458; fLng = 75.8421; }
+        else if (farmer.location.includes('Barnala')) { fLat = 30.3819; fLng = 75.5468; }
+        else if (farmer.location.includes('Moga')) { fLat = 30.8165; fLng = 75.1717; }
+        else if (farmer.location.includes('Bathinda')) { fLat = 30.2110; fLng = 74.9455; }
+        else if (farmer.location.includes('Patiala')) { fLat = 30.3398; fLng = 76.3869; }
+        else if (farmer.location.includes('Ludhiana')) { fLat = 30.9010; fLng = 75.8573; }
+        else if (farmer.location.includes('Firozpur')) { fLat = 30.9237; fLng = 74.6122; }
+        else if (farmer.location.includes('Jalandhar')) { fLat = 31.3260; fLng = 75.5762; }
+        else if (farmer.location.includes('Amritsar')) { fLat = 31.6340; fLng = 74.8723; }
+        else if (farmer.location.includes('Rupnagar')) { fLat = 30.9664; fLng = 76.5231; }
+      }
 
       const isNearHotspot = firmsResponse.fires.some(fire => {
         const dist = haversineDistanceKm(fLat, fLng, fire.latitude, fire.longitude);
