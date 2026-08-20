@@ -299,15 +299,20 @@ export async function fetchAcceptedSuppliersForRoute(
     acceptedRequests = store.filter((r) => r.status === 'Accepted' || r.status === 'Confirmed');
   }
 
-  return acceptedRequests.map((req, idx) => ({
-    farmer_id: req.farmer_id || `farmer_${idx + 1}`,
-    farmer_name: req.farmer_name || `Supplier ${idx + 1}`,
-    listing_id: req.listing_id || `listing_${idx + 1}`,
-    purchase_request_id: req.id,
-    latitude: 30.31 + idx * 0.04,
-    longitude: 76.35 + idx * 0.05,
-    accepted_quantity_tonnes: Number(req.quantity_requested || 3.0),
-    residue_type: req.residue_type || 'Wheat Straw',
-    price_per_tonne: Number(req.offered_price_per_tonne || 1200)
-  }));
+  return acceptedRequests.map((req, idx) => {
+    const lat = req.latitude != null ? Number(req.latitude) : (req as any).farm_latitude != null ? Number((req as any).farm_latitude) : undefined;
+    const lng = req.longitude != null ? Number(req.longitude) : (req as any).farm_longitude != null ? Number((req as any).farm_longitude) : undefined;
+
+    return {
+      farmer_id: req.farmer_id || `farmer_${idx + 1}`,
+      farmer_name: req.farmer_name || `Supplier ${idx + 1}`,
+      listing_id: req.listing_id || `listing_${idx + 1}`,
+      purchase_request_id: req.id,
+      latitude: lat as any,
+      longitude: lng as any,
+      accepted_quantity_tonnes: Number(req.quantity_requested || 3.0),
+      residue_type: req.residue_type || 'Crop Residue',
+      price_per_tonne: Number(req.offered_price_per_tonne || 1200)
+    };
+  });
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { useAuth } from '../context/AuthContext';
 import { createResidueListing } from '../services/marketplaceService';
+import { LocationPicker, LocationData } from '../components/LocationPicker';
 import { Sprout, IndianRupee, MapPin, Calendar, Camera, Info, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 interface FarmerSellProps {
@@ -15,7 +16,9 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
   const [crop, setCrop] = useState<'Wheat' | 'Rice' | 'Maize' | 'Sugarcane' | 'Other'>('Wheat');
   const [residueType, setResidueType] = useState('Wheat Straw (Tudi)');
   const [quantity, setQuantity] = useState<number>(3);
-  const [pickupLocation, setPickupLocation] = useState(profile?.village ? `${profile.village}, ${profile.district}` : 'Sangrur Fields Block A');
+  const [pickupLocation, setPickupLocation] = useState(profile?.village ? `${profile.village}, ${profile.district}` : 'Local Harvest Field');
+  const [latitude, setLatitude] = useState<number | undefined>(profile?.latitude || undefined);
+  const [longitude, setLongitude] = useState<number | undefined>(profile?.longitude || undefined);
   const [pickupDate, setPickupDate] = useState('2026-08-22');
   const [valuationMin, setValuationMin] = useState(2400);
   const [valuationMax, setValuationMax] = useState(2800);
@@ -50,10 +53,12 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
           quantity,
           price_per_tonne: pricePerTonne,
           pickup_location: pickupLocation,
-          state: profile?.state || 'Punjab',
-          district: profile?.district || 'Sangrur',
+          state: profile?.state || 'Local State',
+          district: profile?.district || 'Local District',
           village: profile?.village || '',
-          pickup_ready_date: pickupDate
+          pickup_ready_date: pickupDate,
+          latitude: latitude,
+          longitude: longitude
         });
       }
 
@@ -62,7 +67,7 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
         residueType,
         quantity,
         pickupLocation,
-        coordinates: [31, 46],
+        coordinates: latitude && longitude ? [longitude, latitude] : undefined,
         pickupDate,
         images: [],
         estimatedPriceMin: valuationMin,
