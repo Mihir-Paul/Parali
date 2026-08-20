@@ -1,13 +1,15 @@
 import React from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { UserAvatar } from './UserAvatar';
 import { PillNav, PillNavItem } from './ui/PillNav';
-import { Sprout, LogOut, ArrowLeftRight, ShieldAlert, Award } from 'lucide-react';
+import { Sprout, LogOut, ArrowLeftRight, ShieldAlert, Award, Sun, Moon } from 'lucide-react';
 
 interface NavbarProps {
   currentView?: string;
   onNavigateProfile?: () => void;
+  onNavigateLanding?: () => void;
   farmerView?: string;
   setFarmerView?: (view: 'dashboard' | 'sell' | 'impact') => void;
   buyerView?: string;
@@ -19,6 +21,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   currentView,
   onNavigateProfile,
+  onNavigateLanding,
   farmerView,
   setFarmerView,
   buyerView,
@@ -28,6 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const { currentRole, setRole } = useAppStore();
   const { profile, user, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   const handleLogout = async () => {
     await signOut();
@@ -108,9 +112,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           gap: '16px',
         }}
       >
-        {/* Brand Logo — clicking resets to role select */}
+        {/* Brand Logo — clicking opens landing page */}
         <div
-          onClick={() => setRole('none')}
+          onClick={() => {
+            if (onNavigateLanding) onNavigateLanding();
+            else setRole('none');
+          }}
           style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', flexShrink: 0 }}
         >
           <div
@@ -168,7 +175,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               hoveredPillTextColor="#E2903F"
               pillTextColor="#C9CFC1"
               initialLoadAnimation={false}
-              onLogoClick={() => setRole('none')}
+              onLogoClick={() => {
+                if (onNavigateLanding) onNavigateLanding();
+                else setRole('none');
+              }}
             />
           </div>
         )}
@@ -258,6 +268,27 @@ export const Navbar: React.FC<NavbarProps> = ({
               Switch
             </button>
           )}
+
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: '50%',
+              border: '1px solid rgba(246, 242, 231, 0.12)',
+              background: theme === 'dark' ? 'rgba(111, 175, 138, 0.15)' : 'rgba(246, 242, 231, 0.08)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              color: theme === 'dark' ? '#8BC7A3' : '#E2903F',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            {theme === 'dark' ? <Sun style={{ width: 15, height: 15 }} /> : <Moon style={{ width: 15, height: 15 }} />}
+          </button>
 
           {/* Sign out */}
           {currentRole !== 'none' && (

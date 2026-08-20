@@ -22,7 +22,16 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
   const [pickupDate, setPickupDate] = useState('2026-08-22');
   const [valuationMin, setValuationMin] = useState(2400);
   const [valuationMax, setValuationMax] = useState(2800);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+
+  // Handle image file selection
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newUrls = Array.from(e.target.files).map((file) => URL.createObjectURL(file));
+      setSelectedImages((prev) => [...prev, ...newUrls]);
+    }
+  };
 
   // Recalculate AI valuation based on inputs
   useEffect(() => {
@@ -69,7 +78,7 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
         pickupLocation,
         coordinates: latitude && longitude ? [longitude, latitude] : undefined,
         pickupDate,
-        images: [],
+        images: selectedImages,
         estimatedPriceMin: valuationMin,
         estimatedPriceMax: valuationMax
       });
@@ -168,15 +177,53 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
               />
             </div>
 
+            {/* Upload Residue Photos Section */}
             <div>
               <label className="block text-xs font-bold text-forest-800 mb-1.5 uppercase tracking-wide flex items-center gap-1">
-                <Camera className="h-3.5 w-3.5" /> Residue Photos (Optional)
+                <Camera className="h-3.5 w-3.5 text-forest-600" /> Residue Photos (Optional)
               </label>
-              <div className="border-2 border-dashed border-[#BFD3C6] bg-forest-50 rounded-xl p-8 text-center hover:border-forest-600 hover:bg-forest-100 cursor-pointer transition-all">
-                <Camera className="h-7 w-7 text-forest-600 mx-auto mb-2" />
-                <span className="text-sm text-forest-900 font-bold block">Tap to Upload Photos</span>
-                <span className="text-[11px] text-forest-600 mt-1 block">Help buyers verify moisture &amp; compaction</span>
-              </div>
+
+              <input
+                type="file"
+                id="residue-photo-input"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+
+              <label
+                htmlFor="residue-photo-input"
+                className="border-2 border-dashed border-[#294237] bg-[#1C3429] hover:border-[#6FAF8A] rounded-xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center block"
+              >
+                <div className="w-10 h-10 rounded-full bg-[#24563E] border border-[#294237] flex items-center justify-center mb-2">
+                  <Camera className="h-5 w-5 text-[#8BC7A3]" />
+                </div>
+                <span className="text-sm font-bold text-[#F1F5F2] block">Tap to Upload Photos</span>
+                <span className="text-[11px] text-[#B8C8BF] mt-1 block">Help buyers verify moisture &amp; compaction</span>
+              </label>
+
+              {/* Selected Photo Thumbnails */}
+              {selectedImages.length > 0 && (
+                <div className="flex flex-wrap gap-2.5 mt-3">
+                  {selectedImages.map((url, idx) => (
+                    <div key={idx} className="relative w-16 h-16 rounded-xl overflow-hidden border border-[#294237] bg-[#14251D] shadow-sm">
+                      <img src={url} alt={`Upload ${idx + 1}`} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSelectedImages((prev) => prev.filter((_, i) => i !== idx));
+                        }}
+                        className="absolute top-1 right-1 bg-black/80 hover:bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] transition-colors"
+                        title="Remove photo"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

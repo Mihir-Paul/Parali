@@ -147,8 +147,257 @@ button, a, input, select, textarea {
   transition: box-shadow 200ms ease, border-color 200ms ease;
 }
 
-/* Ensure Tailwind classes for forest/cream/clay are also emitted
-   by keeping references here (Tailwind purge safety) */
-/* forest-50 forest-100 forest-200 forest-300 forest-400 forest-500
-   forest-600 forest-700 forest-800 forest-900 forest-950
-   cream-50 cream-100 cream-200 clay-100 clay-200 clay-500 clay-600 clay-700 */
+/* ═══════════════════════════════════════════════════════
+   PARALI DARK THEME SPECIFICATION
+   Main Background: #0D1713
+   Navbar: #101F18
+   Primary Cards: #14251D
+   Highlight Cards: #182D23
+   Soft Surface: #1C3429
+   Primary Text: #F1F5F2
+   Secondary Text: #B8C8BF
+   Muted Text: #81958A
+   Primary Green: #6FAF8A
+   Bright Accent Green: #8BC7A3
+   Primary CTA: #24563E (Text: #F1F5F2)
+   CTA Hover: #2F6B4F
+   Borders: #294237
+   Subtle Card Glow: 0 6px 24px rgba(111, 175, 138, 0.06)
+   Subtle Glow Hover: 0 10px 30px rgba(111, 175, 138, 0.10)
+   ═══════════════════════════════════════════════════════ */
+
+.dark {
+  color-scheme: dark;
+  background-color: #0D1713;
+  color: #F1F5F2;
+
+  --paper-50: #0D1713;
+  --surface-0: #14251D;
+  --line-200: #294237;
+  --ink-900: #F1F5F2;
+  --ink-500: #B8C8BF;
+  --pine-900: #182D23;
+  --pine-700: #6FAF8A;
+  --pine-100: #1C3429;
+
+  --parali-green-primary: #6FAF8A;
+  --parali-green-accent: #8BC7A3;
+  --parali-green-light: #1C3429;
+  --parali-green-soft: #14251D;
+  --parali-border: #294237;
+  --parali-card-glow: 0 6px 24px rgba(111, 175, 138, 0.06);
+  --parali-card-glow-hover: 0 10px 30px rgba(111, 175, 138, 0.10);
+}
+
+.dark body {
+  background-color: #0D1713;
+  color: #F1F5F2;
+}
+
+/* Page Backgrounds */
+.dark .bg-paper-50,
+.dark .bg-cream-50,
+.dark .bg-cream-100,
+.dark .bg-slate-50,
+.dark .bg-slate-100,
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
+  background-color: #0D1713 !important;
+}
+
+/* Primary Card Surfaces */
+.dark .bg-white,
+.dark .bg-surface-0,
+.dark .bg-slate-900\/50,
+.dark .bg-forest-950\/80 {
+  background-color: #14251D !important;
+}
+
+/* Secondary & Soft Green Surfaces */
+.dark .bg-forest-50,
+.dark .bg-forest-100,
+.dark .bg-emerald-50,
+.dark .bg-green-50,
+.dark .bg-slate-100 {
+  background-color: #1C3429 !important;
+}
+
+.dark .bg-forest-900,
+.dark .bg-forest-950 {
+  background-color: #24563E !important;
+  color: #F1F5F2 !important;
+}
+
+.dark .bg-forest-900:hover,
+.dark .bg-forest-950:hover {
+  background-color: #2F6B4F !important;
+}
+
+/* Text Hierarchy */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
+.dark .text-forest-950,
+.dark .text-forest-900,
+.dark .text-ink-900,
+.dark .text-slate-900,
+.dark .text-gray-900,
+.dark .text-black {
+  color: #F1F5F2 !important;
+}
+
+.dark p,
+.dark .text-forest-800,
+.dark .text-forest-700,
+.dark .text-ink-500,
+.dark .text-slate-700,
+.dark .text-slate-600,
+.dark .text-gray-700,
+.dark .text-gray-600 {
+  color: #B8C8BF !important;
+}
+
+.dark .text-forest-600,
+.dark .text-forest-500,
+.dark .text-ink-400,
+.dark .text-slate-500,
+.dark .text-slate-400,
+.dark .text-gray-500,
+.dark .text-gray-400 {
+  color: #81958A !important;
+}
+
+.dark .text-emerald-600,
+.dark .text-emerald-500,
+.dark .text-green-600,
+.dark .text-clay-700,
+.dark .text-clay-600 {
+  color: #6FAF8A !important;
+}
+
+.dark .text-emerald-400,
+.dark .text-green-400,
+.dark .text-forest-400 {
+  color: #8BC7A3 !important;
+}
+
+/* Borders & Dividers */
+.dark .border-line-200,
+.dark .border-cream-200,
+.dark .border-cream-300,
+.dark .border-forest-100,
+.dark .border-forest-150,
+.dark .border-forest-200,
+.dark .border-forest-300,
+.dark .border-gray-100,
+.dark .border-gray-200,
+.dark .border-gray-300,
+.dark .border-slate-200,
+.dark .border-slate-300,
+.dark .divide-cream-200 > * + *,
+.dark .divide-gray-200 > * + * {
+  border-color: #294237 !important;
+}
+
+/* Cards & Card Glow Effects */
+.dark .parali-card,
+.dark [class*="rounded-3xl"].bg-white,
+.dark [class*="rounded-2xl"].bg-white,
+.dark [class*="rounded-xl"].bg-white,
+.dark [class*="rounded-card"].bg-white {
+  background-color: #14251D !important;
+  border-color: #294237 !important;
+  box-shadow: 0 6px 24px rgba(111, 175, 138, 0.06) !important;
+  transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease !important;
+}
+
+.dark .parali-card:hover,
+.dark [class*="rounded-3xl"].bg-white:hover,
+.dark [class*="rounded-2xl"].bg-white:hover,
+.dark [class*="rounded-xl"].bg-white:hover {
+  border-color: #6FAF8A !important;
+  box-shadow: 0 10px 30px rgba(111, 175, 138, 0.10) !important;
+  transform: translateY(-1px) !important;
+}
+
+.dark .parali-card-soft {
+  background-color: #1C3429 !important;
+  border-color: #294237 !important;
+}
+
+/* Form Controls & Inputs */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #14251D !important;
+  border-color: #294237 !important;
+  color: #F1F5F2 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #81958A !important;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: #6FAF8A !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(111, 175, 138, 0.25) !important;
+}
+
+/* Buttons */
+.dark button.bg-forest-600,
+.dark button.bg-forest-900,
+.dark button.bg-forest-950,
+.dark button.bg-emerald-600 {
+  background-color: #24563E !important;
+  color: #F1F5F2 !important;
+}
+
+.dark button.bg-forest-600:hover,
+.dark button.bg-forest-900:hover,
+.dark button.bg-forest-950:hover,
+.dark button.bg-emerald-600:hover {
+  background-color: #2F6B4F !important;
+}
+
+.dark button.bg-white,
+.dark button.bg-forest-50,
+.dark button.bg-forest-100 {
+  background-color: #1C3429 !important;
+  color: #F1F5F2 !important;
+  border-color: #294237 !important;
+}
+
+.dark button.bg-white:hover,
+.dark button.bg-forest-50:hover,
+.dark button.bg-forest-100:hover {
+  background-color: #24563E !important;
+  border-color: #6FAF8A !important;
+}
+
+/* Status Badges */
+.dark .badge-success,
+.dark .bg-emerald-100,
+.dark .bg-forest-100 {
+  background-color: #1C3429 !important;
+  color: #8BC7A3 !important;
+  border-color: #2F6B4F !important;
+}
+
+.dark .bg-amber-100,
+.dark .bg-orange-100,
+.dark .bg-yellow-100 {
+  background-color: #2D2314 !important;
+  color: #E2903F !important;
+  border-color: #4A381F !important;
+}
+
+.dark .bg-blue-100,
+.dark .bg-indigo-100,
+.dark .bg-sky-100 {
+  background-color: #142332 !important;
+  color: #7DB5EC !important;
+  border-color: #213B56 !important;
+}
+

@@ -1,13 +1,14 @@
 export interface RouteStop {
   sequence: number;
-  type: 'depot' | 'farm';
+  type: 'depot' | 'farm' | 'farm_pickup';
   id: string;
   name: string;
   latitude: number;
   longitude: number;
   quantity_tonnes: number;
   residue_type?: string;
-  estimated_travel_minutes: number;
+  estimated_travel_minutes?: number;
+  estimated_arrival?: string;
 }
 
 export interface GeoJSONGeometry {

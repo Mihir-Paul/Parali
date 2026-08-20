@@ -355,74 +355,113 @@ export const ImpactDashboard: React.FC = () => {
           )}
 
           {/* Without Parali vs With Parali Comparison Section */}
-          <div className="bg-white border border-forest-100 p-8 rounded-3xl shadow-sm">
+          <div 
+            className="p-8 rounded-3xl transition-all"
+            style={{
+              backgroundColor: '#14251D',
+              border: '1px solid #294237',
+              boxShadow: '0 6px 24px rgba(0, 0, 0, 0.16)'
+            }}
+          >
             <div className="mb-6">
-              <span className="text-[10px] bg-forest-100 text-forest-900 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+              <span 
+                className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider inline-block"
+                style={{
+                  backgroundColor: '#183328',
+                  color: '#8BC7A3',
+                  border: '1px solid #294237'
+                }}
+              >
                 Systemic Transformation
               </span>
-              <h3 className="text-xl font-black text-forest-950 mt-2">Without Parali vs. With Parali</h3>
-              <p className="text-xs text-forest-700 mt-1">
+              <h3 className="text-xl font-black mt-2" style={{ color: '#F1F5F2' }}>
+                Without Parali vs. With Parali
+              </h3>
+              <p className="text-xs mt-1" style={{ color: '#B8C8BF' }}>
                 Comparing regional agricultural outcome metrics before and after Parali Marketplace deployment.
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               {/* WITHOUT PARALI */}
-              <div className="bg-red-50/50 border border-red-200 p-6 rounded-2xl">
+              <div 
+                className="p-6 rounded-2xl transition-all duration-200 hover:-translate-y-0.5 hover:border-[#6B403A]"
+                style={{
+                  backgroundColor: '#241E1C',
+                  border: '1px solid #6B403A',
+                  boxShadow: '0 6px 24px rgba(0, 0, 0, 0.16)'
+                }}
+              >
                 <div className="flex items-center gap-2 mb-4">
-                  <Flame className="h-5 w-5 text-red-600" />
-                  <h4 className="font-black text-base text-red-950">WITHOUT PARALI (Traditional Status Quo)</h4>
+                  <Flame className="h-5 w-5 shrink-0" style={{ color: '#F28B82' }} />
+                  <h4 className="font-black text-base" style={{ color: '#F1F5F2' }}>
+                    WITHOUT PARALI (Traditional Status Quo)
+                  </h4>
                 </div>
                 <div className="space-y-3 text-xs">
-                  <div className="flex justify-between py-2 border-b border-red-200/60">
-                    <span className="text-slate-600 font-medium">Crop Residue Status</span>
-                    <strong className="text-red-900 font-extrabold">Open In-Field Burning</strong>
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #493733' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Crop Residue Status</span>
+                    <strong className="font-extrabold" style={{ color: '#F28B82' }}>Open In-Field Burning</strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-red-200/60">
-                    <span className="text-slate-600 font-medium">Farmer Revenue</span>
-                    <strong className="text-red-900 font-extrabold">₹0 (Negative Nutrient Loss)</strong>
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #493733' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Farmer Revenue</span>
+                    <strong className="font-extrabold" style={{ color: '#F28B82' }}>₹0 (Negative Nutrient Loss)</strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-red-200/60">
-                    <span className="text-slate-600 font-medium">Logistics Efficiency</span>
-                    <strong className="text-red-900 font-extrabold">Fragmented & High Empty Return</strong>
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #493733' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Logistics Efficiency</span>
+                    <strong className="font-extrabold text-right" style={{ color: '#F28B82' }}>Fragmented &amp; High Empty Return</strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-red-200/60">
-                    <span className="text-slate-600 font-medium">Atmospheric Impact</span>
-                    <strong className="text-red-900 font-extrabold">Severe CO₂ & PM2.5 Pollution</strong>
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #493733' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Atmospheric Impact</span>
+                    <strong className="font-extrabold text-right" style={{ color: '#F28B82' }}>Severe CO₂ &amp; PM2.5 Pollution</strong>
                   </div>
                 </div>
               </div>
 
               {/* WITH PARALI */}
-              <div className="bg-emerald-50/50 border border-emerald-200 p-6 rounded-2xl shadow-xs">
+              <div 
+                className="p-6 rounded-2xl transition-all duration-200 hover:-translate-y-0.5 hover:border-[#6FAF8A]"
+                style={{
+                  backgroundColor: '#183328',
+                  border: '1px solid #4D8066',
+                  boxShadow: '0 6px 24px rgba(0, 0, 0, 0.16)'
+                }}
+              >
                 <div className="flex items-center gap-2 mb-4">
-                  <Sprout className="h-5 w-5 text-emerald-600" />
-                  <h4 className="font-black text-base text-emerald-950">WITH PARALI (Marketplace & OR-Tools Optimization)</h4>
+                  <Sprout className="h-5 w-5 shrink-0" style={{ color: '#8BC7A3' }} />
+                  <h4 className="font-black text-base" style={{ color: '#F1F5F2' }}>
+                    WITH PARALI (Marketplace &amp; OR-Tools Optimization)
+                  </h4>
                 </div>
                 <div className="space-y-3 text-xs">
-                  <div className="flex justify-between py-2 border-b border-emerald-200/60">
-                    <span className="text-slate-600 font-medium">Crop Residue Status</span>
-                    <strong className="text-emerald-900 font-extrabold">
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #2D5442' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Crop Residue Status</span>
+                    <strong className="font-extrabold" style={{ color: '#8BC7A3' }}>
                       {(impactData?.residue_diverted_tonnes || 0).toLocaleString()} Tonnes Diverted
                     </strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-emerald-200/60">
-                    <span className="text-slate-600 font-medium">Farmer Revenue</span>
-                    <strong className="text-emerald-900 font-extrabold">
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #2D5442' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Farmer Revenue</span>
+                    <strong className="font-extrabold" style={{ color: '#8BC7A3' }}>
                       ₹{(impactData?.farmer_income_inr || 0).toLocaleString('en-IN')} Paid
                     </strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-emerald-200/60">
-                    <span className="text-slate-600 font-medium">Logistics Efficiency</span>
-                    <strong className="text-emerald-900 font-extrabold">
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #2D5442' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Logistics Efficiency</span>
+                    <strong 
+                      className="font-extrabold text-right" 
+                      style={{ 
+                        color: impactData?.distance_saved_km && impactData.distance_saved_km > 0 ? '#8BC7A3' : '#B8C8BF' 
+                      }}
+                    >
                       {impactData?.distance_saved_km && impactData.distance_saved_km > 0
                         ? `${impactData.distance_saved_km} km Saved (${impactData.average_route_reduction_percent || 0}% Fuel Saved)`
                         : 'Not available'}
                     </strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-emerald-200/60">
-                    <span className="text-slate-600 font-medium">Atmospheric Impact</span>
-                    <strong className="text-emerald-900 font-extrabold">
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #2D5442' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Atmospheric Impact</span>
+                    <strong className="font-extrabold text-right" style={{ color: '#8BC7A3' }}>
                       {impactData?.estimated_emissions_avoided_tco2e || 0} tCO₂e Avoided
                     </strong>
                   </div>

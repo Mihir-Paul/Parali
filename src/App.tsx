@@ -102,11 +102,13 @@ export default function App() {
     );
   }
 
+  // Landing Page Flow
+  if (showLanding) {
+    return <LandingPage onStart={handleStart} />;
+  }
+
   // Unauthenticated Flow
   if (!user) {
-    if (showLanding) {
-      return <LandingPage onStart={handleStart} />;
-    }
     return <AuthLogin />;
   }
 
@@ -160,6 +162,7 @@ export default function App() {
       <Navbar
         currentView={currentView}
         onNavigateProfile={() => setCurrentView(currentView === 'profile' ? 'main' : 'profile')}
+        onNavigateLanding={() => setShowLanding(true)}
         farmerView={farmerView}
         setFarmerView={setFarmerView}
         buyerView={buyerView}
