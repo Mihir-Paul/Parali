@@ -49,14 +49,14 @@ export const UserAvatar: React.FC<UserAvatarProps> = ({
         }}
         referrerPolicy="no-referrer"
         crossOrigin="anonymous"
-        className={`${sizeClass} rounded-full object-cover border border-forest-200 shadow-xs ${className}`}
+        className={`${sizeClass} rounded-full object-cover border border-line-200 ${className}`}
       />
     );
   }
 
   return (
     <div
-      className={`${sizeClass} rounded-full bg-forest-800 text-cream-100 border border-forest-600 font-extrabold flex items-center justify-center shadow-xs select-none ${className}`}
+      className={`${sizeClass} rounded-full bg-pine-900 text-white border border-pine-700 font-semibold flex items-center justify-center select-none ${className}`}
       title={name || email || 'User Profile'}
     >
       {initials}

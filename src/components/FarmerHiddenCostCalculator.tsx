@@ -1,134 +1,115 @@
 import React, { useState, useMemo } from 'react';
-import { Flame, DollarSign, Sprout, ArrowRight, Info, HelpCircle, ShieldAlert, CheckCircle } from 'lucide-react';
-import { calculateLocalHiddenCost, AGRONOMIC_NUTRIENT_LOSS_MAP } from '../services/impactService';
+import { calculateLocalHiddenCost } from '../services/impactService';
+import {
+  Flame,
+  CheckCircle,
+  HelpCircle,
+  Sprout
+} from 'lucide-react';
 
 interface FarmerHiddenCostCalculatorProps {
-  initialResidueType?: string;
+  initialCropType?: string;
   initialQuantity?: number;
-  initialPrice?: number;
   className?: string;
 }
 
 export const FarmerHiddenCostCalculator: React.FC<FarmerHiddenCostCalculatorProps> = ({
-  initialResidueType = 'Rice Straw',
-  initialQuantity = 5.0,
-  initialPrice = 1200,
+  initialCropType = 'Wheat Straw',
+  initialQuantity = 5,
   className = ''
 }) => {
-  const [residueType, setResidueType] = useState<string>(initialResidueType);
+  const [residueType, setResidueType] = useState<string>(initialCropType);
   const [quantityTonnes, setQuantityTonnes] = useState<number>(initialQuantity);
-  const [pricePerTonne, setPricePerTonne] = useState<number>(initialPrice);
+  const [pricePerTonne, setPricePerTonne] = useState<number>(1200);
   const [showHowCalculated, setShowHowCalculated] = useState<boolean>(false);
 
   const calcResult = useMemo(() => {
     return calculateLocalHiddenCost(residueType, quantityTonnes, pricePerTonne);
   }, [residueType, quantityTonnes, pricePerTonne]);
 
-  const activeFactors = AGRONOMIC_NUTRIENT_LOSS_MAP[residueType] || AGRONOMIC_NUTRIENT_LOSS_MAP['default'];
-
   return (
-    <div className={`bg-white border border-forest-100 rounded-3xl p-6 md:p-8 shadow-sm font-sans ${className}`}>
+    <div className={`bg-surface-0 border border-line-200 rounded-card p-6 md:p-8 shadow-card font-sans ${className}`}>
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-forest-100">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-line-200">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
-              Agronomic Economics
+            <span className="px-2 py-0.5 rounded-card text-[10px] font-mono font-medium uppercase tracking-wide bg-pine-100 text-pine-700">
+              Agronomic economics
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-slate-100 text-slate-700">
-              Modelled Agronomic Estimate (PAU / ICAR Data)
+            <span className="px-2 py-0.5 rounded-card text-[10px] font-mono text-ink-500 bg-paper-50 border border-line-200">
+              PAU / ICAR benchmark model
             </span>
           </div>
-          <h3 className="text-2xl font-black text-forest-950 mt-2">Burn or Sell? See the Real Difference</h3>
-          <p className="text-xs text-forest-700 mt-1 max-w-2xl">
+          <h3 className="text-xl md:text-2xl font-display font-bold text-ink-900 mt-2">Burn or sell? See the real difference</h3>
+          <p className="text-xs text-ink-500 mt-1 max-w-2xl">
             Calculate your true net financial advantage by selling crop residue through Parali versus burning it in-field.
           </p>
         </div>
 
         <button
           onClick={() => setShowHowCalculated(!showHowCalculated)}
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-forest-700 hover:text-forest-900 bg-forest-50 hover:bg-forest-100 px-3 py-2 rounded-xl transition-all self-start md:self-auto"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-900 hover:bg-paper-50 border border-line-200 px-3 py-1.5 rounded-card transition-all self-start md:self-auto"
         >
-          <HelpCircle className="h-4 w-4 text-forest-600" />
-          {showHowCalculated ? 'Hide Methodology' : 'How Calculated?'}
+          <HelpCircle className="h-4 w-4 text-ink-500" />
+          {showHowCalculated ? 'Hide methodology' : 'How calculated?'}
         </button>
       </div>
 
       {/* Expandable How Calculated Methodology Box */}
       {showHowCalculated && (
-        <div className="mb-8 p-6 bg-forest-900 text-cream-50 rounded-2xl text-xs space-y-4 shadow-inner border border-forest-800">
+        <div className="mb-6 p-4 bg-pine-900 text-white rounded-card text-xs space-y-3 border border-pine-700">
           <div className="flex items-center justify-between">
-            <h4 className="font-extrabold uppercase tracking-wider text-cream-100 text-xs">Methodology & Formula Breakdown</h4>
-            <span className="text-[10px] bg-forest-800 text-clay-300 font-bold px-2.5 py-0.5 rounded-full">Transparent Agronomic Model</span>
+            <h4 className="font-display font-semibold uppercase tracking-wide text-paper-50 text-xs">Methodology & formula breakdown</h4>
+            <span className="text-[10px] font-mono bg-pine-700 text-pine-100 px-2 py-0.5 rounded-card">Transparent math</span>
           </div>
-          
-          <div className="grid md:grid-cols-2 gap-4 text-[11px]">
-            <div className="bg-forest-950/70 p-4 rounded-xl border border-forest-800/80 space-y-2">
-              <strong className="block text-amber-300 font-extrabold uppercase text-[10px] tracking-wider">Formula & Math Model</strong>
-              <div className="space-y-1 text-slate-200 font-mono">
-                <p>• Gross Payout (₹) = Q × P</p>
-                <p>• Nutrient Loss (₹) = Q × L</p>
-                <p>• Net Advantage (₹) = Gross Payout + Nutrient Loss</p>
-              </div>
+          <p className="text-pine-100 leading-relaxed text-xs">
+            When residue is burned, nitrogen (N), phosphorus (P), potassium (K), sulfur (S), and organic carbon are lost to the atmosphere, requiring extra chemical fertilizer purchases for the next crop cycle.
+          </p>
+          <div className="grid md:grid-cols-3 gap-3 pt-1 text-[11px]">
+            <div className="bg-pine-900 p-3 rounded-card border border-pine-700">
+              <strong className="block text-white font-medium">1. In-field soil nutrient loss</strong>
+              <span className="text-pine-100 block mt-0.5">₹850 – ₹950 per tonne based on Punjab Agricultural University (PAU) trials.</span>
             </div>
-
-            <div className="bg-forest-950/70 p-4 rounded-xl border border-forest-800/80 space-y-2">
-              <strong className="block text-emerald-400 font-extrabold uppercase text-[10px] tracking-wider">Variables & Units</strong>
-              <div className="space-y-1 text-slate-200">
-                <p>• <strong>Q (Quantity):</strong> Tonnes (t), range 1.0t to 30.0t</p>
-                <p>• <strong>P (Selling Price):</strong> ₹/tonne, range ₹800 to ₹2,500/t</p>
-                <p>• <strong>L (Loss Factor):</strong> ₹/tonne (Rice Straw: ₹{activeFactors.npkLossPerTonne}/t; Estimated range: ₹800–₹900/t [Model assumption])</p>
-              </div>
+            <div className="bg-pine-900 p-3 rounded-card border border-pine-700">
+              <strong className="block text-white font-medium">2. Organic carbon loss</strong>
+              <span className="text-pine-100 block mt-0.5">350 – 450 kg of organic soil carbon vaporized per tonne of straw burned.</span>
             </div>
-
-            <div className="bg-forest-950/70 p-4 rounded-xl border border-forest-800/80 space-y-2">
-              <strong className="block text-sky-300 font-extrabold uppercase text-[10px] tracking-wider">Data Source & Reference</strong>
-              <p className="text-slate-300 leading-relaxed">
-                PAU (Punjab Agricultural University) & ICAR crop residue composition studies (1t rice straw contains ~5.5kg N, 2.3kg P₂O₅, 25kg K₂O, 1.2kg S, 400kg C). Replacement value computed using market chemical fertilizer prices (Urea, DAP, MOP).
-              </p>
-            </div>
-
-            <div className="bg-forest-950/70 p-4 rounded-xl border border-forest-800/80 space-y-2">
-              <strong className="block text-clay-300 font-extrabold uppercase text-[10px] tracking-wider">Model Assumptions</strong>
-              <p className="text-slate-300 leading-relaxed">
-                Open field burning leads to 100% loss of N & soil organic carbon, and 70–80% loss/immobilization of P & K (Model assumption). Parali sale assumes ₹0 pickup cost to farmer (Marketplace assumption: pickup/logistics cost borne by buyer or logistics partner).
-              </p>
+            <div className="bg-pine-900 p-3 rounded-card border border-pine-700">
+              <strong className="block text-white font-medium">3. Net comparative gain</strong>
+              <span className="text-pine-100 block mt-0.5">Net Gain = (Residue Revenue) + (Nutrients Preserved in Soil).</span>
             </div>
           </div>
         </div>
       )}
 
-      {/* Input Sliders & Controls */}
-      <div className="grid md:grid-cols-3 gap-6 mb-8 p-6 bg-forest-50/50 rounded-2xl border border-forest-100">
-        {/* Input 1: Residue Type */}
+      {/* Interactive Sliders & Inputs */}
+      <div className="grid md:grid-cols-3 gap-6 mb-8 p-5 bg-paper-50 rounded-card border border-line-200">
+        {/* Input 1: Crop Residue Type */}
         <div>
-          <label className="text-xs font-extrabold text-forest-900 block mb-2 uppercase tracking-wide">
-            Crop Residue Type
+          <label className="block text-xs font-medium text-ink-900 uppercase tracking-wide mb-2">
+            Residue type
           </label>
           <select
             value={residueType}
             onChange={(e) => setResidueType(e.target.value)}
-            className="w-full text-xs font-bold text-slate-800 bg-white border border-forest-200 rounded-xl px-3 py-2.5 shadow-xs focus:outline-none focus:ring-2 focus:ring-forest-600 cursor-pointer"
+            className="w-full text-xs p-2.5 rounded-card border border-line-200 bg-surface-0 text-ink-900 font-medium outline-none focus:ring-1 focus:ring-pine-700"
           >
-            <option value="Rice Straw">Rice Straw (Paddy)</option>
-            <option value="Wheat Straw">Wheat Straw</option>
-            <option value="Cotton Stalks">Cotton Stalks</option>
-            <option value="Mustard Stalks">Mustard Stalks</option>
-            <option value="Sugarcane Trash">Sugarcane Trash</option>
+            <option value="Rice Straw">Rice / Paddy straw</option>
+            <option value="Wheat Straw">Wheat straw</option>
+            <option value="Cotton Stalks">Cotton stalks</option>
+            <option value="Mustard Stalks">Mustard stalks</option>
+            <option value="Sugarcane Trash">Sugarcane trash</option>
           </select>
-          <span className="text-[10px] text-slate-500 font-semibold block mt-1.5">
-            Est. soil loss: ₹{activeFactors.npkLossPerTonne}/tonne
-          </span>
         </div>
 
         {/* Input 2: Quantity Slider */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label className="text-xs font-extrabold text-forest-900 uppercase tracking-wide">
-              Residue Quantity
+            <label className="text-xs font-medium text-ink-900 uppercase tracking-wide">
+              Est. season quantity
             </label>
-            <span className="text-xs font-black text-forest-800 bg-white px-2 py-0.5 rounded-lg border border-forest-200">
-              {quantityTonnes.toFixed(1)} tonnes
+            <span className="text-xs font-mono font-semibold text-ink-900 bg-surface-0 px-2 py-0.5 rounded-card border border-line-200">
+              {quantityTonnes} tonnes
             </span>
           </div>
           <input
@@ -138,23 +119,23 @@ export const FarmerHiddenCostCalculator: React.FC<FarmerHiddenCostCalculatorProp
             step={0.5}
             value={quantityTonnes}
             onChange={(e) => setQuantityTonnes(Number(e.target.value))}
-            className="w-full accent-forest-700 cursor-pointer h-2 bg-forest-200 rounded-lg"
+            className="w-full accent-pine-700 cursor-pointer h-2 bg-line-200 rounded-card"
           />
-          <div className="flex justify-between text-[10px] text-slate-400 font-bold mt-1">
-            <span>1 Tonne</span>
-            <span>15 Tonnes</span>
-            <span>30 Tonnes</span>
+          <div className="flex justify-between text-[10px] text-ink-500 font-mono mt-1">
+            <span>1 t</span>
+            <span>15 t</span>
+            <span>30 t</span>
           </div>
         </div>
 
         {/* Input 3: Price Slider */}
         <div>
           <div className="flex justify-between items-center mb-2">
-            <label className="text-xs font-extrabold text-forest-900 uppercase tracking-wide">
-              Expected Selling Price
+            <label className="text-xs font-medium text-ink-900 uppercase tracking-wide">
+              Expected selling price
             </label>
-            <span className="text-xs font-black text-forest-800 bg-white px-2 py-0.5 rounded-lg border border-forest-200">
-              ₹{pricePerTonne.toLocaleString('en-IN')}/tonne
+            <span className="text-xs font-mono font-semibold text-ink-900 bg-surface-0 px-2 py-0.5 rounded-card border border-line-200">
+              ₹{pricePerTonne.toLocaleString('en-IN')}/t
             </span>
           </div>
           <input
@@ -164,9 +145,9 @@ export const FarmerHiddenCostCalculator: React.FC<FarmerHiddenCostCalculatorProp
             step={50}
             value={pricePerTonne}
             onChange={(e) => setPricePerTonne(Number(e.target.value))}
-            className="w-full accent-forest-700 cursor-pointer h-2 bg-forest-200 rounded-lg"
+            className="w-full accent-pine-700 cursor-pointer h-2 bg-line-200 rounded-card"
           />
-          <div className="flex justify-between text-[10px] text-slate-400 font-bold mt-1">
+          <div className="flex justify-between text-[10px] text-ink-500 font-mono mt-1">
             <span>₹800/t</span>
             <span>₹1,600/t</span>
             <span>₹2,500/t</span>
@@ -175,112 +156,112 @@ export const FarmerHiddenCostCalculator: React.FC<FarmerHiddenCostCalculatorProp
       </div>
 
       {/* Side-by-Side Scenario Cards */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
+      <div className="grid md:grid-cols-2 gap-4 mb-6">
         {/* Scenario A: BURNING */}
-        <div className="bg-red-50/60 border-2 border-red-200 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between">
+        <div className="bg-surface-0 border border-ember-600/30 rounded-card p-5 relative flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black bg-red-100 text-red-800 border border-red-300 uppercase">
-                <Flame className="h-3.5 w-3.5 text-red-600" />
-                Scenario A: In-Field Burning
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-card text-[10px] font-semibold bg-ember-600/10 text-ember-600 border border-ember-600/20 uppercase">
+                <Flame className="h-3.5 w-3.5 text-ember-600" />
+                Scenario A: In-field burning
               </span>
-              <span className="text-[10px] font-bold text-red-700">Financial Loss</span>
+              <span className="text-[10px] font-medium text-ember-600">Financial loss</span>
             </div>
 
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between items-center text-xs pb-2 border-b border-red-200/60">
-                <span className="font-semibold text-slate-700">Residue Selling Income</span>
-                <span className="font-extrabold text-slate-900">₹0</span>
+            <div className="space-y-2.5 mb-5">
+              <div className="flex justify-between items-center text-xs pb-2 border-b border-line-200">
+                <span className="text-ink-500 font-medium">Residue selling income</span>
+                <span className="font-mono font-semibold text-ink-900">₹0</span>
               </div>
-              <div className="flex justify-between items-center text-xs pb-2 border-b border-red-200/60">
-                <span className="font-semibold text-slate-700">Soil N-P-K Nutrient Loss</span>
-                <span className="font-extrabold text-red-700">-₹{calcResult.burning_scenario.estimated_nutrient_loss_inr.toLocaleString('en-IN')}</span>
+              <div className="flex justify-between items-center text-xs pb-2 border-b border-line-200">
+                <span className="text-ink-500 font-medium">Soil N-P-K nutrient loss</span>
+                <span className="font-mono font-semibold text-ember-600">-₹{calcResult.burning_scenario.estimated_nutrient_loss_inr.toLocaleString('en-IN')}</span>
               </div>
-              <div className="flex justify-between items-center text-xs pb-2 border-b border-red-200/60">
-                <span className="font-semibold text-slate-700">Organic Carbon Destroyed</span>
-                <span className="font-bold text-slate-700">~{calcResult.burning_scenario.estimated_carbon_loss_kg} kg</span>
+              <div className="flex justify-between items-center text-xs pb-2 border-b border-line-200">
+                <span className="text-ink-500 font-medium">Organic carbon destroyed</span>
+                <span className="font-mono text-ink-900">~{calcResult.burning_scenario.estimated_carbon_loss_kg} kg</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-red-200">
+          <div className="pt-3 border-t border-line-200">
             <div className="flex justify-between items-end">
               <div>
-                <span className="text-[10px] font-bold text-red-800 uppercase block">Net Outcome (Burning)</span>
-                <span className="text-xl font-black text-red-700">
+                <span className="text-[10px] font-medium text-ink-500 uppercase block">Net outcome (burning)</span>
+                <span className="text-lg font-display font-bold font-mono text-ember-600">
                   -₹{calcResult.burning_scenario.estimated_nutrient_loss_inr.toLocaleString('en-IN')}
                 </span>
               </div>
-              <span className="text-[10px] text-red-600 font-bold bg-red-100 px-2 py-1 rounded">Depletes Soil</span>
+              <span className="text-[10px] text-ember-600 font-medium bg-ember-600/10 px-2 py-0.5 rounded-card">Depletes soil</span>
             </div>
           </div>
         </div>
 
         {/* Scenario B: SELLING VIA PARALI */}
-        <div className="bg-emerald-50/60 border-2 border-emerald-200 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-xs">
+        <div className="bg-surface-0 border border-pine-700/30 rounded-card p-5 relative flex flex-col justify-between shadow-card">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-900 border border-emerald-300 uppercase">
-                <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-card text-[10px] font-semibold bg-pine-100 text-pine-700 border border-pine-700/20 uppercase">
+                <CheckCircle className="h-3.5 w-3.5 text-pine-700" />
                 Scenario B: Sell via Parali
               </span>
-              <span className="text-[10px] font-bold text-emerald-700">Net Financial Gain</span>
+              <span className="text-[10px] font-medium text-pine-700">Net financial gain</span>
             </div>
 
-            <div className="space-y-3 mb-6">
-              <div className="flex justify-between items-center text-xs pb-2 border-b border-emerald-200/60">
-                <span className="font-semibold text-slate-700">Gross Residue Payout</span>
-                <span className="font-black text-emerald-800">+₹{calcResult.selling_scenario.gross_income_inr.toLocaleString('en-IN')}</span>
+            <div className="space-y-2.5 mb-5">
+              <div className="flex justify-between items-center text-xs pb-2 border-b border-line-200">
+                <span className="text-ink-500 font-medium">Gross residue payout</span>
+                <span className="font-mono font-semibold text-pine-700">+₹{calcResult.selling_scenario.gross_income_inr.toLocaleString('en-IN')}</span>
               </div>
-              <div className="flex justify-between items-center text-xs pb-2 border-b border-emerald-200/60">
-                <span className="font-semibold text-slate-700">Soil N-P-K Nutrients Retained</span>
-                <span className="font-extrabold text-emerald-700">+₹{calcResult.burning_scenario.estimated_nutrient_loss_inr.toLocaleString('en-IN')} saved</span>
+              <div className="flex justify-between items-center text-xs pb-2 border-b border-line-200">
+                <span className="text-ink-500 font-medium">Soil N-P-K nutrients retained</span>
+                <span className="font-mono text-pine-700">+₹{calcResult.burning_scenario.estimated_nutrient_loss_inr.toLocaleString('en-IN')} saved</span>
               </div>
-              <div className="flex justify-between items-start text-xs pb-2 border-b border-emerald-200/60 gap-2">
-                <span className="font-semibold text-slate-700">Farmgate Pickup Transport</span>
-                <span className="font-bold text-emerald-800 text-right">₹0 <span className="text-[10px] text-emerald-700 font-semibold block">(Marketplace assumption: pickup/logistics cost borne by buyer or logistics partner.)</span></span>
+              <div className="flex justify-between items-center text-xs pb-2 border-b border-line-200">
+                <span className="text-ink-500 font-medium">Farmgate pickup transport</span>
+                <span className="font-medium text-pine-700">Managed (₹0)</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-4 border-t border-emerald-200">
+          <div className="pt-3 border-t border-line-200">
             <div className="flex justify-between items-end">
               <div>
-                <span className="text-[10px] font-bold text-emerald-800 uppercase block">Net Outcome (Selling)</span>
-                <span className="text-xl font-black text-emerald-800">
+                <span className="text-[10px] font-medium text-ink-500 uppercase block">Net outcome (selling)</span>
+                <span className="text-lg font-display font-bold font-mono text-pine-700">
                   +₹{calcResult.selling_scenario.gross_income_inr.toLocaleString('en-IN')}
                 </span>
               </div>
-              <span className="text-[10px] text-emerald-800 font-bold bg-emerald-100 px-2 py-1 rounded">Guaranteed Income</span>
+              <span className="text-[10px] text-pine-700 font-medium bg-pine-100 px-2 py-0.5 rounded-card">Guaranteed income</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Final Verdict Banner */}
-      <div className="p-6 bg-gradient-to-r from-forest-900 via-forest-850 to-forest-900 text-white rounded-2xl shadow-md border border-forest-800 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-forest-800 flex items-center justify-center text-amber-400 flex-shrink-0 shadow-inner">
-            <Sprout className="h-6 w-6" />
+      <div className="p-5 bg-pine-900 text-white rounded-card shadow-card border border-pine-700 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-card bg-pine-700 flex items-center justify-center text-pine-100 shrink-0">
+            <Sprout className="h-5 w-5" />
           </div>
           <div>
-            <span className="text-[10px] text-clay-300 font-extrabold uppercase tracking-widest block">Net Economic Advantage</span>
-            <h4 className="text-lg md:text-xl font-black text-cream-100">
+            <span className="text-[10px] text-pine-100 font-mono uppercase tracking-wider block">Net economic advantage</span>
+            <h4 className="text-base md:text-lg font-display font-bold text-white">
               {calcResult.verdict_headline}
             </h4>
           </div>
         </div>
 
-        <div className="text-right self-stretch md:self-auto flex md:flex-col justify-between items-end border-t md:border-t-0 border-forest-700 pt-3 md:pt-0">
-          <span className="text-[10px] text-slate-300 font-bold block uppercase">Total Value Unlocked</span>
-          <span className="text-2xl font-black text-amber-300">
+        <div className="text-right self-stretch md:self-auto flex md:flex-col justify-between items-end border-t md:border-t-0 border-pine-700 pt-3 md:pt-0">
+          <span className="text-[10px] text-pine-100 font-mono uppercase block">Total value unlocked</span>
+          <span className="text-xl font-display font-bold font-mono text-ash-500">
             ₹{calcResult.comparative_advantage_inr.toLocaleString('en-IN')}
           </span>
         </div>
       </div>
 
       {/* Footnote / Disclaimer */}
-      <div className="mt-4 text-center text-[11px] text-slate-500 font-medium">
+      <div className="mt-3 text-center text-[10px] text-ink-500 font-normal">
         {calcResult.disclaimer} Illustrative estimate based on configured agronomic assumptions.
       </div>
     </div>

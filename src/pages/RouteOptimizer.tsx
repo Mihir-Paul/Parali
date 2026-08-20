@@ -13,8 +13,8 @@ import {
   Play, 
   RefreshCw, 
   CheckCircle2, 
+  Layers,
   TrendingDown, 
-  Layers, 
   ChevronRight, 
   MapPin, 
   Sparkles,
@@ -138,7 +138,6 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
     loadRouteOptimization();
   };
 
-  // Selected route or summary of all routes
   const activeRoutes: VehicleRoute[] = routeData?.routes || [];
   const displayedRoutes = selectedVehicleIndex === null 
     ? activeRoutes 
@@ -155,7 +154,7 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
   const baseline = routeData?.baseline;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 font-sans selection:bg-forest-200">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 font-sans">
       
       {/* Missing Buyer Depot Facility Warning Banner */}
       {depotMissing && (
@@ -188,273 +187,176 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
             onClick={handleRunOptimizer}
             className="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black px-4 py-1.5 rounded-xl transition-all cursor-pointer"
           >
-            Recalculate Route
+            Recalculate route
           </button>
         </div>
       )}
 
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+      {/* Header Bar */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
-          <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-forest-700 mb-1">
-            <Compass className="h-4 w-4 text-forest-600" /> Automated Fleet Dispatching
+          <div className="flex items-center gap-2 mb-1">
+            <span className="px-2 py-0.5 rounded-card text-[10px] font-mono font-medium uppercase tracking-wide bg-pine-100 text-pine-700">
+              OR-Tools Logistics Engine
+            </span>
+            <span className="px-2 py-0.5 rounded-card text-[10px] font-mono text-ink-500 bg-paper-50 border border-line-200 uppercase">
+              Multi-depot CVRP
+            </span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-black text-forest-950">
-            Logistics Route Optimizer
-          </h1>
-          <p className="text-xs md:text-sm text-forest-750 mt-1">
-            Capacitated Vehicle Routing Problem (CVRP) powered by OR-Tools and OpenRouteService road network directions.
+          <h2 className="text-2xl md:text-3xl font-display font-bold text-ink-900">Collection route optimizer</h2>
+          <p className="text-xs text-ink-500 mt-0.5">
+            Capacitated vehicle routing solved with OR-Tools and OpenRouteService road network directions.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             onClick={loadRouteOptimization}
             disabled={loading}
-            className="p-3 border border-forest-200 hover:bg-forest-50 rounded-2xl text-xs font-bold text-forest-800 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+            className="p-2 border border-line-200 hover:bg-paper-50 rounded-card text-xs font-medium text-ink-900 transition-all flex items-center gap-1.5"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+            <RefreshCw className={`h-4 w-4 text-pine-700 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
           <button
             onClick={handleRunOptimizer}
             disabled={loading || acceptedFarmsCount === 0}
-            className={`font-extrabold px-5 py-3 rounded-2xl shadow-md transition-all text-xs flex items-center gap-2 ${
+            className={`font-semibold px-4 py-2 rounded-card shadow-card transition-all text-xs flex items-center gap-1.5 ${
               acceptedFarmsCount > 0
-                ? 'bg-forest-600 hover:bg-forest-700 text-white cursor-pointer'
-                : 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-300'
+                ? 'bg-pine-900 hover:bg-pine-700 text-white cursor-pointer'
+                : 'bg-paper-50 text-ink-500 border border-line-200 cursor-not-allowed'
             }`}
-            title={acceptedFarmsCount === 0 ? 'No accepted suppliers yet.' : 'Recalculate optimized pickup route'}
           >
-            <Play className="h-4 w-4 fill-current" />
-            {acceptedFarmsCount > 0 ? (isStale ? 'Recalculate Route' : 'Optimize Pickup Route') : 'No accepted suppliers yet'}
+            <Play className="h-3.5 w-3.5 fill-white" /> Recalculate routes
           </button>
         </div>
       </div>
 
-      {/* Main Grid Layout */}
-      <div className="grid lg:grid-cols-12 gap-8 items-start">
+      {/* Map-First Split View Container */}
+      <div className="grid lg:grid-cols-12 gap-6 items-start">
         
-        {/* Left Side: Summary Cards & Vehicle Route Sequence */}
-        <div className="lg:col-span-5 flex flex-col gap-6">
+        {/* Dominant WebGL Route Map Column (7/12) */}
+        <div className="lg:col-span-7 bg-surface-0 border border-line-200 rounded-card shadow-card overflow-hidden">
+          <div className="p-3 bg-paper-50 border-b border-line-200 flex justify-between items-center text-xs">
+            <span className="font-display font-bold text-ink-900 flex items-center gap-1.5">
+              <Compass className="h-4 w-4 text-pine-700" /> Dispatch Spatial Routing Canvas
+            </span>
+            <div className="flex items-center gap-1.5 font-mono text-[10px]">
+              <button
+                onClick={() => setSelectedVehicleIndex(null)}
+                className={`px-2 py-0.5 rounded-card border ${
+                  selectedVehicleIndex === null ? 'bg-pine-900 text-white border-pine-900' : 'bg-surface-0 text-ink-500 border-line-200'
+                }`}
+              >
+                All trucks
+              </button>
+              {activeRoutes.map((r) => (
+                <button
+                  key={r.vehicle_index}
+                  onClick={() => setSelectedVehicleIndex(r.vehicle_index)}
+                  className={`px-2 py-0.5 rounded-card border ${
+                    selectedVehicleIndex === r.vehicle_index ? 'bg-pine-900 text-white border-pine-900' : 'bg-surface-0 text-ink-500 border-line-200'
+                  }`}
+                >
+                  Truck {r.vehicle_index + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="h-[520px] relative">
+            <MapViewer
+              routeData={routeData}
+              selectedVehicleIndex={selectedVehicleIndex}
+              showHotspots={false}
+              showRoutes={true}
+            />
+          </div>
+        </div>
+
+        {/* Right Docked Route Telemetry & Sequences Column (5/12) */}
+        <div className="lg:col-span-5 space-y-6">
           
-          {/* Collection Plan Summary */}
-          <div className="bg-white border border-forest-100 p-6 rounded-3xl shadow-sm">
-            <h3 className="font-black text-base text-forest-950 mb-4 flex items-center gap-2">
-              <Compass className="h-5 w-5 text-forest-600" /> Collection Plan Summary
+          {/* Metrics Overview Card */}
+          <div className="bg-surface-0 border border-line-200 rounded-card p-5 shadow-card">
+            <h3 className="text-sm font-display font-bold text-ink-900 mb-3 flex items-center justify-between">
+              <span>Optimization Telemetry</span>
+              <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-card bg-pine-100 text-pine-700">
+                OR-Tools Engine
+              </span>
             </h3>
-            
-            <div className="grid grid-cols-2 gap-3.5 mb-6">
-              <div className="bg-forest-50/60 p-4 rounded-2xl border border-forest-100/40">
-                <span className="text-[10px] text-slate-500 font-extrabold block uppercase tracking-wider">Farms Batched</span>
-                <span className="text-xl font-black text-forest-950 mt-0.5 block">{totalFarmsCount} Farms</span>
+
+            <div className="grid grid-cols-2 gap-3 font-mono text-xs">
+              <div className="p-3 bg-paper-50 rounded-card border border-line-200">
+                <span className="text-[10px] font-sans text-ink-500 block uppercase">Total distance</span>
+                <span className="text-base font-bold text-ink-900">{totalDistanceKm.toFixed(1)} km</span>
               </div>
-              <div className="bg-forest-50/60 p-4 rounded-2xl border border-forest-100/40">
-                <span className="text-[10px] text-slate-500 font-extrabold block uppercase tracking-wider">Total Tonnage</span>
-                <span className="text-xl font-black text-forest-950 mt-0.5 block">{totalTonnage.toFixed(1)} Tonnes</span>
+
+              <div className="p-3 bg-paper-50 rounded-card border border-line-200">
+                <span className="text-[10px] font-sans text-ink-500 block uppercase">Est. duration</span>
+                <span className="text-base font-bold text-ink-900">{hours > 0 ? `${hours}h ` : ''}{mins}m</span>
               </div>
-              <div className="bg-forest-50/60 p-4 rounded-2xl border border-forest-100/40">
-                <span className="text-[10px] text-slate-500 font-extrabold block uppercase tracking-wider">Road Distance</span>
-                <span className="text-xl font-black text-forest-950 mt-0.5 block">{totalDistanceKm} km</span>
+
+              <div className="p-3 bg-paper-50 rounded-card border border-line-200">
+                <span className="text-[10px] font-sans text-ink-500 block uppercase">Farms collected</span>
+                <span className="text-base font-bold text-ink-900">{totalFarmsCount} farms</span>
               </div>
-              <div className="bg-forest-50/60 p-4 rounded-2xl border border-forest-100/40">
-                <span className="text-[10px] text-slate-500 font-extrabold block uppercase tracking-wider">Logistics Time</span>
-                <span className="text-xl font-black text-forest-950 mt-0.5 block">
-                  {hours > 0 ? `${hours}h ` : ''}{mins}m
-                </span>
+
+              <div className="p-3 bg-paper-50 rounded-card border border-line-200">
+                <span className="text-[10px] font-sans text-ink-500 block uppercase">Payload biomass</span>
+                <span className="text-base font-bold text-pine-700">{totalTonnage.toFixed(1)} t</span>
               </div>
             </div>
 
-            {/* Distance & Cost Savings Comparison */}
+            {/* Baseline comparison callout */}
             {baseline && (
-              <div className="border-t border-slate-100 pt-5">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
-                    Logistics Efficiency Metrics
-                  </span>
-                  <span className="text-xs bg-emerald-100 text-emerald-800 font-black px-2 py-0.5 rounded-full">
-                    {baseline.savings_pct}% Distance Reduction
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 items-center bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                  <div>
-                    <span className="text-[9px] text-slate-400 font-bold block uppercase">Naive Distance</span>
-                    <span className="text-xs font-black text-slate-700">{baseline.traditional_distance_km} km</span>
-                  </div>
-                  <div>
-                    <span className="text-[9px] text-slate-400 font-bold block uppercase">AI Optimized</span>
-                    <span className="text-xs font-black text-forest-700">{baseline.optimized_distance_km} km</span>
-                  </div>
-                  <div className="bg-forest-600 text-white p-2.5 rounded-xl text-center shadow-xs">
-                    <span className="text-[9px] font-bold block uppercase tracking-wider leading-none">Saved</span>
-                    <span className="text-xs font-black mt-1 block">{baseline.distance_saved_km} km</span>
-                  </div>
-                </div>
+              <div className="mt-4 pt-3 border-t border-line-200 text-xs flex justify-between items-center text-ink-500 font-mono">
+                <span>Distance saved vs unoptimized:</span>
+                <span className="font-bold text-pine-700 font-sans flex items-center gap-1">
+                  <TrendingDown className="h-3.5 w-3.5" />
+                  {baseline.distance_saved_km.toFixed(1)} km ({baseline.savings_pct ? baseline.savings_pct.toFixed(0) : 0}%)
+                </span>
               </div>
             )}
           </div>
 
-          {/* Vehicle Selector Tabs */}
-          {activeRoutes.length > 1 && (
-            <div className="bg-white border border-forest-100 p-2 rounded-2xl flex items-center gap-1 shadow-xs">
-              <button
-                onClick={() => setSelectedVehicleIndex(null)}
-                className={`flex-1 py-2 px-3 rounded-xl text-xs font-extrabold transition-all ${
-                  selectedVehicleIndex === null
-                    ? 'bg-forest-900 text-white shadow-sm'
-                    : 'text-slate-600 hover:bg-forest-50'
-                }`}
-              >
-                All Routes ({activeRoutes.length} Trucks)
-              </button>
-              {activeRoutes.map(r => (
-                <button
-                  key={`truck-tab-${r.vehicle_index}`}
-                  onClick={() => setSelectedVehicleIndex(r.vehicle_index)}
-                  className={`flex-1 py-2 px-3 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 ${
-                    selectedVehicleIndex === r.vehicle_index
-                      ? 'bg-forest-600 text-white shadow-sm'
-                      : 'text-slate-600 hover:bg-forest-50'
-                  }`}
-                >
-                  <Truck className="h-3.5 w-3.5" /> Truck {r.vehicle_index}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Smart Pickup Plan — Vehicle Stop Sequences */}
-          <div className="bg-white border border-forest-100 p-6 rounded-3xl shadow-sm space-y-6">
-            <h3 className="font-black text-base text-forest-950 flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <Truck className="h-5 w-5 text-forest-600" /> Smart Pickup Plan
-              </span>
-              <span className="text-xs text-slate-500 font-bold">
-                Capacity: 15T / Truck
-              </span>
+          {/* Vehicle Stops Sequence Breakdown */}
+          <div className="bg-surface-0 border border-line-200 rounded-card p-5 shadow-card max-h-[380px] overflow-y-auto space-y-4">
+            <h3 className="text-sm font-display font-bold text-ink-900 flex items-center gap-2">
+              <Truck className="h-4 w-4 text-pine-700" /> Fleet Pickup Sequence
             </h3>
 
-            {displayedRoutes.map((route) => {
-              const farmStops = route.stops.filter(s => s.type === 'farm');
-
-              return (
-                <div 
-                  key={`route-card-${route.vehicle_index}`} 
-                  className="bg-cream-50/60 border border-forest-100/60 rounded-2xl p-4 space-y-4"
-                >
-                  {/* Truck Header */}
-                  <div className="flex items-center justify-between pb-3 border-b border-forest-100/60">
-                    <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-lg bg-forest-800 text-white font-black text-xs flex items-center justify-center">
-                        {route.vehicle_index}
-                      </span>
-                      <span className="font-extrabold text-sm text-forest-950">
-                        Truck #{route.vehicle_index} Pickup Route
-                      </span>
-                    </div>
-                    <span className="text-[11px] font-bold bg-forest-100 text-forest-800 px-2.5 py-1 rounded-full">
-                      {route.total_quantity_tonnes}T Load ({route.capacity_utilization_pct}%)
+            {displayedRoutes.length === 0 ? (
+              <p className="text-xs text-ink-500 font-mono text-center py-6">No active vehicle routes computed.</p>
+            ) : (
+              displayedRoutes.map((route) => (
+                <div key={route.vehicle_index} className="border border-line-200 rounded-card p-3 bg-paper-50 text-xs space-y-2">
+                  <div className="flex justify-between items-center border-b border-line-200 pb-2">
+                    <span className="font-bold text-ink-900 flex items-center gap-1.5 font-sans">
+                      Vehicle #{route.vehicle_index + 1}
+                    </span>
+                    <span className="font-mono text-[10px] text-ink-500">
+                      {route.total_quantity_tonnes}t / {route.distance_km.toFixed(1)} km
                     </span>
                   </div>
 
-                  {/* Stops Sequence List */}
-                  <div className="relative pl-4 border-l-2 border-forest-200 space-y-3">
-                    
-                    {/* Depot Start */}
-                    <div className="relative flex items-center gap-3 text-xs">
-                      <span className="absolute -left-[21px] w-3 h-3 rounded-full bg-amber-800 border-2 border-white"></span>
-                      <div>
-                        <span className="font-extrabold text-slate-900 block">DEPOT • GreenGrow Bio-Energy</span>
-                        <span className="text-[10px] text-slate-500">Departure & Logistics Hub</span>
-                      </div>
-                    </div>
-
-                    {/* Farm Pickups */}
-                    {farmStops.map((stop) => (
-                      <div key={`stop-item-${stop.id}`} className="relative flex items-center justify-between gap-2 text-xs bg-white p-2.5 rounded-xl border border-forest-100/60">
-                        <span className="absolute -left-[21px] w-3 h-3 rounded-full bg-forest-600 border-2 border-white"></span>
-                        
-                        <div>
-                          <span className="font-black text-forest-950 block">
-                            Stop #{stop.sequence}. {stop.name}
-                          </span>
-                          <span className="text-[10px] text-slate-500">
-                            {stop.residue_type || 'Rice Straw'} • Est. {stop.estimated_travel_minutes} mins
-                          </span>
-                        </div>
-
-                        <span className="font-black text-xs text-forest-800 bg-forest-50 px-2 py-1 rounded-lg shrink-0">
-                          {stop.quantity_tonnes} T
+                  <div className="space-y-1.5 pt-1 font-mono text-[11px]">
+                    {route.stops.map((stop, idx) => (
+                      <div key={idx} className="flex items-center gap-2 text-ink-900">
+                        <span className="w-4 h-4 rounded-full bg-surface-0 border border-line-200 flex items-center justify-center text-[9px] font-bold text-ink-500 shrink-0">
+                          {stop.sequence}
                         </span>
+                        <span className="truncate">
+                          {stop.type === 'depot' ? 'Depot Hub' : stop.name || `Farm ${stop.sequence}`}
+                        </span>
+                        {stop.quantity_tonnes && stop.quantity_tonnes > 0 ? (
+                          <span className="ml-auto text-[10px] text-pine-700 font-semibold shrink-0">+{stop.quantity_tonnes}t</span>
+                        ) : null}
                       </div>
                     ))}
-
-                    {/* Depot Return */}
-                    <div className="relative flex items-center gap-3 text-xs pt-1">
-                      <span className="absolute -left-[21px] w-3 h-3 rounded-full bg-amber-800 border-2 border-white"></span>
-                      <div>
-                        <span className="font-extrabold text-slate-900 block">RETURN TO DEPOT</span>
-                        <span className="text-[10px] text-slate-500">Unload biomass payload at factory</span>
-                      </div>
-                    </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Legitimate Optimization Status Card (Replaces fake terminal log console) */}
-          <div className="bg-white border border-forest-100 p-5 rounded-3xl shadow-sm">
-            <h4 className="text-xs font-extrabold text-forest-900 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-              <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Optimization Execution Verification
-            </h4>
-            
-            <div className="space-y-2 text-xs text-slate-700">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span>Supplier farm coordinates & residue payloads loaded</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span>Distance matrix fetched via OpenRouteService / Haversine fallback</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span>Capacitated Vehicle Routing Problem (CVRP) solved with Google OR-Tools</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span>GeoJSON road directions drawn on Leaflet OpenStreetMap canvas</span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Right Side: Interactive Leaflet OpenStreetMap Container */}
-        <div className="lg:col-span-7 flex flex-col gap-4">
-          
-          <div className="bg-white border border-forest-100 p-2 rounded-3xl shadow-sm overflow-hidden">
-            <MapViewer
-              routeData={routeData}
-              selectedVehicleIndex={selectedVehicleIndex}
-              showRoutes={true}
-              isLoading={loading}
-            />
-          </div>
-
-          <div className="bg-forest-900 text-white p-5 rounded-3xl text-xs space-y-1 shadow-md border border-forest-800">
-            <div className="flex items-center justify-between">
-              <span className="font-extrabold uppercase text-[10px] text-clay-300 tracking-wider">
-                Live Geographic Routing Active
-              </span>
-              <span className="text-[10px] bg-forest-800 text-forest-200 px-2 py-0.5 rounded-full font-bold">
-                Source: {routeData?.optimization_source === 'ors' ? 'OpenRouteService Road Network' : 'ORS / Haversine Matrix'}
-              </span>
-            </div>
-            <p className="text-forest-100 pt-1 font-medium leading-relaxed">
-              💡 Vehicle collection paths are rendered over real OpenStreetMap road tiles. Routes turn and follow actual highways and rural connectivity paths between Punjab farm clusters and the central biomass depot.
-            </p>
+              ))
+            )}
           </div>
 
         </div>

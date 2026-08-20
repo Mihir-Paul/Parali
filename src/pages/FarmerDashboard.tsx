@@ -390,7 +390,7 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
       {/* Integrated Hidden Cost Calculator */}
       <div className="mt-12">
         <FarmerHiddenCostCalculator
-          initialResidueType={`${primaryCrop} Straw`}
+          initialCropType={`${primaryCrop} Straw`}
           initialQuantity={estimatedTonnes > 0 ? Number(estimatedTonnes) : 5.0}
         />
       </div>

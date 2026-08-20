@@ -84,14 +84,18 @@ export default function App() {
     setShowLanding(false);
   };
 
-  // Auth Loading and Callback states
+  // Auth Loading and Callback states — skeleton instead of spinner
   if (loading || isCallback) {
     return (
-      <div className="min-h-screen bg-cream-50 flex flex-col justify-center items-center font-sans">
+      <div className="min-h-screen bg-paper-50 flex flex-col justify-center items-center font-sans">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-forest-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm font-bold text-forest-800">
-            {isCallback ? 'Completing Google authorization...' : 'Checking session...'}
+          <div className="flex gap-2">
+            <div className="w-3 h-3 rounded-full bg-pine-700 skeleton" style={{ animationDelay: '0ms' }}></div>
+            <div className="w-3 h-3 rounded-full bg-pine-700 skeleton" style={{ animationDelay: '200ms' }}></div>
+            <div className="w-3 h-3 rounded-full bg-pine-700 skeleton" style={{ animationDelay: '400ms' }}></div>
+          </div>
+          <p className="text-sm font-medium text-ink-500">
+            {isCallback ? 'Completing Google authorization…' : 'Checking session…'}
           </p>
         </div>
       </div>
@@ -111,15 +115,55 @@ export default function App() {
     return <Onboarding onComplete={() => setShowLanding(false)} />;
   }
 
+  // Sidebar button component for consistency
+  const SidebarButton = ({ active, onClick, icon: Icon, label, accent = 'pine' }: {
+    active: boolean;
+    onClick: () => void;
+    icon: React.ElementType;
+    label: string;
+    accent?: 'pine' | 'soil';
+  }) => (
+    <button
+      onClick={onClick}
+      className={`w-full text-left text-xs p-2.5 rounded-card flex items-center gap-2.5 transition-all font-medium ${
+        active
+          ? accent === 'soil'
+            ? 'bg-soil-700 text-white'
+            : 'bg-pine-900 text-white'
+          : 'text-ink-900 hover:bg-pine-100/50'
+      }`}
+    >
+      <Icon className="h-4 w-4" /> {label}
+    </button>
+  );
+
+  // Mobile bottom nav button
+  const BottomNavButton = ({ active, onClick, icon: Icon, label }: {
+    active: boolean;
+    onClick: () => void;
+    icon: React.ElementType;
+    label: string;
+  }) => (
+    <button
+      onClick={onClick}
+      className={`flex flex-col items-center gap-0.5 py-1.5 px-2 rounded-card transition-all text-[10px] font-medium min-w-[56px] ${
+        active ? 'text-pine-900' : 'text-ink-500'
+      }`}
+    >
+      <Icon className={`h-5 w-5 ${active ? 'text-pine-900' : 'text-ink-500'}`} />
+      <span>{label}</span>
+    </button>
+  );
+
   return (
-    <div className="min-h-screen bg-cream-50 flex flex-col font-sans selection:bg-forest-200">
+    <div className="min-h-screen bg-paper-50 flex flex-col font-sans">
       <Navbar
         currentView={currentView}
         onNavigateProfile={() => setCurrentView(currentView === 'profile' ? 'main' : 'profile')}
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col pb-16 md:pb-0">
         {currentView === 'profile' ? (
           <ProfilePage />
         ) : currentRole === 'none' ? (
@@ -127,188 +171,50 @@ export default function App() {
         ) : (
           <div className="flex-1 flex flex-col md:flex-row">
             
-            {/* Sidebar for Admin / Ops view */}
+            {/* Sidebar for Admin / Ops view — hidden on mobile */}
             {currentRole === 'Admin' && (
-              <aside className="w-full md:w-64 bg-white border-r border-forest-100 p-6 flex flex-col gap-2">
-                <div className="mb-4">
-                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Operations Panel</h4>
+              <aside className="hidden md:flex w-56 bg-surface-0 border-r border-line-200 p-4 flex-col gap-1">
+                <div className="mb-3">
+                  <h4 className="text-[10px] font-medium text-ink-500 uppercase tracking-[0.08em] leading-none">Operations</h4>
                 </div>
-                
-                <button
-                  onClick={() => setAdminTab('optimizer')}
-                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
-                    adminTab === 'optimizer' 
-                      ? 'bg-forest-600 text-white shadow-sm' 
-                      : 'text-forest-800 hover:bg-forest-50'
-                  }`}
-                >
-                  <Compass className="h-4 w-4" /> AI Route Optimizer
-                </button>
-
-                <button
-                  onClick={() => setAdminTab('burns')}
-                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
-                    adminTab === 'burns' 
-                      ? 'bg-forest-600 text-white shadow-sm' 
-                      : 'text-forest-800 hover:bg-forest-50'
-                  }`}
-                >
-                  <Flame className="h-4 w-4" /> Burn Intelligence
-                </button>
-
-                <button
-                  onClick={() => setAdminTab('impact')}
-                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
-                    adminTab === 'impact' 
-                      ? 'bg-forest-600 text-white shadow-sm' 
-                      : 'text-forest-800 hover:bg-forest-50'
-                  }`}
-                >
-                  <Heart className="h-4 w-4" /> Impact & Offsets
-                </button>
-
-                <div className="mt-auto pt-6 border-t border-forest-100">
-                  <button
-                    onClick={() => setCurrentView('profile')}
-                    className="w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 text-forest-800 hover:bg-forest-50"
-                  >
-                    <UserCheck className="h-4 w-4 text-forest-600" /> Account Settings
-                  </button>
+                <SidebarButton active={adminTab === 'optimizer'} onClick={() => setAdminTab('optimizer')} icon={Compass} label="Route optimizer" />
+                <SidebarButton active={adminTab === 'burns'} onClick={() => setAdminTab('burns')} icon={Flame} label="Burn intelligence" />
+                <SidebarButton active={adminTab === 'impact'} onClick={() => setAdminTab('impact')} icon={Heart} label="Impact & offsets" />
+                <div className="mt-auto pt-4 border-t border-line-200">
+                  <SidebarButton active={false} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Account settings" />
                 </div>
               </aside>
             )}
 
-            {/* Sidebar for Buyer view */}
+            {/* Sidebar for Buyer view — hidden on mobile */}
             {currentRole === 'Buyer' && (
-              <aside className="w-full md:w-64 bg-white border-r border-forest-100 p-6 flex flex-col gap-2">
-                <div className="mb-4">
-                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Buyer Actions</h4>
+              <aside className="hidden md:flex w-56 bg-surface-0 border-r border-line-200 p-4 flex-col gap-1">
+                <div className="mb-3">
+                  <h4 className="text-[10px] font-medium text-ink-500 uppercase tracking-[0.08em] leading-none">Buyer actions</h4>
                 </div>
-
-                <button
-                  onClick={() => setBuyerView('dashboard')}
-                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
-                    buyerView === 'dashboard' 
-                      ? 'bg-clay-600 text-white shadow-sm' 
-                      : 'text-forest-800 hover:bg-forest-50'
-                  }`}
-                >
-                  <LayoutDashboard className="h-4 w-4" /> Sourcing Overview
-                </button>
-
-                <button
-                  onClick={() => setBuyerView('marketplace')}
-                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
-                    buyerView === 'marketplace' 
-                      ? 'bg-clay-600 text-white shadow-sm' 
-                      : 'text-forest-800 hover:bg-forest-50'
-                  }`}
-                >
-                  <ShoppingBag className="h-4 w-4" /> Biomass Marketplace
-                </button>
-
-                <button
-                  onClick={() => setBuyerView('demand')}
-                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
-                    buyerView === 'demand' 
-                      ? 'bg-clay-600 text-white shadow-sm' 
-                      : 'text-forest-800 hover:bg-forest-50'
-                  }`}
-                >
-                  <PlusCircle className="h-4 w-4" /> Post Requirement
-                </button>
-
-                <button
-                  onClick={() => setBuyerView('matches')}
-                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
-                    buyerView === 'matches' 
-                      ? 'bg-clay-600 text-white shadow-sm' 
-                      : 'text-forest-800 hover:bg-forest-50'
-                  }`}
-                >
-                  <Sparkles className="h-4 w-4" /> Matched Farmers
-                </button>
-
-                <button
-                  onClick={() => setBuyerView('requests')}
-                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
-                    buyerView === 'requests' 
-                      ? 'bg-clay-600 text-white shadow-sm' 
-                      : 'text-forest-800 hover:bg-forest-50'
-                  }`}
-                >
-                  <Clock className="h-4 w-4" /> Purchase Requests
-                </button>
-
-                <button
-                  onClick={() => setBuyerView('impact')}
-                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
-                    buyerView === 'impact' 
-                      ? 'bg-clay-600 text-white shadow-sm' 
-                      : 'text-forest-800 hover:bg-forest-50'
-                  }`}
-                >
-                  <Heart className="h-4 w-4" /> Impact & Offsets
-                </button>
-
-                <div className="mt-auto pt-6 border-t border-forest-100">
-                  <button
-                    onClick={() => setCurrentView('profile')}
-                    className="w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 text-forest-800 hover:bg-forest-50"
-                  >
-                    <UserCheck className="h-4 w-4 text-clay-600" /> Buyer Profile
-                  </button>
+                <SidebarButton active={buyerView === 'dashboard'} onClick={() => setBuyerView('dashboard')} icon={LayoutDashboard} label="Sourcing overview" accent="soil" />
+                <SidebarButton active={buyerView === 'marketplace'} onClick={() => setBuyerView('marketplace')} icon={ShoppingBag} label="Biomass marketplace" accent="soil" />
+                <SidebarButton active={buyerView === 'demand'} onClick={() => setBuyerView('demand')} icon={PlusCircle} label="Post requirement" accent="soil" />
+                <SidebarButton active={buyerView === 'matches'} onClick={() => setBuyerView('matches')} icon={Sparkles} label="Matched farmers" accent="soil" />
+                <SidebarButton active={buyerView === 'requests'} onClick={() => setBuyerView('requests')} icon={Clock} label="Purchase requests" accent="soil" />
+                <SidebarButton active={buyerView === 'impact'} onClick={() => setBuyerView('impact')} icon={Heart} label="Impact & offsets" accent="soil" />
+                <div className="mt-auto pt-4 border-t border-line-200">
+                  <SidebarButton active={false} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Buyer profile" accent="soil" />
                 </div>
               </aside>
             )}
 
-            {/* Sidebar for Farmer view */}
+            {/* Sidebar for Farmer view — hidden on mobile */}
             {currentRole === 'Farmer' && (
-              <aside className="w-full md:w-64 bg-white border-r border-forest-100 p-6 flex flex-col gap-2">
-                <div className="mb-4">
-                  <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Farmer Actions</h4>
+              <aside className="hidden md:flex w-56 bg-surface-0 border-r border-line-200 p-4 flex-col gap-1">
+                <div className="mb-3">
+                  <h4 className="text-[10px] font-medium text-ink-500 uppercase tracking-[0.08em] leading-none">Farmer actions</h4>
                 </div>
-
-                <button
-                  onClick={() => setFarmerView('dashboard')}
-                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
-                    farmerView === 'dashboard' 
-                      ? 'bg-forest-600 text-white shadow-sm' 
-                      : 'text-forest-800 hover:bg-forest-50'
-                  }`}
-                >
-                  <LayoutDashboard className="h-4 w-4" /> My Farm Dashboard
-                </button>
-
-                <button
-                  onClick={() => setFarmerView('sell')}
-                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
-                    farmerView === 'sell' 
-                      ? 'bg-forest-600 text-white shadow-sm' 
-                      : 'text-forest-800 hover:bg-forest-50'
-                  }`}
-                >
-                  <Sprout className="h-4 w-4" /> Sell Residue
-                </button>
-
-                <button
-                  onClick={() => setFarmerView('impact')}
-                  className={`w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 transition-all ${
-                    farmerView === 'impact' 
-                      ? 'bg-forest-600 text-white shadow-sm' 
-                      : 'text-forest-800 hover:bg-forest-50'
-                  }`}
-                >
-                  <Heart className="h-4 w-4" /> Impact & Offsets
-                </button>
-
-                <div className="mt-auto pt-6 border-t border-forest-100">
-                  <button
-                    onClick={() => setCurrentView('profile')}
-                    className="w-full text-left font-bold text-xs p-3 rounded-xl flex items-center gap-2.5 text-forest-800 hover:bg-forest-50"
-                  >
-                    <UserCheck className="h-4 w-4 text-forest-600" /> Farm Profile
-                  </button>
+                <SidebarButton active={farmerView === 'dashboard'} onClick={() => setFarmerView('dashboard')} icon={LayoutDashboard} label="My farm" />
+                <SidebarButton active={farmerView === 'sell'} onClick={() => setFarmerView('sell')} icon={Sprout} label="List residue" />
+                <SidebarButton active={farmerView === 'impact'} onClick={() => setFarmerView('impact')} icon={Heart} label="Impact & offsets" />
+                <div className="mt-auto pt-4 border-t border-line-200">
+                  <SidebarButton active={false} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Farm profile" />
                 </div>
               </aside>
             )}
@@ -379,6 +285,37 @@ export default function App() {
           </div>
         )}
       </main>
+
+      {/* Mobile Bottom Navigation — visible only on mobile */}
+      {currentRole !== 'none' && currentView === 'main' && (
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface-0 border-t border-line-200 flex items-center justify-around px-2 py-1 safe-area-pb">
+          {currentRole === 'Farmer' && (
+            <>
+              <BottomNavButton active={farmerView === 'dashboard'} onClick={() => setFarmerView('dashboard')} icon={LayoutDashboard} label="Farm" />
+              <BottomNavButton active={farmerView === 'sell'} onClick={() => setFarmerView('sell')} icon={Sprout} label="List" />
+              <BottomNavButton active={farmerView === 'impact'} onClick={() => setFarmerView('impact')} icon={Heart} label="Impact" />
+              <BottomNavButton active={(currentView as string) === 'profile'} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Profile" />
+            </>
+          )}
+          {currentRole === 'Buyer' && (
+            <>
+              <BottomNavButton active={buyerView === 'dashboard'} onClick={() => setBuyerView('dashboard')} icon={LayoutDashboard} label="Overview" />
+              <BottomNavButton active={buyerView === 'marketplace'} onClick={() => setBuyerView('marketplace')} icon={ShoppingBag} label="Market" />
+              <BottomNavButton active={buyerView === 'demand'} onClick={() => setBuyerView('demand')} icon={PlusCircle} label="Post" />
+              <BottomNavButton active={buyerView === 'matches'} onClick={() => setBuyerView('matches')} icon={Sparkles} label="Matches" />
+              <BottomNavButton active={(currentView as string) === 'profile'} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Profile" />
+            </>
+          )}
+          {currentRole === 'Admin' && (
+            <>
+              <BottomNavButton active={adminTab === 'optimizer'} onClick={() => setAdminTab('optimizer')} icon={Compass} label="Routes" />
+              <BottomNavButton active={adminTab === 'burns'} onClick={() => setAdminTab('burns')} icon={Flame} label="Burns" />
+              <BottomNavButton active={adminTab === 'impact'} onClick={() => setAdminTab('impact')} icon={Heart} label="Impact" />
+              <BottomNavButton active={(currentView as string) === 'profile'} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Profile" />
+            </>
+          )}
+        </nav>
+      )}
     </div>
   );
 }

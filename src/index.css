@@ -1,17 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-
 :root {
-  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.6;
   font-weight: 400;
   color-scheme: light;
-  background-color: #faf8f5; /* Warm off-white background */
-  color: #1c2722;
+  background-color: #FAF8F4;
+  color: #211E19;
+
+  /* Design tokens as CSS custom properties */
+  --pine-900: #173226;
+  --pine-700: #2C5940;
+  --pine-100: #E4EEE6;
+  --soil-700: #8A5A2B;
+  --soil-100: #F1E4D3;
+  --ash-500: #D98A2B;
+  --ember-600: #C1402A;
+  --paper-50: #FAF8F4;
+  --surface-0: #FFFFFF;
+  --line-200: #E3DFD5;
+  --ink-900: #211E19;
+  --ink-500: #6B6558;
+
+  /* Signature element: ash-to-green gradient */
+  --gradient-ash-to-green: linear-gradient(90deg, #D98A2B 0%, #2C5940 100%);
 }
 
 body {
@@ -20,53 +34,37 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom premium transitions */
-.transition-3d {
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* ── Base transition timing (150-200ms ease) ── */
+button, a, input, select, textarea {
+  transition: all 150ms ease;
 }
 
-/* 3D card wrapper */
-.card-3d {
-  transform-style: preserve-3d;
-  perspective: 1000px;
+/* ── Skeleton loader animation ── */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 0.85; }
 }
 
-.card-3d-inner {
-  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+.skeleton {
+  background: linear-gradient(90deg, var(--line-200) 25%, #ece8df 50%, var(--line-200) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
 }
 
-.card-3d:hover .card-3d-inner {
-  transform: translateY(-8px) rotateX(4deg) rotateY(-2deg);
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
-/* Flip card container */
-.flip-card {
-  perspective: 1000px;
+/* ── Ash-to-green signature gradient bar ── */
+.ash-to-green-bar {
+  height: 4px;
+  background: var(--gradient-ash-to-green);
+  border-radius: 2px;
 }
 
-.flip-card-inner {
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-}
-
-.flip-card:hover .flip-card-inner {
-  transform: rotateY(180deg);
-}
-
-.flip-card-front, .flip-card-back {
-  backface-visibility: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.flip-card-back {
-  transform: rotateY(180deg);
-}
-
-/* Smooth route drawing animation */
+/* ── Smooth route drawing animation ── */
 @keyframes dash {
   to {
     stroke-dashoffset: 0;
@@ -79,21 +77,37 @@ body {
   animation: dash 5s linear forwards;
 }
 
-/* Scrollbar customizations */
+/* ── Slide-in panel animation ── */
+@keyframes slide-in-right {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.animate-slide-in {
+  animation: slide-in-right 200ms ease forwards;
+}
+
+/* ── Scrollbar customizations ── */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f4ebd9;
+  background: var(--paper-50);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #4c816c;
+  background: var(--pine-700);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a6654;
+  background: var(--pine-900);
+}
+
+/* ── Selection color ── */
+::selection {
+  background: var(--pine-100);
+  color: var(--pine-900);
 }

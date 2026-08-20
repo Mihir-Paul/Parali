@@ -8,12 +8,10 @@ import {
   Briefcase,
   User,
   MapPin,
-  Phone,
   ChevronRight,
   ChevronLeft,
   CheckCircle2,
   AlertCircle,
-  Navigation,
   Check
 } from 'lucide-react';
 
@@ -26,7 +24,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
   // Role selection state
   const [selectedRole, setSelectedRole] = useState<'farmer' | 'buyer' | null>(null);
-  const [currentStep, setCurrentStep] = useState<number>(1); // 1 = Role Selection / Welcome
+  const [currentStep, setCurrentStep] = useState<number>(1);
 
   // Submitting and error state
   const [submitting, setSubmitting] = useState(false);
@@ -61,29 +59,29 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
   // Available options
   const residueOptions = [
-    { id: 'Wheat Straw', label: 'Wheat Straw' },
-    { id: 'Rice/Paddy Residue', label: 'Rice / Paddy Residue' },
-    { id: 'Maize Residue', label: 'Maize Residue' },
-    { id: 'Sugarcane Residue', label: 'Sugarcane Trash' },
-    { id: 'Cotton Residue', label: 'Cotton Stalks' },
-    { id: 'Other', label: 'Other Residue' }
+    { id: 'Wheat Straw', label: 'Wheat straw' },
+    { id: 'Rice/Paddy Residue', label: 'Rice / Paddy residue' },
+    { id: 'Maize Residue', label: 'Maize residue' },
+    { id: 'Sugarcane Residue', label: 'Sugarcane trash' },
+    { id: 'Cotton Residue', label: 'Cotton stalks' },
+    { id: 'Other', label: 'Other residue' }
   ];
 
   const farmTypeOptions: { id: FarmType; label: string; desc: string }[] = [
     { id: 'smallholder', label: 'Smallholder', desc: 'Under 5 acres' },
-    { id: 'medium', label: 'Medium Farm', desc: '5 to 20 acres' },
-    { id: 'large', label: 'Large Farm', desc: 'Over 20 acres' },
+    { id: 'medium', label: 'Medium farm', desc: '5 to 20 acres' },
+    { id: 'large', label: 'Large farm', desc: 'Over 20 acres' },
     { id: 'cooperative', label: 'Cooperative / FPO', desc: 'Group of farmers' }
   ];
 
   const buyerTypeOptions: { id: BuyerType; label: string }[] = [
-    { id: 'mushroom_farm', label: 'Mushroom Cultivation Farm' },
-    { id: 'paper_mill', label: 'Paper & Pulp Mill' },
-    { id: 'biomass_plant', label: 'Biomass Power Plant' },
-    { id: 'biofuel', label: 'Bio-CNG / Biofuel Plant' },
-    { id: 'cattle_feed', label: 'Cattle Feed Manufacturing' },
-    { id: 'compost', label: 'Organic Compost Facility' },
-    { id: 'other', label: 'Other Biomass User' }
+    { id: 'mushroom_farm', label: 'Mushroom cultivation farm' },
+    { id: 'paper_mill', label: 'Paper & pulp mill' },
+    { id: 'biomass_plant', label: 'Biomass power plant' },
+    { id: 'biofuel', label: 'Bio-CNG / Biofuel plant' },
+    { id: 'cattle_feed', label: 'Cattle feed manufacturing' },
+    { id: 'compost', label: 'Organic compost facility' },
+    { id: 'other', label: 'Other biomass user' }
   ];
 
   // Geolocation fetch
@@ -138,14 +136,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
 
     if (selectedRole === 'farmer') {
       if (currentStep === 2) {
-        // Step 1 for Farmer: Personal info
         if (!fullName.trim()) {
           setErrorMsg('Please enter your full name.');
           return false;
         }
         const phoneRegex = /^[6-9]\d{9}$/;
         if (!phone.trim() || !phoneRegex.test(phone.trim().replace(/\D/g, ''))) {
-          setErrorMsg('Please enter a valid 10-digit Indian phone number (e.g. 9876543210).');
+          setErrorMsg('Please enter a valid 10-digit Indian phone number.');
           return false;
         }
         if (!state.trim() || !district.trim() || !village.trim()) {
@@ -153,14 +150,12 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           return false;
         }
       } else if (currentStep === 3) {
-        // Step 2 for Farmer: Farm info
         const areaNum = parseFloat(landArea);
         if (isNaN(areaNum) || areaNum <= 0) {
           setErrorMsg('Please enter a valid positive land area in acres.');
           return false;
         }
       } else if (currentStep === 4) {
-        // Step 3 for Farmer: Residue info
         if (selectedResidueTypes.length === 0) {
           setErrorMsg('Please select at least one crop residue type.');
           return false;
@@ -173,7 +168,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
       }
     } else if (selectedRole === 'buyer') {
       if (currentStep === 2) {
-        // Step 1 for Buyer: Business Info & Personal Info
         if (!fullName.trim()) {
           setErrorMsg('Please enter your full contact name.');
           return false;
@@ -188,7 +182,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           return false;
         }
       } else if (currentStep === 3) {
-        // Step 2 for Buyer: Residue Needs
         if (requiredResidueTypes.length === 0) {
           setErrorMsg('Please select at least one required residue type.');
           return false;
@@ -199,7 +192,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           return false;
         }
       } else if (currentStep === 4) {
-        // Step 3 for Buyer: Location & Procurement
         if (!state.trim() || !district.trim()) {
           setErrorMsg('Please provide State and District.');
           return false;
@@ -221,7 +213,6 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
     setCurrentStep((prev) => Math.max(1, prev - 1));
   };
 
-  // Submit onboarding form to Supabase
   const handleSubmit = async () => {
     if (!user) {
       setErrorMsg('Session lost. Please log in with Google again.');
@@ -275,7 +266,7 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
       onComplete();
     } catch (err: any) {
       console.error('Error during onboarding submission:', err);
-      setErrorMsg(err.message || 'We could not create your profile. Please check your internet connection and try again.');
+      setErrorMsg(err.message || 'We could not create your profile. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -284,45 +275,41 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
   const maxSteps = selectedRole === 'farmer' ? 6 : 5;
 
   return (
-    <div className="min-h-[90vh] flex flex-col justify-center items-center px-4 py-8 bg-cream-50 font-sans selection:bg-forest-200">
-      <div className="max-w-3xl w-full bg-white border border-forest-100 rounded-3xl p-6 md:p-10 shadow-lg relative overflow-hidden">
+    <div className="min-h-[90vh] flex flex-col justify-center items-center px-4 py-8 bg-paper-50 font-sans">
+      <div className="max-w-3xl w-full bg-surface-0 border border-line-200 rounded-card p-6 md:p-8 shadow-card relative">
         
-        {/* Subtle decorative background accent */}
-        <div className="absolute -top-16 -right-16 w-48 h-48 bg-forest-100/50 rounded-full blur-3xl pointer-events-none"></div>
-
-        {/* Header with User Info */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-6 border-b border-forest-100">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b border-line-200">
           <div>
-            <span className="text-[10px] font-black uppercase tracking-widest text-forest-700 bg-forest-50 px-3 py-1 rounded-full border border-forest-200">
-              Account Onboarding
+            <span className="text-[10px] font-mono uppercase tracking-wide text-pine-700 bg-pine-100 px-2.5 py-0.5 rounded-card">
+              Account onboarding
             </span>
-            <h1 className="text-2xl md:text-3xl font-extrabold text-forest-950 mt-2">
+            <h1 className="text-xl md:text-2xl font-display font-bold text-ink-900 mt-1">
               Welcome to Parali
             </h1>
-            <p className="text-xs md:text-sm text-forest-800 mt-1">
-              Let's set up your verified profile to start trading agricultural residue.
+            <p className="text-xs text-ink-500 mt-0.5">
+              Set up your profile to start trading agricultural residue.
             </p>
           </div>
 
-          {/* User Google Badge */}
           {user && (
-            <div className="flex items-center gap-3 bg-cream-50 border border-forest-150 p-2.5 rounded-2xl shrink-0">
+            <div className="flex items-center gap-2.5 bg-paper-50 border border-line-200 p-2 rounded-card shrink-0">
               {user.user_metadata?.avatar_url ? (
                 <img
                   src={user.user_metadata.avatar_url}
                   alt={user.user_metadata.full_name || 'Google User'}
-                  className="w-10 h-10 rounded-full border border-forest-200 object-cover"
+                  className="w-8 h-8 rounded-full border border-line-200 object-cover"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-forest-100 text-forest-700 flex items-center justify-center font-bold">
-                  <User className="h-5 w-5" />
+                <div className="w-8 h-8 rounded-full bg-pine-900 text-white flex items-center justify-center font-bold text-xs">
+                  <User className="h-4 w-4" />
                 </div>
               )}
               <div className="text-left">
-                <p className="text-xs font-bold text-forest-950 leading-tight">
-                  {user.user_metadata?.full_name || user.email?.split('@')[0] || 'Authenticated User'}
+                <p className="text-xs font-semibold text-ink-900 leading-tight">
+                  {user.user_metadata?.full_name || user.email?.split('@')[0]}
                 </p>
-                <p className="text-[10px] text-forest-600 font-semibold leading-tight mt-0.5">
+                <p className="text-[10px] text-ink-500 font-mono leading-tight">
                   {user.email}
                 </p>
               </div>
@@ -330,274 +317,264 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           )}
         </div>
 
-        {/* Step Progress Bar (Shown after role selection) */}
+        {/* Step Progress Bar */}
         {selectedRole && (
-          <div className="mb-8">
-            <div className="flex items-center justify-between text-xs font-bold text-forest-800 mb-2">
+          <div className="mb-6 font-mono text-xs">
+            <div className="flex items-center justify-between text-ink-500 mb-1.5">
               <span>Step {currentStep - 1} of {maxSteps - 1}</span>
-              <span className="capitalize">{selectedRole} Registration</span>
+              <span className="capitalize font-sans">{selectedRole} registration</span>
             </div>
-            <div className="w-full bg-forest-50 h-2 rounded-full overflow-hidden border border-forest-100">
+            <div className="w-full bg-paper-50 h-1.5 rounded-card overflow-hidden border border-line-200">
               <div
-                className="bg-forest-600 h-full transition-all duration-500 ease-out"
+                className="bg-pine-700 h-full transition-all duration-300"
                 style={{ width: `${((currentStep - 1) / (maxSteps - 1)) * 100}%` }}
               ></div>
             </div>
           </div>
         )}
 
-        {/* Error Alert Message */}
+        {/* Error Alert */}
         {errorMsg && (
-          <div className="w-full bg-clay-50 border border-clay-200 text-clay-900 text-xs p-4 rounded-2xl mb-6 font-semibold flex items-start gap-3 shadow-sm">
-            <AlertCircle className="h-4 w-4 shrink-0 text-clay-700 mt-0.5" />
+          <div className="w-full bg-ember-600/10 border border-ember-600/30 text-ember-600 text-xs p-3.5 rounded-card mb-6 font-medium flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
             <span className="leading-relaxed">{errorMsg}</span>
           </div>
         )}
 
-        {/* ============================================================ */}
-        {/* STEP 1: WELCOME & ROLE SELECTION */}
-        {/* ============================================================ */}
+        {/* STEP 1: ROLE SELECTION */}
         {currentStep === 1 && (
           <div>
-            <h2 className="text-lg md:text-xl font-extrabold text-forest-950 mb-2">
+            <h2 className="text-lg font-display font-bold text-ink-900 mb-1">
               How will you use Parali?
             </h2>
-            <p className="text-xs text-forest-750 mb-6">
+            <p className="text-xs text-ink-500 mb-6">
               Select your account type to personalize your experience.
             </p>
 
-            <div className="grid md:grid-cols-2 gap-5 mb-8">
-              {/* FARMER CARD */}
+            <div className="grid md:grid-cols-2 gap-4 mb-6">
               <div
                 tabIndex={0}
                 role="button"
-                onClick={() => setSelectedRole('farmer')}
-                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setSelectedRole('farmer')}
-                className={`group relative p-6 rounded-3xl border-2 transition-all duration-300 cursor-pointer flex flex-col justify-between ${
+                onClick={() => {
+                  setSelectedRole('farmer');
+                  setCurrentStep(2);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    setSelectedRole('farmer');
+                    setCurrentStep(2);
+                  }
+                }}
+                className={`p-5 rounded-card border transition-all cursor-pointer flex flex-col justify-between ${
                   selectedRole === 'farmer'
-                    ? 'border-forest-600 bg-forest-50/60 shadow-md ring-2 ring-forest-200'
-                    : 'border-forest-100 bg-white hover:border-forest-300 hover:shadow-sm'
+                    ? 'border-pine-700 bg-pine-100/40 shadow-card'
+                    : 'border-line-200 bg-surface-0 hover:border-pine-700/30'
                 }`}
               >
                 {selectedRole === 'farmer' && (
-                  <div className="absolute top-4 right-4 bg-forest-600 text-white rounded-full p-1 shadow">
-                    <Check className="h-4 w-4" />
+                  <div className="absolute top-4 right-4 bg-pine-700 text-white rounded-full p-0.5">
+                    <Check className="h-3.5 w-3.5" />
                   </div>
                 )}
                 <div>
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-colors ${
-                    selectedRole === 'farmer' ? 'bg-forest-600 text-white' : 'bg-forest-100 text-forest-700 group-hover:bg-forest-600 group-hover:text-white'
+                  <div className={`w-10 h-10 rounded-card flex items-center justify-center mb-3 transition-colors ${
+                    selectedRole === 'farmer' ? 'bg-pine-900 text-white' : 'bg-pine-100 text-pine-700'
                   }`}>
-                    <Sprout className="h-7 w-7" />
+                    <Sprout className="h-5 w-5" />
                   </div>
-                  <h3 className="text-lg font-extrabold text-forest-950 mb-1">Farmer</h3>
-                  <p className="text-xs text-forest-700 leading-relaxed mt-2">
-                    Sell your crop residue, find buyers, request on-field baling, and turn agricultural stubble into income.
+                  <h3 className="text-base font-display font-bold text-ink-900 mb-1">Farmer</h3>
+                  <p className="text-xs text-ink-500 leading-relaxed mt-1">
+                    Sell your crop residue, find buyers, request on-field baling, and turn stubble into revenue.
                   </p>
                 </div>
-                <div className="mt-6 pt-4 border-t border-forest-100/60 flex items-center justify-between text-xs font-bold text-forest-800">
-                  <span>Farmer Portal</span>
-                  <ChevronRight className="h-4 w-4 text-forest-600 group-hover:translate-x-1 transition-transform" />
+                <div className="mt-4 pt-3 border-t border-line-200 flex items-center justify-between text-xs font-semibold text-pine-700">
+                  <span>Farmer portal</span>
+                  <ChevronRight className="h-4 w-4" />
                 </div>
               </div>
 
-              {/* BUYER CARD */}
               <div
                 tabIndex={0}
                 role="button"
-                onClick={() => setSelectedRole('buyer')}
-                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setSelectedRole('buyer')}
-                className={`group relative p-6 rounded-3xl border-2 transition-all duration-300 cursor-pointer flex flex-col justify-between ${
+                onClick={() => {
+                  setSelectedRole('buyer');
+                  setCurrentStep(2);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    setSelectedRole('buyer');
+                    setCurrentStep(2);
+                  }
+                }}
+                className={`p-5 rounded-card border transition-all cursor-pointer flex flex-col justify-between ${
                   selectedRole === 'buyer'
-                    ? 'border-clay-600 bg-clay-50/60 shadow-md ring-2 ring-clay-200'
-                    : 'border-forest-100 bg-white hover:border-clay-300 hover:shadow-sm'
+                    ? 'border-soil-700 bg-soil-100/40 shadow-card'
+                    : 'border-line-200 bg-surface-0 hover:border-soil-700/30'
                 }`}
               >
                 {selectedRole === 'buyer' && (
-                  <div className="absolute top-4 right-4 bg-clay-600 text-white rounded-full p-1 shadow">
-                    <Check className="h-4 w-4" />
+                  <div className="absolute top-4 right-4 bg-soil-700 text-white rounded-full p-0.5">
+                    <Check className="h-3.5 w-3.5" />
                   </div>
                 )}
                 <div>
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-colors ${
-                    selectedRole === 'buyer' ? 'bg-clay-600 text-white' : 'bg-clay-100 text-clay-700 group-hover:bg-clay-600 group-hover:text-white'
+                  <div className={`w-10 h-10 rounded-card flex items-center justify-center mb-3 transition-colors ${
+                    selectedRole === 'buyer' ? 'bg-soil-700 text-white' : 'bg-soil-100 text-soil-700'
                   }`}>
-                    <Briefcase className="h-7 w-7" />
+                    <Briefcase className="h-5 w-5" />
                   </div>
-                  <h3 className="text-lg font-extrabold text-forest-950 mb-1">Buyer</h3>
-                  <p className="text-xs text-forest-700 leading-relaxed mt-2">
-                    Source agricultural residue directly from farmers, manage procurement orders, and coordinate regional logistics.
+                  <h3 className="text-base font-display font-bold text-ink-900 mb-1">Buyer / Business</h3>
+                  <p className="text-xs text-ink-500 leading-relaxed mt-1">
+                    Source bulk agricultural biomass, post plant requirements, and optimize collection logistics.
                   </p>
                 </div>
-                <div className="mt-6 pt-4 border-t border-forest-100/60 flex items-center justify-between text-xs font-bold text-clay-800">
-                  <span>Buyer Portal</span>
-                  <ChevronRight className="h-4 w-4 text-clay-600 group-hover:translate-x-1 transition-transform" />
+                <div className="mt-4 pt-3 border-t border-line-200 flex items-center justify-between text-xs font-semibold text-soil-700">
+                  <span>Buyer portal</span>
+                  <ChevronRight className="h-4 w-4" />
                 </div>
               </div>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-4 border-t border-line-200">
               <button
-                onClick={handleNext}
-                disabled={!selectedRole}
-                className="bg-forest-600 hover:bg-forest-700 text-white font-extrabold text-xs py-3.5 px-8 rounded-2xl flex items-center gap-2 shadow-md transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                onClick={() => {
+                  if (selectedRole) {
+                    setCurrentStep(2);
+                  } else {
+                    setErrorMsg('Please select whether you are a Farmer or a Buyer.');
+                  }
+                }}
+                className="bg-pine-900 hover:bg-pine-700 text-white font-semibold text-xs px-6 py-2.5 rounded-card transition-all flex items-center gap-1.5 shadow-card"
               >
-                Continue <ChevronRight className="h-4 w-4" />
+                <span>Continue setup</span>
+                <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           </div>
         )}
 
-        {/* ============================================================ */}
-        {/* FARMER ONBOARDING STEPS */}
-        {/* ============================================================ */}
-        {selectedRole === 'farmer' && (
+        {/* FARMER REGISTRATION STEPS */}
+        {selectedRole === 'farmer' && currentStep > 1 && (
           <>
-            {/* FARMER STEP 1: PERSONAL INFORMATION */}
             {currentStep === 2 && (
-              <div className="flex flex-col gap-5">
+              <div className="space-y-4 text-xs">
                 <div>
-                  <h2 className="text-lg font-extrabold text-forest-950">Personal Information</h2>
-                  <p className="text-xs text-forest-700 mt-1">Please provide your contact and location details.</p>
+                  <h2 className="text-base font-display font-bold text-ink-900">Personal & contact details</h2>
+                  <p className="text-xs text-ink-500 mt-0.5">Your contact info will be shared with buyers during confirmed pickups.</p>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-wider mb-1">Full Name</label>
+                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">Full name</label>
                     <input
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="e.g. Ramesh Kumar"
-                      className="w-full text-xs p-3.5 rounded-xl border border-forest-200 focus:ring-2 focus:ring-forest-500 font-semibold outline-none"
+                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-medium text-ink-900 outline-none focus:ring-1 focus:ring-pine-700"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-wider mb-1">Email Address (Google Account)</label>
+                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">Phone number</label>
                     <input
-                      type="email"
-                      value={user?.email || ''}
-                      readOnly
-                      className="w-full text-xs p-3.5 rounded-xl border border-slate-200 bg-slate-50 font-semibold text-slate-600 cursor-not-allowed outline-none"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="10-digit phone number"
+                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-mono font-semibold text-ink-900 outline-none focus:ring-1 focus:ring-pine-700"
                     />
                   </div>
+                </div>
 
+                <div className="grid md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-wider mb-1">Mobile Phone Number</label>
-                    <div className="relative">
-                      <Phone className="h-4 w-4 text-forest-400 absolute left-3.5 top-3.5" />
-                      <input
-                        type="tel"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        placeholder="10-digit mobile number (e.g. 9876543210)"
-                        className="w-full text-xs p-3.5 pl-10 rounded-xl border border-forest-200 focus:ring-2 focus:ring-forest-500 font-bold outline-none"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-wider mb-1">State</label>
+                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">State</label>
                     <input
                       type="text"
                       value={state}
                       onChange={(e) => setState(e.target.value)}
-                      placeholder="State (e.g. Punjab)"
-                      className="w-full text-xs p-3.5 rounded-xl border border-forest-200 focus:ring-2 focus:ring-forest-500 font-semibold outline-none"
+                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-medium text-ink-900 outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-wider mb-1">District</label>
+                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">District</label>
                     <input
                       type="text"
                       value={district}
                       onChange={(e) => setDistrict(e.target.value)}
                       placeholder="e.g. Sangrur"
-                      className="w-full text-xs p-3.5 rounded-xl border border-forest-200 focus:ring-2 focus:ring-forest-500 font-semibold outline-none"
+                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-medium text-ink-900 outline-none focus:ring-1 focus:ring-pine-700"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-wider mb-1">Village / City</label>
+                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">Village / Town</label>
                     <input
                       type="text"
                       value={village}
                       onChange={(e) => setVillage(e.target.value)}
-                      placeholder="e.g. Kila Raipur"
-                      className="w-full text-xs p-3.5 rounded-xl border border-forest-200 focus:ring-2 focus:ring-forest-500 font-semibold outline-none"
+                      placeholder="e.g. Badrukhan"
+                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-medium text-ink-900 outline-none focus:ring-1 focus:ring-pine-700"
                     />
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-wider mb-1">Farm / Residence Address (Optional)</label>
-                  <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Landmark or specific field address"
-                    className="w-full text-xs p-3.5 rounded-xl border border-forest-200 focus:ring-2 focus:ring-forest-500 font-semibold outline-none"
-                  />
                 </div>
               </div>
             )}
 
-            {/* FARMER STEP 2: FARM INFORMATION */}
             {currentStep === 3 && (
-              <div className="flex flex-col gap-6">
+              <div className="space-y-4 text-xs">
                 <div>
-                  <h2 className="text-lg font-extrabold text-forest-950">Farm Details</h2>
-                  <p className="text-xs text-forest-700 mt-1">Tell us about your agricultural land and primary crop.</p>
+                  <h2 className="text-base font-display font-bold text-ink-900">Farm details</h2>
+                  <p className="text-xs text-ink-500 mt-0.5">Helps Parali estimate available crop stubble volume.</p>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-5">
+                <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-wider mb-1">Primary Harvest Crop</label>
+                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">Primary crop</label>
                     <select
                       value={primaryCrop}
                       onChange={(e) => setPrimaryCrop(e.target.value)}
-                      className="w-full text-xs p-3.5 rounded-xl border border-forest-200 bg-white font-bold text-forest-900 outline-none focus:ring-2 focus:ring-forest-500"
+                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-medium text-ink-900 bg-surface-0 outline-none"
                     >
                       <option value="Wheat">Wheat</option>
-                      <option value="Rice/Paddy">Rice / Paddy</option>
+                      <option value="Rice">Rice / Paddy</option>
                       <option value="Maize">Maize</option>
                       <option value="Sugarcane">Sugarcane</option>
                       <option value="Cotton">Cotton</option>
-                      <option value="Other">Other Crop</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-wider mb-1">Land Area (Acres)</label>
+                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">Land holding (acres)</label>
                     <input
                       type="number"
                       step="0.5"
-                      min="0.1"
+                      min="0.5"
                       value={landArea}
                       onChange={(e) => setLandArea(e.target.value)}
                       placeholder="e.g. 5"
-                      className="w-full text-xs p-3.5 rounded-xl border border-forest-200 font-bold outline-none focus:ring-2 focus:ring-forest-500"
+                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-mono font-semibold text-ink-900 outline-none focus:ring-1 focus:ring-pine-700"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-wider mb-2">Farm Classification</label>
+                  <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-2">Farm type</label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {farmTypeOptions.map((opt) => (
                       <div
                         key={opt.id}
                         onClick={() => setFarmType(opt.id)}
-                        className={`p-3.5 rounded-2xl border-2 cursor-pointer transition-all ${
+                        className={`p-3 rounded-card border text-center cursor-pointer transition-all ${
                           farmType === opt.id
-                            ? 'border-forest-600 bg-forest-50 text-forest-950 font-bold shadow-sm'
-                            : 'border-forest-100 hover:border-forest-200 text-forest-800'
+                            ? 'border-pine-700 bg-pine-100/50 text-pine-700 font-semibold'
+                            : 'border-line-200 hover:border-pine-700/30 text-ink-900'
                         }`}
                       >
-                        <p className="text-xs font-extrabold">{opt.label}</p>
-                        <p className="text-[10px] text-forest-600 mt-0.5">{opt.desc}</p>
+                        <div className="font-semibold text-xs">{opt.label}</div>
+                        <div className="text-[10px] text-ink-500 font-normal mt-0.5">{opt.desc}</div>
                       </div>
                     ))}
                   </div>
@@ -605,33 +582,30 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               </div>
             )}
 
-            {/* FARMER STEP 3: RESIDUE INFORMATION */}
             {currentStep === 4 && (
-              <div className="flex flex-col gap-6">
+              <div className="space-y-4 text-xs">
                 <div>
-                  <h2 className="text-lg font-extrabold text-forest-950">Crop Residue Details</h2>
-                  <p className="text-xs text-forest-700 mt-1">Specify what stubble or biomass you produce after harvest.</p>
+                  <h2 className="text-base font-display font-bold text-ink-900">Crop residue details</h2>
+                  <p className="text-xs text-ink-500 mt-0.5">Select the stubble types you plan to sell.</p>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-wider mb-2">
-                    Residue Types Generated (Select all that apply)
-                  </label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-2">Residue types</label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
                     {residueOptions.map((opt) => {
                       const isSelected = selectedResidueTypes.includes(opt.id);
                       return (
                         <div
                           key={opt.id}
                           onClick={() => toggleResidueType(opt.id, false)}
-                          className={`p-3.5 rounded-2xl border-2 cursor-pointer flex items-center justify-between transition-all ${
+                          className={`p-3 rounded-card border cursor-pointer flex items-center justify-between transition-all ${
                             isSelected
-                              ? 'border-forest-600 bg-forest-50 text-forest-950 font-bold shadow-sm'
-                              : 'border-forest-100 hover:border-forest-200 text-forest-800'
+                              ? 'border-pine-700 bg-pine-100/50 text-pine-700 font-semibold'
+                              : 'border-line-200 text-ink-900 hover:border-pine-700/30'
                           }`}
                         >
-                          <span className="text-xs">{opt.label}</span>
-                          {isSelected && <CheckCircle2 className="h-4 w-4 text-forest-600 shrink-0" />}
+                          <span>{opt.label}</span>
+                          {isSelected && <CheckCircle2 className="h-4 w-4 text-pine-700 shrink-0" />}
                         </div>
                       );
                     })}
@@ -639,8 +613,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-forest-800 uppercase tracking-wider mb-1">
-                    Estimated Residue Generation (Tonnes per season)
+                  <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">
+                    Estimated seasonal residue (tonnes)
                   </label>
                   <input
                     type="number"
@@ -649,16 +623,14 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     value={estimatedResidueTonnes}
                     onChange={(e) => setEstimatedResidueTonnes(e.target.value)}
                     placeholder="e.g. 10"
-                    className="w-full text-xs p-3.5 rounded-xl border border-forest-200 font-bold text-forest-950 outline-none focus:ring-2 focus:ring-forest-500"
+                    className="w-full text-xs p-2.5 rounded-card border border-line-200 font-mono font-semibold text-ink-900 outline-none focus:ring-1 focus:ring-pine-700"
                   />
-                  <p className="text-[10px] text-forest-500 mt-1">Rule of thumb: ~1.5 to 2.5 tonnes of residue is produced per acre of wheat/paddy.</p>
                 </div>
               </div>
             )}
 
-            {/* FARMER STEP 4: GEOLOCATION */}
             {currentStep === 5 && (
-              <div className="flex flex-col gap-6">
+              <div className="space-y-4 text-xs">
                 <div>
                   <h2 className="text-lg font-extrabold text-forest-950">Field Location Verification</h2>
                   <p className="text-xs text-forest-700 mt-1">Acquire exact GPS coordinates for automated logistics routing and buyer matching.</p>
@@ -685,40 +657,39 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               </div>
             )}
 
-            {/* FARMER STEP 5: REVIEW & SUBMIT */}
             {currentStep === 6 && (
-              <div className="flex flex-col gap-6">
+              <div className="space-y-4 text-xs">
                 <div>
-                  <h2 className="text-lg font-extrabold text-forest-950">Review Your Farmer Profile</h2>
-                  <p className="text-xs text-forest-700 mt-1">Please confirm your details before creating your account.</p>
+                  <h2 className="text-base font-display font-bold text-ink-900">Review your farmer profile</h2>
+                  <p className="text-xs text-ink-500 mt-0.5">Verify details before creating your account.</p>
                 </div>
 
-                <div className="bg-cream-50 border border-forest-150 rounded-3xl p-6 space-y-4 text-xs">
-                  <div className="grid grid-cols-2 gap-4 pb-4 border-b border-forest-150">
+                <div className="bg-paper-50 border border-line-200 rounded-card p-4 space-y-3 font-mono">
+                  <div className="grid grid-cols-2 gap-4 pb-2 border-b border-line-200">
                     <div>
-                      <span className="text-[10px] text-forest-500 font-bold uppercase">Name</span>
-                      <p className="font-extrabold text-forest-950">{fullName}</p>
+                      <span className="text-[10px] font-sans text-ink-500 uppercase">Name</span>
+                      <p className="font-semibold text-ink-900">{fullName}</p>
                     </div>
                     <div>
-                      <span className="text-[10px] text-forest-500 font-bold uppercase">Phone</span>
-                      <p className="font-extrabold text-forest-950">{phone}</p>
+                      <span className="text-[10px] font-sans text-ink-500 uppercase">Phone</span>
+                      <p className="font-semibold text-ink-900">{phone}</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 pb-4 border-b border-forest-150">
+                  <div className="grid grid-cols-2 gap-4 pb-2 border-b border-line-200">
                     <div>
-                      <span className="text-[10px] text-forest-500 font-bold uppercase">Location</span>
-                      <p className="font-bold text-forest-900">{village}, {district}, {state}</p>
+                      <span className="text-[10px] font-sans text-ink-500 uppercase">Location</span>
+                      <p className="font-semibold text-ink-900">{village}, {district}, {state}</p>
                     </div>
                     <div>
-                      <span className="text-[10px] text-forest-500 font-bold uppercase">Primary Crop & Land</span>
-                      <p className="font-bold text-forest-900">{primaryCrop} • {landArea} Acres ({farmType})</p>
+                      <span className="text-[10px] font-sans text-ink-500 uppercase">Land & crop</span>
+                      <p className="font-semibold text-ink-900">{landArea} acres ({primaryCrop})</p>
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-[10px] text-forest-500 font-bold uppercase">Residue Types & Tonnes</span>
-                    <p className="font-extrabold text-forest-950">{selectedResidueTypes.join(', ')} (~{estimatedResidueTonnes} tonnes)</p>
+                    <span className="text-[10px] font-sans text-ink-500 uppercase">Residues</span>
+                    <p className="font-semibold text-ink-900">{selectedResidueTypes.join(', ')} ({estimatedResidueTonnes} tonnes est.)</p>
                   </div>
                 </div>
               </div>
@@ -726,109 +697,92 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
           </>
         )}
 
-        {/* ============================================================ */}
-        {/* BUYER ONBOARDING STEPS */}
-        {/* ============================================================ */}
-        {selectedRole === 'buyer' && (
+        {/* BUYER REGISTRATION STEPS */}
+        {selectedRole === 'buyer' && currentStep > 1 && (
           <>
-            {/* BUYER STEP 1: BUSINESS DETAILS */}
             {currentStep === 2 && (
-              <div className="flex flex-col gap-5">
+              <div className="space-y-4 text-xs">
                 <div>
-                  <h2 className="text-lg font-extrabold text-forest-950">Business Information</h2>
-                  <p className="text-xs text-forest-700 mt-1">Provide your business credentials and point of contact.</p>
+                  <h2 className="text-base font-display font-bold text-ink-900">Company & contact details</h2>
+                  <p className="text-xs text-ink-500 mt-0.5">Provide business credentials for biomass contracts.</p>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] font-bold text-clay-800 uppercase tracking-wider mb-1">Contact Person Name</label>
-                    <input
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="e.g. Anish Gupta"
-                      className="w-full text-xs p-3.5 rounded-xl border border-clay-200 focus:ring-2 focus:ring-clay-500 font-semibold outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-bold text-clay-800 uppercase tracking-wider mb-1">Business / Entity Name</label>
+                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">Company / Facility name</label>
                     <input
                       type="text"
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
-                      placeholder="e.g. GreenGrow Bio-Energy Pvt Ltd"
-                      className="w-full text-xs p-3.5 rounded-xl border border-clay-200 focus:ring-2 focus:ring-clay-500 font-bold outline-none"
+                      placeholder="e.g. GreenGrow Bio-Energy"
+                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-medium text-ink-900 outline-none focus:ring-1 focus:ring-pine-700"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-clay-800 uppercase tracking-wider mb-1">Buyer Industry Type</label>
+                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">Facility industry type</label>
                     <select
                       value={buyerType}
                       onChange={(e) => setBuyerType(e.target.value as BuyerType)}
-                      className="w-full text-xs p-3.5 rounded-xl border border-clay-200 bg-white font-bold text-clay-950 outline-none focus:ring-2 focus:ring-clay-500"
+                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-medium text-ink-900 bg-surface-0 outline-none"
                     >
                       {buyerTypeOptions.map((b) => (
-                        <option key={b.id} value={b.id}>
-                          {b.label}
-                        </option>
+                        <option key={b.id} value={b.id}>{b.label}</option>
                       ))}
                     </select>
                   </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">Contact person name</label>
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Contact person full name"
+                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-medium text-ink-900 outline-none focus:ring-1 focus:ring-pine-700"
+                    />
+                  </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold text-clay-800 uppercase tracking-wider mb-1">Contact Phone Number</label>
+                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">Contact phone number</label>
                     <input
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="10-digit phone number"
-                      className="w-full text-xs p-3.5 rounded-xl border border-clay-200 focus:ring-2 focus:ring-clay-500 font-bold outline-none"
+                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-mono font-semibold text-ink-900 outline-none focus:ring-1 focus:ring-pine-700"
                     />
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-bold text-clay-800 uppercase tracking-wider mb-1">Business Description (Optional)</label>
-                  <textarea
-                    rows={2}
-                    value={businessDescription}
-                    onChange={(e) => setBusinessDescription(e.target.value)}
-                    placeholder="Describe your plant capacity, stubble utilization method, or procurement guidelines..."
-                    className="w-full text-xs p-3.5 rounded-xl border border-clay-200 focus:ring-2 focus:ring-clay-500 font-semibold outline-none"
-                  />
                 </div>
               </div>
             )}
 
-            {/* BUYER STEP 2: RESIDUE REQUIREMENTS */}
             {currentStep === 3 && (
-              <div className="flex flex-col gap-6">
+              <div className="space-y-4 text-xs">
                 <div>
-                  <h2 className="text-lg font-extrabold text-forest-950">Biomass Requirements</h2>
-                  <p className="text-xs text-forest-700 mt-1">Specify what residue types and tonnage you want to procure.</p>
+                  <h2 className="text-base font-display font-bold text-ink-900">Biomass requirements</h2>
+                  <p className="text-xs text-ink-500 mt-0.5">Specify what residue types and tonnage you want to procure.</p>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-clay-800 uppercase tracking-wider mb-2">
-                    Required Residue Types (Select all that apply)
-                  </label>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-2">Required residue types</label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
                     {residueOptions.map((opt) => {
                       const isSelected = requiredResidueTypes.includes(opt.id);
                       return (
                         <div
                           key={opt.id}
                           onClick={() => toggleResidueType(opt.id, true)}
-                          className={`p-3.5 rounded-2xl border-2 cursor-pointer flex items-center justify-between transition-all ${
+                          className={`p-3 rounded-card border cursor-pointer flex items-center justify-between transition-all ${
                             isSelected
-                              ? 'border-clay-600 bg-clay-50 text-clay-950 font-bold shadow-sm'
-                              : 'border-forest-100 hover:border-clay-200 text-forest-800'
+                              ? 'border-soil-700 bg-soil-100/50 text-soil-700 font-semibold'
+                              : 'border-line-200 text-ink-900 hover:border-soil-700/30'
                           }`}
                         >
-                          <span className="text-xs">{opt.label}</span>
-                          {isSelected && <CheckCircle2 className="h-4 w-4 text-clay-600 shrink-0" />}
+                          <span>{opt.label}</span>
+                          {isSelected && <CheckCircle2 className="h-4 w-4 text-soil-700 shrink-0" />}
                         </div>
                       );
                     })}
@@ -836,8 +790,8 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-clay-800 uppercase tracking-wider mb-1">
-                    Required Quantity (Tonnes per month / season)
+                  <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">
+                    Required quantity (tonnes)
                   </label>
                   <input
                     type="number"
@@ -846,33 +800,30 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     value={requiredQuantityTonnes}
                     onChange={(e) => setRequiredQuantityTonnes(e.target.value)}
                     placeholder="e.g. 100"
-                    className="w-full text-xs p-3.5 rounded-xl border border-clay-200 font-bold text-clay-950 outline-none focus:ring-2 focus:ring-clay-500"
+                    className="w-full text-xs p-2.5 rounded-card border border-line-200 font-mono font-semibold text-ink-900 outline-none focus:ring-1 focus:ring-pine-700"
                   />
                 </div>
               </div>
             )}
 
-            {/* BUYER STEP 3: PROCUREMENT RADIUS & LOCATION */}
             {currentStep === 4 && (
-              <div className="flex flex-col gap-6">
+              <div className="space-y-4 text-xs">
                 <div>
-                  <h2 className="text-lg font-extrabold text-forest-950">Procurement Logistics & Location</h2>
-                  <p className="text-xs text-forest-700 mt-1">Set your operational radius and facility location.</p>
+                  <h2 className="text-base font-display font-bold text-ink-900">Procurement logistics & location</h2>
+                  <p className="text-xs text-ink-500 mt-0.5">Set your operational radius and facility location.</p>
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-clay-800 uppercase tracking-wider mb-2">
-                    Procurement Radius (km)
-                  </label>
-                  <div className="grid grid-cols-4 gap-3">
+                  <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-2">Procurement radius (km)</label>
+                  <div className="grid grid-cols-4 gap-2 font-mono">
                     {[10, 25, 50, 100].map((radius) => (
                       <div
                         key={radius}
                         onClick={() => setProcurementRadiusKm(radius)}
-                        className={`p-3 rounded-xl border-2 text-center cursor-pointer font-bold text-xs transition-all ${
+                        className={`p-2.5 rounded-card border text-center cursor-pointer text-xs transition-all ${
                           procurementRadiusKm === radius
-                            ? 'border-clay-600 bg-clay-50 text-clay-900 shadow-sm'
-                            : 'border-forest-100 hover:border-clay-200 text-forest-800'
+                            ? 'border-soil-700 bg-soil-100/50 text-soil-700 font-semibold'
+                            : 'border-line-200 text-ink-900'
                         }`}
                       >
                         {radius} km
@@ -902,40 +853,39 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               </div>
             )}
 
-            {/* BUYER STEP 4: REVIEW & SUBMIT */}
             {currentStep === 5 && (
-              <div className="flex flex-col gap-6">
+              <div className="space-y-4 text-xs">
                 <div>
-                  <h2 className="text-lg font-extrabold text-forest-950">Review Buyer Profile</h2>
-                  <p className="text-xs text-forest-700 mt-1">Verify details before creating your buyer account.</p>
+                  <h2 className="text-base font-display font-bold text-ink-900">Review buyer profile</h2>
+                  <p className="text-xs text-ink-500 mt-0.5">Verify details before creating your buyer account.</p>
                 </div>
 
-                <div className="bg-clay-50/70 border border-clay-200 rounded-3xl p-6 space-y-4 text-xs">
-                  <div className="grid grid-cols-2 gap-4 pb-4 border-b border-clay-200">
+                <div className="bg-paper-50 border border-line-200 rounded-card p-4 space-y-3 font-mono">
+                  <div className="grid grid-cols-2 gap-4 pb-2 border-b border-line-200">
                     <div>
-                      <span className="text-[10px] text-clay-600 font-bold uppercase">Business Name</span>
-                      <p className="font-extrabold text-clay-950">{businessName}</p>
+                      <span className="text-[10px] font-sans text-ink-500 uppercase">Business</span>
+                      <p className="font-semibold text-ink-900">{businessName}</p>
                     </div>
                     <div>
-                      <span className="text-[10px] text-clay-600 font-bold uppercase">Contact Person</span>
-                      <p className="font-extrabold text-clay-950">{fullName} ({phone})</p>
+                      <span className="text-[10px] font-sans text-ink-500 uppercase">Contact</span>
+                      <p className="font-semibold text-ink-900">{fullName} ({phone})</p>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 pb-4 border-b border-clay-200">
+                  <div className="grid grid-cols-2 gap-4 pb-2 border-b border-line-200">
                     <div>
-                      <span className="text-[10px] text-clay-600 font-bold uppercase">Location & Radius</span>
-                      <p className="font-bold text-clay-900">{district}, {state} ({procurementRadiusKm} km radius)</p>
+                      <span className="text-[10px] font-sans text-ink-500 uppercase">Location & radius</span>
+                      <p className="font-semibold text-ink-900">{district}, {state} ({procurementRadiusKm} km)</p>
                     </div>
                     <div>
-                      <span className="text-[10px] text-clay-600 font-bold uppercase">Target Quantity</span>
-                      <p className="font-bold text-clay-900">{requiredQuantityTonnes} Tonnes</p>
+                      <span className="text-[10px] font-sans text-ink-500 uppercase">Target quantity</span>
+                      <p className="font-semibold text-ink-900">{requiredQuantityTonnes} tonnes</p>
                     </div>
                   </div>
 
                   <div>
-                    <span className="text-[10px] text-clay-600 font-bold uppercase">Residue Types</span>
-                    <p className="font-extrabold text-clay-950">{requiredResidueTypes.join(', ')}</p>
+                    <span className="text-[10px] font-sans text-ink-500 uppercase">Residues</span>
+                    <p className="font-semibold text-ink-900">{requiredResidueTypes.join(', ')}</p>
                   </div>
                 </div>
               </div>
@@ -944,13 +894,13 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
         )}
 
         {/* Footer Navigation Buttons */}
-        <div className="flex justify-between items-center mt-8 pt-6 border-t border-forest-100">
+        <div className="flex justify-between items-center mt-6 pt-4 border-t border-line-200">
           {currentStep > 1 ? (
             <button
               type="button"
               onClick={handleBack}
               disabled={submitting}
-              className="text-xs font-extrabold text-forest-700 hover:text-forest-950 flex items-center gap-1 transition-colors"
+              className="text-xs font-medium text-ink-500 hover:text-ink-900 flex items-center gap-1 transition-colors"
             >
               <ChevronLeft className="h-4 w-4" /> Back
             </button>
@@ -964,17 +914,14 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                 type="button"
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="bg-forest-600 hover:bg-forest-700 text-white font-extrabold text-xs py-3.5 px-8 rounded-2xl shadow-md transition-all disabled:opacity-50 flex items-center gap-2"
+                className="bg-pine-900 hover:bg-pine-700 text-white font-semibold text-xs py-2.5 px-6 rounded-card shadow-card transition-all disabled:opacity-50 flex items-center gap-2"
               >
                 {submitting ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Saving Profile...</span>
-                  </>
+                  <span>Saving profile…</span>
                 ) : (
                   <>
                     <CheckCircle2 className="h-4 w-4" />
-                    <span>{selectedRole === 'farmer' ? 'Create My Parali Profile' : 'Create Buyer Profile'}</span>
+                    <span>{selectedRole === 'farmer' ? 'Create farmer profile' : 'Create buyer profile'}</span>
                   </>
                 )}
               </button>
@@ -982,9 +929,9 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
               <button
                 type="button"
                 onClick={handleNext}
-                className="bg-forest-600 hover:bg-forest-700 text-white font-extrabold text-xs py-3.5 px-8 rounded-2xl shadow-md transition-all flex items-center gap-2"
+                className="bg-pine-900 hover:bg-pine-700 text-white font-semibold text-xs py-2.5 px-6 rounded-card shadow-card transition-all flex items-center gap-2"
               >
-                Next Step <ChevronRight className="h-4 w-4" />
+                Next step <ChevronRight className="h-4 w-4" />
               </button>
             )
           )}
