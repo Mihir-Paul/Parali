@@ -94,48 +94,18 @@ def test_firms_integration(
 
 @app.post("/api/optimize-route", response_model=OptimizeRouteResponse)
 def optimize_route(request: Optional[OptimizeRouteRequest] = None):
-    if not request or (not request.farms and not request.buyer_depot):
-        # Default sample data for demo/testing
-        depot = DepotInput(
-            buyer_id="b_demo",
-            company_name="GreenGrow Bio-Energy Plant",
-            latitude=30.3400,
-            longitude=76.3800
+    if not request or not request.buyer_depot:
+        raise HTTPException(
+            status_code=400,
+            detail="Set buyer facility location before optimizing pickups. Buyer depot coordinates are required."
         )
-        farms = [
-            FarmPickupInput(
-                farmer_id="f1", farmer_name="Gurpreet Singh", listing_id="l1", purchase_request_id="pr1",
-                latitude=30.3550, longitude=76.4120, accepted_quantity_tonnes=8.5, residue_type="Rice Straw"
-            ),
-            FarmPickupInput(
-                farmer_id="f2", farmer_name="Harmanpreet Kaur", listing_id="l2", purchase_request_id="pr2",
-                latitude=30.3120, longitude=76.4500, accepted_quantity_tonnes=12.0, residue_type="Paddy Straw"
-            ),
-            FarmPickupInput(
-                farmer_id="f3", farmer_name="Jagjit Singh", listing_id="l3", purchase_request_id="pr3",
-                latitude=30.2900, longitude=76.3500, accepted_quantity_tonnes=6.0, residue_type="Wheat Straw"
-            ),
-            FarmPickupInput(
-                farmer_id="f4", farmer_name="Sukhwinder Sharma", listing_id="l4", purchase_request_id="pr4",
-                latitude=30.3800, longitude=76.3200, accepted_quantity_tonnes=10.0, residue_type="Rice Straw"
-            )
-        ]
-        vehicle_capacity = 15.0
-        vehicle_count = 2
-        buyer_demand_id = "demo_demand_1"
-        cost_per_km = 20.0
-    else:
-        depot = request.buyer_depot or DepotInput(
-            buyer_id="b_demo",
-            company_name="Buyer Depot",
-            latitude=30.3400,
-            longitude=76.3800
-        )
-        farms = request.farms or []
-        vehicle_capacity = request.vehicle_capacity_tonnes
-        vehicle_count = request.vehicle_count
-        buyer_demand_id = request.buyer_demand_id or "demo_demand_1"
-        cost_per_km = request.cost_per_km or 20.0
+
+    depot = request.buyer_depot
+    farms = request.farms or []
+    vehicle_capacity = request.vehicle_capacity_tonnes
+    vehicle_count = request.vehicle_count
+    buyer_demand_id = request.buyer_demand_id or "demand_active"
+    cost_per_km = request.cost_per_km or 20.0
 
     try:
         response = optimizer_service.optimize_pickup_route(

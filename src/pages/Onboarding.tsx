@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { saveFarmerProfile, saveBuyerProfile } from '../services/profileService';
 import { FarmType, BuyerType } from '../types/profile';
+import { LocationPicker, LocationData } from '../components/LocationPicker';
 import {
   Sprout,
   Briefcase,
@@ -631,31 +632,28 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
             {currentStep === 5 && (
               <div className="space-y-4 text-xs">
                 <div>
-                  <h2 className="text-base font-display font-bold text-ink-900">Field location (optional)</h2>
-                  <p className="text-xs text-ink-500 mt-0.5">Pinpoint your location for truck collection optimization.</p>
+                  <h2 className="text-lg font-extrabold text-forest-950">Field Location Verification</h2>
+                  <p className="text-xs text-forest-700 mt-1">Acquire exact GPS coordinates for automated logistics routing and buyer matching.</p>
                 </div>
 
-                <div className="bg-paper-50 p-4 rounded-card border border-line-200 flex flex-col md:flex-row items-center justify-between gap-3">
-                  <div>
-                    <span className="font-semibold text-ink-900 flex items-center gap-1">
-                      <MapPin className="h-4 w-4 text-pine-700" /> GPS coordinates
-                    </span>
-                    <p className="text-[11px] text-ink-500 mt-0.5">
-                      {latitude && longitude
-                        ? `Lat: ${latitude.toFixed(4)}, Lng: ${longitude.toFixed(4)}`
-                        : 'Not detected yet.'}
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleGetLocation}
-                    disabled={locationLoading}
-                    className="bg-pine-900 hover:bg-pine-700 text-white font-semibold text-xs px-4 py-2 rounded-card transition-all"
-                  >
-                    {locationSuccess ? 'Location saved ✓' : 'Detect my location'}
-                  </button>
-                </div>
+                <LocationPicker
+                  label="Farm Field Location"
+                  helperText="Acquire GPS coordinates for your primary stubble harvesting field."
+                  initialLocation={{
+                    latitude: latitude || undefined,
+                    longitude: longitude || undefined,
+                    district,
+                    state,
+                    village
+                  }}
+                  onLocationChange={(loc: LocationData) => {
+                    if (loc.latitude != null) setLatitude(loc.latitude);
+                    if (loc.longitude != null) setLongitude(loc.longitude);
+                    if (loc.district) setDistrict(loc.district);
+                    if (loc.state) setState(loc.state);
+                    if (loc.village) setVillage(loc.village);
+                  }}
+                />
               </div>
             )}
 
@@ -834,28 +832,24 @@ export const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">Facility state</label>
-                    <input
-                      type="text"
-                      value={state}
-                      onChange={(e) => setState(e.target.value)}
-                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-medium outline-none text-ink-900"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-medium text-ink-500 uppercase tracking-wide mb-1">Facility district</label>
-                    <input
-                      type="text"
-                      value={district}
-                      onChange={(e) => setDistrict(e.target.value)}
-                      placeholder="e.g. Patiala"
-                      className="w-full text-xs p-2.5 rounded-card border border-line-200 font-medium outline-none focus:ring-1 focus:ring-pine-700 text-ink-900"
-                    />
-                  </div>
-                </div>
+                <LocationPicker
+                  label="Buyer Processing Facility / Depot Location"
+                  helperText="Acquire GPS coordinates for your biomass receiving plant or processing depot."
+                  initialLocation={{
+                    latitude: latitude || undefined,
+                    longitude: longitude || undefined,
+                    district,
+                    state,
+                    village
+                  }}
+                  onLocationChange={(loc: LocationData) => {
+                    if (loc.latitude != null) setLatitude(loc.latitude);
+                    if (loc.longitude != null) setLongitude(loc.longitude);
+                    if (loc.district) setDistrict(loc.district);
+                    if (loc.state) setState(loc.state);
+                    if (loc.village) setVillage(loc.village);
+                  }}
+                />
               </div>
             )}
 
