@@ -1,132 +1,234 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { Sprout, Briefcase, Cpu } from 'lucide-react';
+import { Sprout, Briefcase, Cpu, ArrowRight } from 'lucide-react';
+import SpotlightCard from '../components/ui/SpotlightCard';
+import BorderGlow from '../components/ui/BorderGlow';
 
 export const RoleSelect: React.FC = () => {
   const { setRole, loginAsFarmer, loginAsBuyer } = useAppStore();
-  const [phone, setPhone] = useState('9999999999');
-  const [email, setEmail] = useState('buyer@parali.demo');
-  const [showFarmerLogin, setShowFarmerLogin] = useState(false);
-  const [showBuyerLogin, setShowBuyerLogin] = useState(false);
-
-  const handleFarmerLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    loginAsFarmer(phone);
-  };
-
-  const handleBuyerLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    loginAsBuyer(email);
-  };
 
   return (
-    <div className="min-h-[85vh] flex flex-col justify-center items-center px-4 md:px-6 py-12 bg-paper-50 font-sans">
-      <div className="max-w-4xl w-full text-center mb-10">
-        <h2 className="text-2xl md:text-4xl font-display font-bold text-ink-900 tracking-tight">
+    <div
+      style={{
+        minHeight: '85vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '48px 24px',
+        backgroundColor: '#0F1A12',
+        fontFamily: "'Manrope', sans-serif",
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Background orb */}
+      <div style={{
+        position: 'absolute', top: '50%', left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 700, height: 700,
+        background: 'radial-gradient(circle, rgba(226,144,63,0.08) 0%, transparent 70%)',
+        filter: 'blur(80px)',
+        pointerEvents: 'none',
+      }} />
+
+      <div style={{ maxWidth: 860, width: '100%', textAlign: 'center', marginBottom: 40, position: 'relative' }}>
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 7,
+          padding: '5px 14px', borderRadius: 999,
+          background: 'rgba(226,144,63,0.1)', border: '1px solid rgba(226,144,63,0.2)',
+          marginBottom: 18,
+          fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 600,
+          color: '#E2903F', letterSpacing: '0.1em', textTransform: 'uppercase' as const,
+        }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#E2903F', display: 'inline-block' }} />
+          Parali Platform
+        </div>
+        <h2 style={{
+          fontFamily: "'Sora', sans-serif",
+          fontWeight: 800,
+          fontSize: 'clamp(1.8rem, 3.5vw, 2.8rem)',
+          color: '#F6F2E7',
+          margin: '0 0 12px',
+          letterSpacing: '-0.02em',
+        }}>
           Access the Parali ecosystem
         </h2>
-        <p className="text-xs md:text-sm text-ink-500 mt-2 max-w-xl mx-auto">
+        <p style={{ fontSize: 15, color: '#9BA695', maxWidth: 500, marginInline: 'auto' }}>
           Select your portal to interact with the stubble marketplace, logistics planning, or regional air quality tracking.
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 max-w-5xl w-full">
-        {/* Farmer Portal Card */}
-        <div className="group bg-surface-0 border border-line-200 rounded-card p-6 flex flex-col justify-between shadow-card hover:shadow-card-hover transition-shadow">
-          <div>
-            <div className="w-12 h-12 rounded-card bg-pine-100 text-pine-700 flex items-center justify-center mb-5 group-hover:bg-pine-900 group-hover:text-white transition-colors">
-              <Sprout className="h-6 w-6" />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20, maxWidth: 900, width: '100%', position: 'relative' }}>
+
+        {/* Farmer Card */}
+        <SpotlightCard spotlightColor="rgba(127,163,119,0.18)" className="role-card">
+          <div style={{ padding: '32px 28px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: 14,
+              background: 'rgba(127,163,119,0.15)',
+              border: '1px solid rgba(127,163,119,0.25)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 20,
+            }}>
+              <Sprout style={{ width: 24, height: 24, color: '#7FA377' }} />
             </div>
-            <h3 className="text-xl font-display font-bold text-ink-900">Farmer portal</h3>
-            <p className="text-xs text-ink-500 mt-2 leading-relaxed">
+            <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 20, color: '#F6F2E7', margin: '0 0 10px' }}>
+              Farmer portal
+            </h3>
+            <p style={{ fontSize: 13, color: '#9BA695', lineHeight: 1.7, margin: '0 0 auto', flexGrow: 1 }}>
               Sell wheat, paddy, or sugarcane residue. Request free on-field baling, get instant AI valuations, and receive direct payments.
             </p>
-          </div>
-
-          <div className="mt-6">
-            {showFarmerLogin ? (
-              <form onSubmit={handleFarmerLoginSubmit} className="flex flex-col gap-2">
-                <input 
-                  type="text" 
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Enter phone number"
-                  className="w-full text-xs p-2.5 rounded-card border border-line-200 focus:outline-none focus:ring-1 focus:ring-pine-700 font-mono text-ink-900"
-                />
-                <button type="submit" className="w-full bg-pine-900 hover:bg-pine-700 text-white text-xs font-semibold py-2 rounded-card transition-all">
-                  Proceed to dashboard
-                </button>
-              </form>
-            ) : (
-              <button 
-                onClick={() => setShowFarmerLogin(true)}
-                className="w-full bg-pine-100 text-pine-700 hover:bg-pine-900 hover:text-white text-xs font-semibold py-2.5 rounded-card transition-all"
-              >
-                I'm a farmer
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Buyer Portal Card */}
-        <div className="group bg-surface-0 border border-line-200 rounded-card p-6 flex flex-col justify-between shadow-card hover:shadow-card-hover transition-shadow">
-          <div>
-            <div className="w-12 h-12 rounded-card bg-soil-100 text-soil-700 flex items-center justify-center mb-5 group-hover:bg-soil-700 group-hover:text-white transition-colors">
-              <Briefcase className="h-6 w-6" />
-            </div>
-            <h3 className="text-xl font-display font-bold text-ink-900">Buyer portal</h3>
-            <p className="text-xs text-ink-500 mt-2 leading-relaxed">
-              Source bulk agricultural biomass. Post volume requirements, accept matches, and track scheduled regional shipments.
-            </p>
-          </div>
-
-          <div className="mt-6">
-            {showBuyerLogin ? (
-              <form onSubmit={handleBuyerLoginSubmit} className="flex flex-col gap-2">
-                <input 
-                  type="email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter email address"
-                  className="w-full text-xs p-2.5 rounded-card border border-line-200 focus:outline-none focus:ring-1 focus:ring-pine-700 font-medium text-ink-900"
-                />
-                <button type="submit" className="w-full bg-soil-700 hover:bg-soil-700/90 text-white text-xs font-semibold py-2 rounded-card transition-all">
-                  Proceed to dashboard
-                </button>
-              </form>
-            ) : (
-              <button 
-                onClick={() => setShowBuyerLogin(true)}
-                className="w-full bg-soil-100 text-soil-700 hover:bg-soil-700 hover:text-white text-xs font-semibold py-2.5 rounded-card transition-all"
-              >
-                I'm a biomass buyer
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Admin / Operations Portal Card */}
-        <div className="group bg-surface-0 border border-line-200 rounded-card p-6 flex flex-col justify-between shadow-card hover:shadow-card-hover transition-shadow">
-          <div>
-            <div className="w-12 h-12 rounded-card bg-paper-50 border border-line-200 text-ink-500 flex items-center justify-center mb-5 group-hover:bg-pine-900 group-hover:text-white transition-colors">
-              <Cpu className="h-6 w-6" />
-            </div>
-            <h3 className="text-xl font-display font-bold text-ink-900">Operations center</h3>
-            <p className="text-xs text-ink-500 mt-2 leading-relaxed">
-              Access NASA FIRMS burn intelligence, trigger OR-Tools vehicle routing, and monitor MRV carbon offset data.
-            </p>
-          </div>
-
-          <div className="mt-6">
-            <button 
-              onClick={() => setRole('Admin')}
-              className="w-full bg-paper-50 hover:bg-pine-900 hover:text-white text-ink-900 border border-line-200 text-xs font-semibold py-2.5 rounded-card transition-all"
+            <button
+              onClick={() => loginAsFarmer('9999999999')}
+              style={{
+                marginTop: 28, width: '100%', padding: '12px 16px',
+                background: 'rgba(127,163,119,0.12)',
+                border: '1px solid rgba(127,163,119,0.3)',
+                borderRadius: 10,
+                color: '#7FA377',
+                fontFamily: "'Sora', sans-serif",
+                fontWeight: 700, fontSize: 13,
+                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = '#7FA377';
+                (e.currentTarget as HTMLButtonElement).style.color = '#0F1A12';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(127,163,119,0.12)';
+                (e.currentTarget as HTMLButtonElement).style.color = '#7FA377';
+              }}
             >
-              Open operations dashboard
+              Proceed to dashboard <ArrowRight style={{ width: 14, height: 14 }} />
             </button>
           </div>
-        </div>
+        </SpotlightCard>
+
+        {/* Buyer Card — center, wrapped in BorderGlow for hero treatment */}
+        <BorderGlow
+          borderRadius={16}
+          glowColor="28 70 62"
+          backgroundColor="#17271B"
+          glowIntensity={1.2}
+          animated={true}
+          colors={['#E2903F', '#7FA377', '#F2B77A']}
+          edgeSensitivity={20}
+        >
+          <div style={{ padding: '32px 28px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: 14,
+              background: 'rgba(226,144,63,0.15)',
+              border: '1px solid rgba(226,144,63,0.3)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 20,
+            }}>
+              <Briefcase style={{ width: 24, height: 24, color: '#E2903F' }} />
+            </div>
+            <div style={{
+              display: 'inline-block', marginBottom: 12,
+              fontFamily: "'JetBrains Mono', monospace", fontSize: 10,
+              color: '#E2903F', textTransform: 'uppercase' as const, letterSpacing: '0.1em',
+              background: 'rgba(226,144,63,0.1)', border: '1px solid rgba(226,144,63,0.2)',
+              borderRadius: 999, padding: '3px 10px',
+            }}>Most Popular</div>
+            <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 20, color: '#F6F2E7', margin: '0 0 10px' }}>
+              Buyer portal
+            </h3>
+            <p style={{ fontSize: 13, color: '#9BA695', lineHeight: 1.7, margin: '0 0 auto', flexGrow: 1 }}>
+              Source bulk agricultural biomass. Post volume requirements, accept matches, and track scheduled regional shipments.
+            </p>
+            <button
+              onClick={() => loginAsBuyer('buyer@parali.demo')}
+              style={{
+                marginTop: 28, width: '100%', padding: '12px 16px',
+                background: '#E2903F',
+                border: 'none',
+                borderRadius: 10,
+                color: '#0F1A12',
+                fontFamily: "'Sora', sans-serif",
+                fontWeight: 700, fontSize: 13,
+                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                transition: 'all 0.2s ease',
+                boxShadow: '0 0 20px rgba(226,144,63,0.3)',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-1px)';
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 4px 24px rgba(226,144,63,0.45)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(0)';
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 20px rgba(226,144,63,0.3)';
+              }}
+            >
+              Proceed to dashboard <ArrowRight style={{ width: 14, height: 14 }} />
+            </button>
+          </div>
+        </BorderGlow>
+
+        {/* Admin Card */}
+        <SpotlightCard spotlightColor="rgba(155,166,149,0.12)" className="role-card">
+          <div style={{ padding: '32px 28px', display: 'flex', flexDirection: 'column', height: '100%' }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: 14,
+              background: 'rgba(155,166,149,0.1)',
+              border: '1px solid rgba(155,166,149,0.2)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              marginBottom: 20,
+            }}>
+              <Cpu style={{ width: 24, height: 24, color: '#9BA695' }} />
+            </div>
+            <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 20, color: '#F6F2E7', margin: '0 0 10px' }}>
+              Operations center
+            </h3>
+            <p style={{ fontSize: 13, color: '#9BA695', lineHeight: 1.7, margin: '0 0 auto', flexGrow: 1 }}>
+              Access NASA FIRMS burn intelligence, trigger OR-Tools vehicle routing, and monitor MRV carbon offset data.
+            </p>
+            <button
+              onClick={() => setRole('Admin')}
+              style={{
+                marginTop: 28, width: '100%', padding: '12px 16px',
+                background: 'rgba(155,166,149,0.08)',
+                border: '1px solid rgba(155,166,149,0.2)',
+                borderRadius: 10,
+                color: '#9BA695',
+                fontFamily: "'Sora', sans-serif",
+                fontWeight: 700, fontSize: 13,
+                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(155,166,149,0.18)';
+                (e.currentTarget as HTMLButtonElement).style.color = '#F6F2E7';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLButtonElement).style.background = 'rgba(155,166,149,0.08)';
+                (e.currentTarget as HTMLButtonElement).style.color = '#9BA695';
+              }}
+            >
+              Open operations dashboard <ArrowRight style={{ width: 14, height: 14 }} />
+            </button>
+          </div>
+        </SpotlightCard>
       </div>
+
+      <style>{`
+        .role-card {
+          border: 1px solid rgba(246,242,231,0.07) !important;
+          background: #17271B !important;
+          border-radius: 16px !important;
+          padding: 0 !important;
+          display: flex;
+          flex-direction: column;
+        }
+        @media (max-width: 720px) {
+          .role-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 };

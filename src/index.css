@@ -7,8 +7,8 @@
   line-height: 1.6;
   font-weight: 400;
   color-scheme: light;
-  background-color: #FAF8F4;
-  color: #211E19;
+  background-color: #FAF9F6;
+  color: #102F24;
 
   /* Design tokens as CSS custom properties */
   --pine-900: #173226;
@@ -18,11 +18,20 @@
   --soil-100: #F1E4D3;
   --ash-500: #D98A2B;
   --ember-600: #C1402A;
-  --paper-50: #FAF8F4;
+  --paper-50: #FAF9F6;
   --surface-0: #FFFFFF;
   --line-200: #E3DFD5;
   --ink-900: #211E19;
   --ink-500: #6B6558;
+
+  /* Parali green system */
+  --parali-green-primary: #12372A;
+  --parali-green-accent: #2F6B4F;
+  --parali-green-light: #E8F1EB;
+  --parali-green-soft: #F3F7F4;
+  --parali-border: #D5E2DA;
+  --parali-card-glow: rgba(18, 55, 42, 0.06);
+  --parali-card-glow-hover: rgba(18, 55, 42, 0.10);
 
   /* Signature element: ash-to-green gradient */
   --gradient-ash-to-green: linear-gradient(90deg, #D98A2B 0%, #2C5940 100%);
@@ -111,3 +120,35 @@ button, a, input, select, textarea {
   background: var(--pine-100);
   color: var(--pine-900);
 }
+
+/* ═══════════════════════════════════════════════════════
+   PARALI CARD SYSTEM — green glow + hover lift
+   ═══════════════════════════════════════════════════════ */
+
+.parali-card {
+  background: #FFFFFF;
+  border: 1px solid var(--parali-border, #D5E2DA);
+  border-radius: 1.5rem;
+  box-shadow: var(--parali-card-glow, 0 4px 20px rgba(18, 55, 42, 0.06));
+  transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
+}
+
+.parali-card:hover {
+  box-shadow: var(--parali-card-glow-hover, 0 8px 28px rgba(18, 55, 42, 0.10));
+  border-color: #9CBAA3;
+  transform: translateY(-1px);
+}
+
+.parali-card-soft {
+  background: #F3F7F4;
+  border: 1px solid var(--parali-border, #D5E2DA);
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 12px rgba(18, 55, 42, 0.04);
+  transition: box-shadow 200ms ease, border-color 200ms ease;
+}
+
+/* Ensure Tailwind classes for forest/cream/clay are also emitted
+   by keeping references here (Tailwind purge safety) */
+/* forest-50 forest-100 forest-200 forest-300 forest-400 forest-500
+   forest-600 forest-700 forest-800 forest-900 forest-950
+   cream-50 cream-100 cream-200 clay-100 clay-200 clay-500 clay-600 clay-700 */

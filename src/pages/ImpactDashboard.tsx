@@ -320,10 +320,10 @@ export const ImpactDashboard: React.FC = () => {
 
           {/* Explanation Modal / Popup */}
           {activeModalMetric && metricExplanations[activeModalMetric] && (
-            <div className="p-6 bg-forest-900 text-white rounded-3xl shadow-lg border border-forest-800 relative">
+            <div className="p-6 bg-forest-50 rounded-3xl shadow-sm border-2 border-forest-200 relative">
               <button
                 onClick={() => setActiveModalMetric(null)}
-                className="absolute top-4 right-4 text-slate-300 hover:text-white font-bold text-xs bg-forest-800 px-2.5 py-1 rounded-lg"
+                className="absolute top-4 right-4 text-forest-700 hover:text-forest-950 font-bold text-xs bg-forest-100 px-2.5 py-1 rounded-lg border border-forest-200"
               >
                 ✕ Close
               </button>
@@ -331,24 +331,24 @@ export const ImpactDashboard: React.FC = () => {
               <div className="flex items-center gap-2 mb-2">
                 <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
                   metricExplanations[activeModalMetric].type === 'Measured'
-                    ? 'bg-emerald-100 text-emerald-900'
-                    : 'bg-amber-100 text-amber-900'
+                    ? 'bg-forest-100 text-forest-900 border border-forest-200'
+                    : 'bg-amber-100 text-amber-900 border border-amber-200'
                 }`}>
                   {metricExplanations[activeModalMetric].type} Data
                 </span>
-                <h4 className="text-lg font-black text-cream-100">
+                <h4 className="text-lg font-black text-forest-950">
                   {metricExplanations[activeModalMetric].title} Calculation Methodology
                 </h4>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4 mt-4 text-xs">
-                <div className="bg-forest-950/70 p-4 rounded-2xl border border-forest-800">
-                  <strong className="text-amber-300 block mb-1 uppercase text-[10px] font-extrabold tracking-wider">Formula / Algorithm</strong>
-                  <code className="text-cream-50 font-mono font-bold block">{metricExplanations[activeModalMetric].formula}</code>
+                <div className="bg-white p-4 rounded-2xl border border-forest-200">
+                  <strong className="text-forest-700 block mb-1 uppercase text-[10px] font-extrabold tracking-wider">Formula / Algorithm</strong>
+                  <code className="text-forest-950 font-mono font-bold block">{metricExplanations[activeModalMetric].formula}</code>
                 </div>
-                <div className="bg-forest-950/70 p-4 rounded-2xl border border-forest-800">
-                  <strong className="text-emerald-400 block mb-1 uppercase text-[10px] font-extrabold tracking-wider">Operational Context</strong>
-                  <p className="text-slate-300 leading-relaxed">{metricExplanations[activeModalMetric].explanation}</p>
+                <div className="bg-white p-4 rounded-2xl border border-forest-200">
+                  <strong className="text-forest-700 block mb-1 uppercase text-[10px] font-extrabold tracking-wider">Operational Context</strong>
+                  <p className="text-forest-800 leading-relaxed">{metricExplanations[activeModalMetric].explanation}</p>
                 </div>
               </div>
             </div>
@@ -432,47 +432,47 @@ export const ImpactDashboard: React.FC = () => {
           </div>
 
           {/* Carbon Offset Readiness (MRV Data Coverage) */}
-          <div className="bg-gradient-to-r from-forest-950 via-forest-900 to-forest-950 text-white p-8 rounded-3xl shadow-md border border-forest-800">
+          <div className="bg-forest-50 border-2 border-forest-200 p-8 rounded-3xl shadow-sm">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <Award className="h-5 w-5 text-amber-400" />
-                  <span className="text-[10px] bg-forest-800 text-amber-300 font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  <Award className="h-5 w-5 text-forest-600" />
+                  <span className="text-[10px] bg-forest-100 text-forest-900 font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-forest-200">
                     Future Carbon Credit Integration
                   </span>
                 </div>
-                <h3 className="text-xl font-black text-cream-100">Carbon Offset MRV Readiness</h3>
-                <p className="text-xs text-slate-300 mt-1 max-w-xl">
-                  Parali captures all data fields required for ISO 14064-2 & Gold Standard MRV (Measurement, Reporting, Verification) carbon methodology.
+                <h3 className="text-xl font-black text-forest-950">Carbon Offset MRV Readiness</h3>
+                <p className="text-xs text-forest-700 mt-1 max-w-xl">
+                  Parali captures all data fields required for ISO 14064-2 &amp; Gold Standard MRV (Measurement, Reporting, Verification) carbon methodology.
                 </p>
               </div>
 
-              <div className="bg-forest-850 border border-forest-700 px-5 py-3 rounded-2xl text-center self-stretch md:self-auto">
-                <span className="text-[10px] font-extrabold text-clay-300 uppercase block">MRV Data Coverage</span>
-                <span className="text-2xl font-black text-emerald-400">100% Complete</span>
+              <div className="bg-white border-2 border-forest-300 px-5 py-3 rounded-2xl text-center self-stretch md:self-auto shadow-green-sm">
+                <span className="text-[10px] font-extrabold text-forest-600 uppercase block">MRV Data Coverage</span>
+                <span className="text-2xl font-black text-forest-900">100% Complete</span>
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 pt-4 border-t border-forest-800/80 text-xs">
-              <div className="bg-forest-900/60 p-4 rounded-2xl border border-forest-800">
-                <span className="text-emerald-400 font-bold block mb-1">✓ Farmer Identity</span>
-                <span className="text-slate-300 text-[11px]">Verified land holding & contact details</span>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 pt-4 border-t border-forest-200 text-xs">
+              <div className="bg-white p-4 rounded-2xl border border-forest-200 shadow-card">
+                <span className="text-forest-600 font-bold block mb-1 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Farmer Identity</span>
+                <span className="text-forest-700 text-[11px]">Verified land holding &amp; contact details</span>
               </div>
-              <div className="bg-forest-900/60 p-4 rounded-2xl border border-forest-800">
-                <span className="text-emerald-400 font-bold block mb-1">✓ Residue Tonnage</span>
-                <span className="text-slate-300 text-[11px]">Weighbridge & bale count records</span>
+              <div className="bg-white p-4 rounded-2xl border border-forest-200 shadow-card">
+                <span className="text-forest-600 font-bold block mb-1 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Residue Tonnage</span>
+                <span className="text-forest-700 text-[11px]">Weighbridge &amp; bale count records</span>
               </div>
-              <div className="bg-forest-900/60 p-4 rounded-2xl border border-forest-800">
-                <span className="text-emerald-400 font-bold block mb-1">✓ Remittance Record</span>
-                <span className="text-slate-300 text-[11px]">Bank transfer proof of transaction</span>
+              <div className="bg-white p-4 rounded-2xl border border-forest-200 shadow-card">
+                <span className="text-forest-600 font-bold block mb-1 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Remittance Record</span>
+                <span className="text-forest-700 text-[11px]">Bank transfer proof of transaction</span>
               </div>
-              <div className="bg-forest-900/60 p-4 rounded-2xl border border-forest-800">
-                <span className="text-emerald-400 font-bold block mb-1">✓ Route Evidence</span>
-                <span className="text-slate-300 text-[11px]">GPS coordinates & truck pickup trace</span>
+              <div className="bg-white p-4 rounded-2xl border border-forest-200 shadow-card">
+                <span className="text-forest-600 font-bold block mb-1 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Route Evidence</span>
+                <span className="text-forest-700 text-[11px]">GPS coordinates &amp; truck pickup trace</span>
               </div>
-              <div className="bg-forest-900/60 p-4 rounded-2xl border border-forest-800">
-                <span className="text-emerald-400 font-bold block mb-1">✓ Satellite Context</span>
-                <span className="text-slate-300 text-[11px]">NASA FIRMS thermal anomaly overlay</span>
+              <div className="bg-white p-4 rounded-2xl border border-forest-200 shadow-card">
+                <span className="text-forest-600 font-bold block mb-1 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Satellite Context</span>
+                <span className="text-forest-700 text-[11px]">NASA FIRMS thermal anomaly overlay</span>
               </div>
             </div>
           </div>

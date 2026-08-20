@@ -1,0 +1,15 @@
+.scroll-reveal {
+  margin: 20px 0;
+}
+
+.scroll-reveal-text {
+  font-family: 'Sora', sans-serif;
+  font-size: clamp(1.6rem, 4vw, 3rem);
+  line-height: 1.5;
+  font-weight: 700;
+  color: #F6F2E7;
+}
+
+.word {
+  display: inline-block;
+}
