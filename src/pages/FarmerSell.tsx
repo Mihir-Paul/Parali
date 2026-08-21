@@ -22,7 +22,16 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
   const [pickupDate, setPickupDate] = useState('2026-08-22');
   const [valuationMin, setValuationMin] = useState(2400);
   const [valuationMax, setValuationMax] = useState(2800);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
+
+  // Handle image file selection
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newUrls = Array.from(e.target.files).map((file) => URL.createObjectURL(file));
+      setSelectedImages((prev) => [...prev, ...newUrls]);
+    }
+  };
 
   // Recalculate AI valuation based on inputs
   useEffect(() => {
@@ -69,7 +78,7 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
         pickupLocation,
         coordinates: latitude && longitude ? [longitude, latitude] : undefined,
         pickupDate,
-        images: [],
+        images: selectedImages,
         estimatedPriceMin: valuationMin,
         estimatedPriceMax: valuationMax
       });
@@ -168,37 +177,74 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
               />
             </div>
 
+            {/* Upload Residue Photos Section */}
             <div>
               <label className="block text-xs font-bold text-forest-800 mb-1.5 uppercase tracking-wide flex items-center gap-1">
-                <Camera className="h-3.5 w-3.5" /> Residue Photos (Optional)
+                <Camera className="h-3.5 w-3.5 text-forest-600" /> Residue Photos (Optional)
               </label>
-              <div className="border-2 border-dashed border-forest-100 rounded-xl p-6 text-center hover:bg-forest-50/50 cursor-pointer transition-all">
-                <span className="text-xs text-forest-600 font-bold block">📷 Tap to Upload Photos</span>
-                <span className="text-[10px] text-slate-400 mt-1 block">Help buyers verify moisture & compaction</span>
-              </div>
+
+              <input
+                type="file"
+                id="residue-photo-input"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+
+              <label
+                htmlFor="residue-photo-input"
+                className="border-2 border-dashed border-[#294237] bg-[#1C3429] hover:border-[#6FAF8A] rounded-xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center block"
+              >
+                <div className="w-10 h-10 rounded-full bg-[#24563E] border border-[#294237] flex items-center justify-center mb-2">
+                  <Camera className="h-5 w-5 text-[#8BC7A3]" />
+                </div>
+                <span className="text-sm font-bold text-[#F1F5F2] block">Tap to Upload Photos</span>
+                <span className="text-[11px] text-[#B8C8BF] mt-1 block">Help buyers verify moisture &amp; compaction</span>
+              </label>
+
+              {/* Selected Photo Thumbnails */}
+              {selectedImages.length > 0 && (
+                <div className="flex flex-wrap gap-2.5 mt-3">
+                  {selectedImages.map((url, idx) => (
+                    <div key={idx} className="relative w-16 h-16 rounded-xl overflow-hidden border border-[#294237] bg-[#14251D] shadow-sm">
+                      <img src={url} alt={`Upload ${idx + 1}`} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSelectedImages((prev) => prev.filter((_, i) => i !== idx));
+                        }}
+                        className="absolute top-1 right-1 bg-black/80 hover:bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] transition-colors"
+                        title="Remove photo"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {/* Right side AI Valuation card */}
         <div className="md:col-span-5 flex flex-col gap-4">
-          <div className="bg-forest-900 text-cream-50 rounded-2xl p-6 shadow-md border border-forest-800 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-forest-800 rounded-full filter blur-2xl opacity-40"></div>
-            
-            <span className="text-[10px] bg-forest-800 text-clay-300 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+          <div className="bg-forest-50 border border-forest-150 rounded-2xl p-6 shadow-sm relative overflow-hidden">
+            <span className="text-[10px] bg-forest-100 text-forest-900 font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-forest-200">
               Parali Valuation AI
             </span>
             
-            <h4 className="font-extrabold text-sm text-cream-100 mt-4 uppercase">Estimated Market Value</h4>
-            <div className="flex items-baseline gap-1 mt-2">
-              <span className="text-3xl font-black text-white">₹{valuationMin.toLocaleString('en-IN')}</span>
-              <span className="text-sm font-semibold text-clay-300">—</span>
-              <span className="text-3xl font-black text-white">₹{valuationMax.toLocaleString('en-IN')}</span>
+            <h4 className="font-extrabold text-xs text-forest-700 mt-4 uppercase tracking-wider">Estimated Market Value</h4>
+            <div className="flex items-baseline gap-1 mt-2 flex-wrap">
+              <span className="text-4xl font-black text-forest-900">₹{valuationMin.toLocaleString('en-IN')}</span>
+              <span className="text-lg font-bold text-forest-500 mx-1">–</span>
+              <span className="text-4xl font-black text-forest-900">₹{valuationMax.toLocaleString('en-IN')}</span>
             </div>
             
-            <div className="mt-4 pt-4 border-t border-forest-800 flex gap-2">
-              <Info className="h-4 w-4 text-clay-400 shrink-0" />
-              <p className="text-[10px] text-slate-300 leading-normal font-semibold">
+            <div className="mt-4 pt-4 border-t border-forest-150 flex gap-2">
+              <Info className="h-4 w-4 text-forest-500 shrink-0 mt-0.5" />
+              <p className="text-[11px] text-forest-600 leading-relaxed font-medium">
                 Valuation is generated by calculating distance to Rajpura Bio-energy Hub, current buyer demand metrics, and crop volume multipliers.
               </p>
             </div>
@@ -207,7 +253,7 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-clay-500 hover:bg-clay-600 text-white font-extrabold text-sm py-4 rounded-2xl shadow-lg transition-all disabled:opacity-50"
+            className="w-full bg-forest-900 hover:bg-forest-950 text-white font-extrabold text-sm py-4 rounded-2xl shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? 'Creating Listing...' : 'Confirm & List Residue'}
           </button>

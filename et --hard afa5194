@@ -1,0 +1,9 @@
+[33mafa5194[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{0}: reset: moving to HEAD~1
+[33m762cf20[m HEAD@{1}: commit: checkpoint: before glow theme
+[33mafa5194[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m HEAD@{2}: commit: feat: add FarmerHiddenCostCalculator component and new dashboard and route optimization pages
+[33m105cde8[m HEAD@{3}: commit: Updated Readme.md
+[33m44b6a81[m HEAD@{4}: commit (merge): Merge branch 'main' of https://github.com/Mihir-Paul/Parali
+[33mecbf901[m HEAD@{5}: reset: moving to HEAD
+[33mecbf901[m HEAD@{6}: commit: feat: implement core application modules including dashboards, authentication, and satellite fire monitoring logic
+[33m35b3fe4[m HEAD@{7}: commit: feat: implement core marketplace and dashboard pages with associated UI components and configuration
+[33md171743[m HEAD@{8}: clone: from https://github.com/Mihir-Paul/Parali.git

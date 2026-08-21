@@ -75,6 +75,8 @@ export interface PurchaseRequestItem extends PurchaseRequestInput {
   residue_type?: string;
   crop_type?: string;
   location?: string;
+  latitude?: number;
+  longitude?: number;
   status: PurchaseRequestStatus;
   accepted_at?: string;
   declined_at?: string;

@@ -425,6 +425,8 @@ export async function createResidueListing(
     quality_grade?: 'Grade A' | 'Grade B' | 'Grade C';
     moisture_pct?: number;
     pickup_ready_date: string;
+    latitude?: number;
+    longitude?: number;
   }
 ): Promise<ResidueListingItem> {
   const payload = {
@@ -441,7 +443,9 @@ export async function createResidueListing(
     quality_grade: input.quality_grade || 'Grade A',
     moisture_pct: input.moisture_pct || 12,
     pickup_ready_date: input.pickup_ready_date,
-    status: 'Listed'
+    status: 'Listed',
+    latitude: input.latitude,
+    longitude: input.longitude
   };
 
   const { data, error } = await supabase

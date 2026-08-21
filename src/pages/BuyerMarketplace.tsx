@@ -159,18 +159,18 @@ export const BuyerMarketplace: React.FC<BuyerMarketplaceProps> = ({
       )}
 
       {/* Hero Banner Header */}
-      <div className="relative bg-gradient-to-r from-forest-950 via-forest-900 to-forest-850 text-cream-50 rounded-3xl p-6 md:p-10 mb-8 shadow-md border border-forest-800 overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-forest-700/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="relative bg-gradient-to-r from-forest-950 via-forest-900 to-forest-800 text-white rounded-3xl p-6 md:p-10 mb-8 shadow-md border border-forest-800 overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 opacity-20 bg-forest-700 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
           <div className="max-w-2xl">
-            <span className="text-[10px] font-black uppercase tracking-widest text-clay-300 bg-forest-800/80 px-3 py-1 rounded-full border border-forest-700">
+            <span className="text-[10px] font-black uppercase tracking-widest text-clay-300 bg-forest-800 px-3 py-1 rounded-full border border-forest-700">
               B2B Biomass Marketplace
             </span>
             <h1 className="text-2xl md:text-4xl font-black text-white mt-3 tracking-tight">
               Source agricultural residue directly from farmers.
             </h1>
-            <p className="text-xs md:text-sm text-slate-250 mt-2 leading-relaxed font-medium">
+            <p className="text-xs md:text-sm text-cream-200 mt-2 leading-relaxed font-medium">
               Find verified crop residue, compare available quantities, and create reliable biomass supply for your plant.
             </p>
           </div>

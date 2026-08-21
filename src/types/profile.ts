@@ -49,6 +49,8 @@ export interface BuyerProfile {
   required_quantity_tonnes?: number;
   procurement_radius_km?: number;
   business_description?: string;
+  latitude?: number;
+  longitude?: number;
   created_at?: string;
   updated_at?: string;
 }

@@ -320,10 +320,10 @@ export const ImpactDashboard: React.FC = () => {
 
           {/* Explanation Modal / Popup */}
           {activeModalMetric && metricExplanations[activeModalMetric] && (
-            <div className="p-6 bg-forest-900 text-white rounded-3xl shadow-lg border border-forest-800 relative">
+            <div className="p-6 bg-forest-50 rounded-3xl shadow-sm border-2 border-forest-200 relative">
               <button
                 onClick={() => setActiveModalMetric(null)}
-                className="absolute top-4 right-4 text-slate-300 hover:text-white font-bold text-xs bg-forest-800 px-2.5 py-1 rounded-lg"
+                className="absolute top-4 right-4 text-forest-700 hover:text-forest-950 font-bold text-xs bg-forest-100 px-2.5 py-1 rounded-lg border border-forest-200"
               >
                 ✕ Close
               </button>
@@ -331,98 +331,137 @@ export const ImpactDashboard: React.FC = () => {
               <div className="flex items-center gap-2 mb-2">
                 <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase ${
                   metricExplanations[activeModalMetric].type === 'Measured'
-                    ? 'bg-emerald-100 text-emerald-900'
-                    : 'bg-amber-100 text-amber-900'
+                    ? 'bg-forest-100 text-forest-900 border border-forest-200'
+                    : 'bg-amber-100 text-amber-900 border border-amber-200'
                 }`}>
                   {metricExplanations[activeModalMetric].type} Data
                 </span>
-                <h4 className="text-lg font-black text-cream-100">
+                <h4 className="text-lg font-black text-forest-950">
                   {metricExplanations[activeModalMetric].title} Calculation Methodology
                 </h4>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4 mt-4 text-xs">
-                <div className="bg-forest-950/70 p-4 rounded-2xl border border-forest-800">
-                  <strong className="text-amber-300 block mb-1 uppercase text-[10px] font-extrabold tracking-wider">Formula / Algorithm</strong>
-                  <code className="text-cream-50 font-mono font-bold block">{metricExplanations[activeModalMetric].formula}</code>
+                <div className="bg-white p-4 rounded-2xl border border-forest-200">
+                  <strong className="text-forest-700 block mb-1 uppercase text-[10px] font-extrabold tracking-wider">Formula / Algorithm</strong>
+                  <code className="text-forest-950 font-mono font-bold block">{metricExplanations[activeModalMetric].formula}</code>
                 </div>
-                <div className="bg-forest-950/70 p-4 rounded-2xl border border-forest-800">
-                  <strong className="text-emerald-400 block mb-1 uppercase text-[10px] font-extrabold tracking-wider">Operational Context</strong>
-                  <p className="text-slate-300 leading-relaxed">{metricExplanations[activeModalMetric].explanation}</p>
+                <div className="bg-white p-4 rounded-2xl border border-forest-200">
+                  <strong className="text-forest-700 block mb-1 uppercase text-[10px] font-extrabold tracking-wider">Operational Context</strong>
+                  <p className="text-forest-800 leading-relaxed">{metricExplanations[activeModalMetric].explanation}</p>
                 </div>
               </div>
             </div>
           )}
 
           {/* Without Parali vs With Parali Comparison Section */}
-          <div className="bg-white border border-forest-100 p-8 rounded-3xl shadow-sm">
+          <div 
+            className="p-8 rounded-3xl transition-all"
+            style={{
+              backgroundColor: '#14251D',
+              border: '1px solid #294237',
+              boxShadow: '0 6px 24px rgba(0, 0, 0, 0.16)'
+            }}
+          >
             <div className="mb-6">
-              <span className="text-[10px] bg-forest-100 text-forest-900 font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+              <span 
+                className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider inline-block"
+                style={{
+                  backgroundColor: '#183328',
+                  color: '#8BC7A3',
+                  border: '1px solid #294237'
+                }}
+              >
                 Systemic Transformation
               </span>
-              <h3 className="text-xl font-black text-forest-950 mt-2">Without Parali vs. With Parali</h3>
-              <p className="text-xs text-forest-700 mt-1">
+              <h3 className="text-xl font-black mt-2" style={{ color: '#F1F5F2' }}>
+                Without Parali vs. With Parali
+              </h3>
+              <p className="text-xs mt-1" style={{ color: '#B8C8BF' }}>
                 Comparing regional agricultural outcome metrics before and after Parali Marketplace deployment.
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
               {/* WITHOUT PARALI */}
-              <div className="bg-red-50/50 border border-red-200 p-6 rounded-2xl">
+              <div 
+                className="p-6 rounded-2xl transition-all duration-200 hover:-translate-y-0.5 hover:border-[#6B403A]"
+                style={{
+                  backgroundColor: '#241E1C',
+                  border: '1px solid #6B403A',
+                  boxShadow: '0 6px 24px rgba(0, 0, 0, 0.16)'
+                }}
+              >
                 <div className="flex items-center gap-2 mb-4">
-                  <Flame className="h-5 w-5 text-red-600" />
-                  <h4 className="font-black text-base text-red-950">WITHOUT PARALI (Traditional Status Quo)</h4>
+                  <Flame className="h-5 w-5 shrink-0" style={{ color: '#F28B82' }} />
+                  <h4 className="font-black text-base" style={{ color: '#F1F5F2' }}>
+                    WITHOUT PARALI (Traditional Status Quo)
+                  </h4>
                 </div>
                 <div className="space-y-3 text-xs">
-                  <div className="flex justify-between py-2 border-b border-red-200/60">
-                    <span className="text-slate-600 font-medium">Crop Residue Status</span>
-                    <strong className="text-red-900 font-extrabold">Open In-Field Burning</strong>
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #493733' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Crop Residue Status</span>
+                    <strong className="font-extrabold" style={{ color: '#F28B82' }}>Open In-Field Burning</strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-red-200/60">
-                    <span className="text-slate-600 font-medium">Farmer Revenue</span>
-                    <strong className="text-red-900 font-extrabold">₹0 (Negative Nutrient Loss)</strong>
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #493733' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Farmer Revenue</span>
+                    <strong className="font-extrabold" style={{ color: '#F28B82' }}>₹0 (Negative Nutrient Loss)</strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-red-200/60">
-                    <span className="text-slate-600 font-medium">Logistics Efficiency</span>
-                    <strong className="text-red-900 font-extrabold">Fragmented & High Empty Return</strong>
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #493733' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Logistics Efficiency</span>
+                    <strong className="font-extrabold text-right" style={{ color: '#F28B82' }}>Fragmented &amp; High Empty Return</strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-red-200/60">
-                    <span className="text-slate-600 font-medium">Atmospheric Impact</span>
-                    <strong className="text-red-900 font-extrabold">Severe CO₂ & PM2.5 Pollution</strong>
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #493733' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Atmospheric Impact</span>
+                    <strong className="font-extrabold text-right" style={{ color: '#F28B82' }}>Severe CO₂ &amp; PM2.5 Pollution</strong>
                   </div>
                 </div>
               </div>
 
               {/* WITH PARALI */}
-              <div className="bg-emerald-50/50 border border-emerald-200 p-6 rounded-2xl shadow-xs">
+              <div 
+                className="p-6 rounded-2xl transition-all duration-200 hover:-translate-y-0.5 hover:border-[#6FAF8A]"
+                style={{
+                  backgroundColor: '#183328',
+                  border: '1px solid #4D8066',
+                  boxShadow: '0 6px 24px rgba(0, 0, 0, 0.16)'
+                }}
+              >
                 <div className="flex items-center gap-2 mb-4">
-                  <Sprout className="h-5 w-5 text-emerald-600" />
-                  <h4 className="font-black text-base text-emerald-950">WITH PARALI (Marketplace & OR-Tools Optimization)</h4>
+                  <Sprout className="h-5 w-5 shrink-0" style={{ color: '#8BC7A3' }} />
+                  <h4 className="font-black text-base" style={{ color: '#F1F5F2' }}>
+                    WITH PARALI (Marketplace &amp; OR-Tools Optimization)
+                  </h4>
                 </div>
                 <div className="space-y-3 text-xs">
-                  <div className="flex justify-between py-2 border-b border-emerald-200/60">
-                    <span className="text-slate-600 font-medium">Crop Residue Status</span>
-                    <strong className="text-emerald-900 font-extrabold">
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #2D5442' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Crop Residue Status</span>
+                    <strong className="font-extrabold" style={{ color: '#8BC7A3' }}>
                       {(impactData?.residue_diverted_tonnes || 0).toLocaleString()} Tonnes Diverted
                     </strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-emerald-200/60">
-                    <span className="text-slate-600 font-medium">Farmer Revenue</span>
-                    <strong className="text-emerald-900 font-extrabold">
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #2D5442' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Farmer Revenue</span>
+                    <strong className="font-extrabold" style={{ color: '#8BC7A3' }}>
                       ₹{(impactData?.farmer_income_inr || 0).toLocaleString('en-IN')} Paid
                     </strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-emerald-200/60">
-                    <span className="text-slate-600 font-medium">Logistics Efficiency</span>
-                    <strong className="text-emerald-900 font-extrabold">
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #2D5442' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Logistics Efficiency</span>
+                    <strong 
+                      className="font-extrabold text-right" 
+                      style={{ 
+                        color: impactData?.distance_saved_km && impactData.distance_saved_km > 0 ? '#8BC7A3' : '#B8C8BF' 
+                      }}
+                    >
                       {impactData?.distance_saved_km && impactData.distance_saved_km > 0
                         ? `${impactData.distance_saved_km} km Saved (${impactData.average_route_reduction_percent || 0}% Fuel Saved)`
                         : 'Not available'}
                     </strong>
                   </div>
-                  <div className="flex justify-between py-2 border-b border-emerald-200/60">
-                    <span className="text-slate-600 font-medium">Atmospheric Impact</span>
-                    <strong className="text-emerald-900 font-extrabold">
+                  <div className="flex justify-between items-center py-2" style={{ borderBottom: '1px solid #2D5442' }}>
+                    <span className="font-medium" style={{ color: '#B8C8BF' }}>Atmospheric Impact</span>
+                    <strong className="font-extrabold text-right" style={{ color: '#8BC7A3' }}>
                       {impactData?.estimated_emissions_avoided_tco2e || 0} tCO₂e Avoided
                     </strong>
                   </div>
@@ -432,47 +471,47 @@ export const ImpactDashboard: React.FC = () => {
           </div>
 
           {/* Carbon Offset Readiness (MRV Data Coverage) */}
-          <div className="bg-gradient-to-r from-forest-950 via-forest-900 to-forest-950 text-white p-8 rounded-3xl shadow-md border border-forest-800">
+          <div className="bg-forest-50 border-2 border-forest-200 p-8 rounded-3xl shadow-sm">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <Award className="h-5 w-5 text-amber-400" />
-                  <span className="text-[10px] bg-forest-800 text-amber-300 font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  <Award className="h-5 w-5 text-forest-600" />
+                  <span className="text-[10px] bg-forest-100 text-forest-900 font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-forest-200">
                     Future Carbon Credit Integration
                   </span>
                 </div>
-                <h3 className="text-xl font-black text-cream-100">Carbon Offset MRV Readiness</h3>
-                <p className="text-xs text-slate-300 mt-1 max-w-xl">
-                  Parali captures all data fields required for ISO 14064-2 & Gold Standard MRV (Measurement, Reporting, Verification) carbon methodology.
+                <h3 className="text-xl font-black text-forest-950">Carbon Offset MRV Readiness</h3>
+                <p className="text-xs text-forest-700 mt-1 max-w-xl">
+                  Parali captures all data fields required for ISO 14064-2 &amp; Gold Standard MRV (Measurement, Reporting, Verification) carbon methodology.
                 </p>
               </div>
 
-              <div className="bg-forest-850 border border-forest-700 px-5 py-3 rounded-2xl text-center self-stretch md:self-auto">
-                <span className="text-[10px] font-extrabold text-clay-300 uppercase block">MRV Data Coverage</span>
-                <span className="text-2xl font-black text-emerald-400">100% Complete</span>
+              <div className="bg-white border-2 border-forest-300 px-5 py-3 rounded-2xl text-center self-stretch md:self-auto shadow-green-sm">
+                <span className="text-[10px] font-extrabold text-forest-600 uppercase block">MRV Data Coverage</span>
+                <span className="text-2xl font-black text-forest-900">100% Complete</span>
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 pt-4 border-t border-forest-800/80 text-xs">
-              <div className="bg-forest-900/60 p-4 rounded-2xl border border-forest-800">
-                <span className="text-emerald-400 font-bold block mb-1">✓ Farmer Identity</span>
-                <span className="text-slate-300 text-[11px]">Verified land holding & contact details</span>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 pt-4 border-t border-forest-200 text-xs">
+              <div className="bg-white p-4 rounded-2xl border border-forest-200 shadow-card">
+                <span className="text-forest-600 font-bold block mb-1 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Farmer Identity</span>
+                <span className="text-forest-700 text-[11px]">Verified land holding &amp; contact details</span>
               </div>
-              <div className="bg-forest-900/60 p-4 rounded-2xl border border-forest-800">
-                <span className="text-emerald-400 font-bold block mb-1">✓ Residue Tonnage</span>
-                <span className="text-slate-300 text-[11px]">Weighbridge & bale count records</span>
+              <div className="bg-white p-4 rounded-2xl border border-forest-200 shadow-card">
+                <span className="text-forest-600 font-bold block mb-1 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Residue Tonnage</span>
+                <span className="text-forest-700 text-[11px]">Weighbridge &amp; bale count records</span>
               </div>
-              <div className="bg-forest-900/60 p-4 rounded-2xl border border-forest-800">
-                <span className="text-emerald-400 font-bold block mb-1">✓ Remittance Record</span>
-                <span className="text-slate-300 text-[11px]">Bank transfer proof of transaction</span>
+              <div className="bg-white p-4 rounded-2xl border border-forest-200 shadow-card">
+                <span className="text-forest-600 font-bold block mb-1 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Remittance Record</span>
+                <span className="text-forest-700 text-[11px]">Bank transfer proof of transaction</span>
               </div>
-              <div className="bg-forest-900/60 p-4 rounded-2xl border border-forest-800">
-                <span className="text-emerald-400 font-bold block mb-1">✓ Route Evidence</span>
-                <span className="text-slate-300 text-[11px]">GPS coordinates & truck pickup trace</span>
+              <div className="bg-white p-4 rounded-2xl border border-forest-200 shadow-card">
+                <span className="text-forest-600 font-bold block mb-1 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Route Evidence</span>
+                <span className="text-forest-700 text-[11px]">GPS coordinates &amp; truck pickup trace</span>
               </div>
-              <div className="bg-forest-900/60 p-4 rounded-2xl border border-forest-800">
-                <span className="text-emerald-400 font-bold block mb-1">✓ Satellite Context</span>
-                <span className="text-slate-300 text-[11px]">NASA FIRMS thermal anomaly overlay</span>
+              <div className="bg-white p-4 rounded-2xl border border-forest-200 shadow-card">
+                <span className="text-forest-600 font-bold block mb-1 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Satellite Context</span>
+                <span className="text-forest-700 text-[11px]">NASA FIRMS thermal anomaly overlay</span>
               </div>
             </div>
           </div>

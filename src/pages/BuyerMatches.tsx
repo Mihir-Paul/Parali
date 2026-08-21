@@ -141,28 +141,28 @@ export const BuyerMatches: React.FC<BuyerMatchesProps> = ({
       </div>
 
       {/* Active Requirement Card Banner */}
-      <div className="bg-gradient-to-r from-forest-900 to-forest-950 text-white rounded-3xl p-6 md:p-8 shadow-md mb-10 border border-forest-800 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-forest-700/30 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="bg-gradient-to-r from-forest-950 via-forest-900 to-forest-800 text-white rounded-3xl p-6 md:p-8 shadow-md mb-10 border border-forest-800 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 opacity-30 bg-forest-700 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <span className="text-[10px] bg-forest-800 text-clay-300 font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
+            <span className="text-[10px] bg-forest-800 text-clay-300 font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-forest-700">
               Active Requirement
             </span>
             <h2 className="text-xl md:text-2xl font-black text-white mt-2">
               {currentDemand.required_quantity_tonnes} tonnes of {currentDemand.residue_type}
             </h2>
-            <p className="text-xs text-slate-300 mt-1">
+            <p className="text-xs text-cream-200 mt-1">
               Target Price: Max ₹{currentDemand.max_price_per_tonne}/tonne • Radius: Within {currentDemand.max_distance_km} km
             </p>
           </div>
 
-          <div className="bg-forest-800/80 border border-forest-700 p-4 rounded-2xl text-xs space-y-1">
-            <div className="flex justify-between gap-6 text-slate-300">
+          <div className="bg-forest-800 border border-forest-700 p-4 rounded-2xl text-xs space-y-1">
+            <div className="flex justify-between gap-6 text-cream-200">
               <span>Entity:</span>
               <span className="font-bold text-white">{currentDemand.company_name}</span>
             </div>
-            <div className="flex justify-between gap-6 text-slate-300">
+            <div className="flex justify-between gap-6 text-cream-200">
               <span>Location:</span>
               <span className="font-bold text-white">{currentDemand.preferred_district}, {currentDemand.preferred_state}</span>
             </div>

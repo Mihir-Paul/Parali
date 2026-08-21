@@ -102,11 +102,13 @@ export default function App() {
     );
   }
 
+  // Landing Page Flow
+  if (showLanding) {
+    return <LandingPage onStart={handleStart} />;
+  }
+
   // Unauthenticated Flow
   if (!user) {
-    if (showLanding) {
-      return <LandingPage onStart={handleStart} />;
-    }
     return <AuthLogin />;
   }
 
@@ -160,6 +162,13 @@ export default function App() {
       <Navbar
         currentView={currentView}
         onNavigateProfile={() => setCurrentView(currentView === 'profile' ? 'main' : 'profile')}
+        onNavigateLanding={() => setShowLanding(true)}
+        farmerView={farmerView}
+        setFarmerView={setFarmerView}
+        buyerView={buyerView}
+        setBuyerView={setBuyerView}
+        adminTab={adminTab}
+        setAdminTab={setAdminTab}
       />
 
       {/* Main Content Area */}
@@ -169,56 +178,7 @@ export default function App() {
         ) : currentRole === 'none' ? (
           <RoleSelect />
         ) : (
-          <div className="flex-1 flex flex-col md:flex-row">
-            
-            {/* Sidebar for Admin / Ops view — hidden on mobile */}
-            {currentRole === 'Admin' && (
-              <aside className="hidden md:flex w-56 bg-surface-0 border-r border-line-200 p-4 flex-col gap-1">
-                <div className="mb-3">
-                  <h4 className="text-[10px] font-medium text-ink-500 uppercase tracking-[0.08em] leading-none">Operations</h4>
-                </div>
-                <SidebarButton active={adminTab === 'optimizer'} onClick={() => setAdminTab('optimizer')} icon={Compass} label="Route optimizer" />
-                <SidebarButton active={adminTab === 'burns'} onClick={() => setAdminTab('burns')} icon={Flame} label="Burn intelligence" />
-                <SidebarButton active={adminTab === 'impact'} onClick={() => setAdminTab('impact')} icon={Heart} label="Impact & offsets" />
-                <div className="mt-auto pt-4 border-t border-line-200">
-                  <SidebarButton active={false} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Account settings" />
-                </div>
-              </aside>
-            )}
-
-            {/* Sidebar for Buyer view — hidden on mobile */}
-            {currentRole === 'Buyer' && (
-              <aside className="hidden md:flex w-56 bg-surface-0 border-r border-line-200 p-4 flex-col gap-1">
-                <div className="mb-3">
-                  <h4 className="text-[10px] font-medium text-ink-500 uppercase tracking-[0.08em] leading-none">Buyer actions</h4>
-                </div>
-                <SidebarButton active={buyerView === 'dashboard'} onClick={() => setBuyerView('dashboard')} icon={LayoutDashboard} label="Sourcing overview" accent="soil" />
-                <SidebarButton active={buyerView === 'marketplace'} onClick={() => setBuyerView('marketplace')} icon={ShoppingBag} label="Biomass marketplace" accent="soil" />
-                <SidebarButton active={buyerView === 'demand'} onClick={() => setBuyerView('demand')} icon={PlusCircle} label="Post requirement" accent="soil" />
-                <SidebarButton active={buyerView === 'matches'} onClick={() => setBuyerView('matches')} icon={Sparkles} label="Matched farmers" accent="soil" />
-                <SidebarButton active={buyerView === 'requests'} onClick={() => setBuyerView('requests')} icon={Clock} label="Purchase requests" accent="soil" />
-                <SidebarButton active={buyerView === 'impact'} onClick={() => setBuyerView('impact')} icon={Heart} label="Impact & offsets" accent="soil" />
-                <div className="mt-auto pt-4 border-t border-line-200">
-                  <SidebarButton active={false} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Buyer profile" accent="soil" />
-                </div>
-              </aside>
-            )}
-
-            {/* Sidebar for Farmer view — hidden on mobile */}
-            {currentRole === 'Farmer' && (
-              <aside className="hidden md:flex w-56 bg-surface-0 border-r border-line-200 p-4 flex-col gap-1">
-                <div className="mb-3">
-                  <h4 className="text-[10px] font-medium text-ink-500 uppercase tracking-[0.08em] leading-none">Farmer actions</h4>
-                </div>
-                <SidebarButton active={farmerView === 'dashboard'} onClick={() => setFarmerView('dashboard')} icon={LayoutDashboard} label="My farm" />
-                <SidebarButton active={farmerView === 'sell'} onClick={() => setFarmerView('sell')} icon={Sprout} label="List residue" />
-                <SidebarButton active={farmerView === 'impact'} onClick={() => setFarmerView('impact')} icon={Heart} label="Impact & offsets" />
-                <div className="mt-auto pt-4 border-t border-line-200">
-                  <SidebarButton active={false} onClick={() => setCurrentView('profile')} icon={UserCheck} label="Farm profile" />
-                </div>
-              </aside>
-            )}
-
+          <div className="flex-1 flex flex-col">
             {/* Page content switcher */}
             <div className="flex-1 bg-cream-50">
               <ErrorBoundary fallbackTitle="Operations View Unavailable">
