@@ -66,6 +66,13 @@ class ListingCreate(BaseModel):
 def read_root():
     return {"message": "Welcome to the Parali AI Valorization Engine API"}
 
+@app.get("/api/health")
+def health_check():
+    return {
+        "status": "ok",
+        "service": "parali-backend"
+    }
+
 @app.get("/api/farmers")
 def get_farmers():
     return [

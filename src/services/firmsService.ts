@@ -54,9 +54,10 @@ export async function fetchFirmsData(
   } catch (networkError: any) {
     // Network-level failure: backend unreachable, CORS, DNS, etc.
     console.error('[FIRMS] Network error — backend unreachable:', networkError);
-    throw new Error(
-      `Backend server unreachable at ${BACKEND_URL}. Ensure the FastAPI backend is running (python -m uvicorn backend.main:app --port 8000).`
-    );
+    const msg = import.meta.env.PROD
+      ? 'Parali backend service is temporarily unavailable.'
+      : `Backend server unreachable at ${BACKEND_URL}. Ensure the FastAPI backend is running (python -m uvicorn backend.main:app --port 8000).`;
+    throw new Error(msg);
   }
 
   if (!response.ok) {
