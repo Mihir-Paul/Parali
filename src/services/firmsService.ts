@@ -51,9 +51,21 @@ export async function fetchFirmsData(
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`[FIRMS] HTTP ${response.status} error from backend:`, errorText);
-    throw new Error(`NASA FIRMS backend request failed (HTTP ${response.status})`);
+    let errorDetail = `NASA FIRMS backend request failed (HTTP ${response.status})`;
+    try {
+      const errorText = await response.text();
+      const errorJson = JSON.parse(errorText);
+      if (errorJson && errorJson.detail) {
+        errorDetail = errorJson.detail;
+      }
+    } catch {
+      // Fallback to default message
+    }
+    if (response.status === 429) {
+      errorDetail = 'Satellite data temporarily unavailable — rate limit reached.';
+    }
+    console.error(`[FIRMS] HTTP ${response.status} error from backend:`, errorDetail);
+    throw new Error(errorDetail);
   }
 
   const data: FirmsApiResponse = await response.json();

@@ -29,7 +29,7 @@ export const BurnIntelligence: React.FC = () => {
       }
     } catch (err: any) {
       console.error('[BurnIntelligence] Error fetching NASA FIRMS satellite data:', err);
-      setError('NASA FIRMS data temporarily unavailable.');
+      setError(err?.message || 'NASA FIRMS data temporarily unavailable.');
       setFirmsResponse(null);
       setSelectedHotspotIndex(null);
     } finally {

@@ -68,7 +68,7 @@ function buildDynamicRouteResponse(requestData?: OptimizeRouteRequest): Optimize
       longitude: Number(farm.longitude),
       quantity_tonnes: Number(farm.accepted_quantity_tonnes || 3.0),
       residue_type: farm.residue_type || 'Crop Residue',
-      estimated_arrival: `${(9 + idx).toString().padStart(2, '0')}:30 AM`
+      estimated_arrival: `${String(9 + idx).padStart(2, '0')}:30 AM`
     });
   });
 
