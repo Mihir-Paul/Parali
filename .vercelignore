@@ -1,0 +1,8 @@
+# Ignore backend and database folders when deploying frontend to Vercel
+backend/
+supabase/
+.env
+.env.local
+.env.*.local
+node_modules/
+dist/
