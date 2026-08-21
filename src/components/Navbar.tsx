@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { UserAvatar } from './UserAvatar';
 import { PillNav, PillNavItem } from './ui/PillNav';
+import StaggeredMenu from './ui/StaggeredMenu';
 import { Sprout, LogOut, ArrowLeftRight, ShieldAlert, Award, Sun, Moon } from 'lucide-react';
 
 interface NavbarProps {
@@ -334,6 +335,26 @@ export const Navbar: React.FC<NavbarProps> = ({
               SIH 2026
             </span>
           )}
+          
+          {/* Staggered Menu Navigation */}
+          <StaggeredMenu
+            position="right"
+            menuButtonColor="#9BA695"
+            openMenuButtonColor="#18392C"
+            accentColor="#E2903F"
+            colors={['#8FA991', '#DCE7DC']}
+            changeMenuColorOnOpen={true}
+            items={[
+              { label: 'Home', link: '#' },
+              { label: 'Platform', link: '#platform' },
+              { label: 'Impact', link: '#impact' },
+              { label: 'Help', link: '#help' }
+            ]}
+            socialItems={[
+              { label: 'Twitter', link: 'https://twitter.com' },
+              { label: 'LinkedIn', link: 'https://linkedin.com' }
+            ]}
+          />
         </div>
       </div>
     </header>

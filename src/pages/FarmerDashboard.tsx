@@ -9,6 +9,7 @@ import {
 import { PurchaseRequestItem } from '../types/marketplace';
 import { IndianRupee, Sprout, ShieldCheck, CheckCircle2, FileSpreadsheet, MapPin, XCircle, Clock, Calculator, AlertTriangle } from 'lucide-react';
 import { FarmerHiddenCostCalculator } from '../components/FarmerHiddenCostCalculator';
+import ScrollStack, { ScrollStackItem } from '../components/ui/ScrollStack';
 
 interface FarmerDashboardProps {
   onNavigateToSell: () => void;
@@ -295,95 +296,98 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
           <span>📨</span> Incoming Buyer Purchase Requests
         </h4>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          {displayRequests.map((req) => (
-            <div
-              key={req.id}
-              className="border border-forest-150 bg-cream-50/50 p-5 rounded-2xl hover:border-forest-300 transition-all flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex justify-between items-start">
+        <div className="h-[600px] relative border border-forest-100 rounded-2xl overflow-hidden bg-white/50">
+          <ScrollStack useWindowScroll={false} itemDistance={30} itemStackDistance={20}>
+            {displayRequests.map((req) => (
+              <ScrollStackItem key={req.id}>
+                <div
+                  className="border border-forest-150 bg-cream-50/90 p-6 rounded-2xl hover:border-forest-300 transition-all flex flex-col justify-between shadow-sm"
+                >
                   <div>
-                    <span className="text-[10px] font-black uppercase tracking-wider text-forest-700 bg-forest-100 px-2.5 py-0.5 rounded-full">
-                      {req.residue_type || 'Crop Residue'}
-                    </span>
-                    <h5 className="font-extrabold text-sm text-forest-950 mt-1.5">
-                      {req.buyer_name || 'Verified Biomass Buyer'}
-                    </h5>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="text-[10px] font-black uppercase tracking-wider text-forest-700 bg-forest-100 px-2.5 py-0.5 rounded-full">
+                          {req.residue_type || 'Crop Residue'}
+                        </span>
+                        <h5 className="font-extrabold text-sm text-forest-950 mt-1.5">
+                          {req.buyer_name || 'Verified Biomass Buyer'}
+                        </h5>
+                      </div>
+
+                      <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
+                        req.status === 'Accepted' || req.status === 'Confirmed' ? 'bg-emerald-600 text-white' :
+                        req.status === 'Declined' || req.status === 'Rejected' ? 'bg-red-100 text-red-800 border border-red-200' :
+                        'bg-amber-100 text-amber-900 border border-amber-200'
+                      }`}>
+                        {req.status === 'Accepted' || req.status === 'Confirmed' ? 'Accepted ✓' :
+                         req.status === 'Declined' || req.status === 'Rejected' ? 'Declined ✗' :
+                         'Pending Offer'}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-forest-600 mt-2 font-medium">
+                      {req.location || 'Punjab Hub'}
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-forest-100/60 text-xs">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block font-semibold">Requested Quantity</span>
+                        <span className="text-sm font-extrabold text-forest-900">{req.quantity_requested} tonnes</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-slate-400 block font-semibold">Offer Rate</span>
+                        <span className="text-sm font-extrabold text-forest-900">₹{req.offered_price_per_tonne} / tonne</span>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 pt-2 text-[10px] text-forest-700 font-bold">
+                      Total Contract Value: <span className="text-forest-950 font-black text-xs">₹{req.total_amount || req.quantity_requested * req.offered_price_per_tonne}</span>
+                    </div>
                   </div>
 
-                  <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full ${
-                    req.status === 'Accepted' || req.status === 'Confirmed' ? 'bg-emerald-600 text-white' :
-                    req.status === 'Declined' || req.status === 'Rejected' ? 'bg-red-100 text-red-800 border border-red-200' :
-                    'bg-amber-100 text-amber-900 border border-amber-200'
-                  }`}>
-                    {req.status === 'Accepted' || req.status === 'Confirmed' ? 'Accepted ✓' :
-                     req.status === 'Declined' || req.status === 'Rejected' ? 'Declined ✗' :
-                     'Pending Offer'}
-                  </span>
+                  {/* Action Buttons & Status State */}
+                  {req.status === 'Pending' ? (
+                    <div className="flex gap-2 mt-5 pt-3 border-t border-forest-100">
+                      <button
+                        onClick={() => handleAcceptRequest(req)}
+                        disabled={submittingId === req.id}
+                        className="flex-1 bg-forest-600 hover:bg-forest-700 disabled:opacity-50 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm transition-all flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        <CheckCircle2 className="h-3.5 w-3.5" />
+                        {submittingId === req.id ? 'Processing...' : 'Accept Offer'}
+                      </button>
+                      <button
+                        onClick={() => handleRejectRequest(req)}
+                        disabled={submittingId === req.id}
+                        className="bg-clay-100 hover:bg-clay-200 disabled:opacity-50 text-clay-800 text-xs font-bold px-4 py-2.5 rounded-xl border border-clay-300 transition-all flex items-center gap-1 cursor-pointer"
+                      >
+                        <XCircle className="h-3.5 w-3.5" /> Decline
+                      </button>
+                    </div>
+                  ) : req.status === 'Accepted' || req.status === 'Confirmed' ? (
+                    <div className="mt-4 pt-3 border-t border-emerald-100 text-xs font-semibold text-emerald-900 bg-emerald-50/70 p-3 rounded-xl">
+                      <div className="flex items-center gap-1.5 font-bold text-emerald-900">
+                        <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Accepted ✓
+                      </div>
+                      <p className="text-[11px] text-emerald-800 mt-1">
+                        Buyer: <strong>{req.buyer_name || 'GreenGrow Bio-Energy Plant'}</strong> • {req.quantity_requested} tonnes @ ₹{req.offered_price_per_tonne}/tonne
+                      </p>
+                      <span className="text-[10px] text-emerald-700 font-bold block mt-1 uppercase tracking-wide">
+                        Pickup planning pending
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="mt-4 pt-3 border-t border-red-100 text-xs font-semibold text-red-800 bg-red-50/50 p-3 rounded-xl">
+                      <div className="flex items-center gap-1.5 font-bold text-red-800">
+                        <XCircle className="h-4 w-4 text-red-600" /> Declined ✗
+                      </div>
+                      <p className="text-[11px] text-red-700 mt-0.5">Declined by farmer</p>
+                    </div>
+                  )}
                 </div>
-
-                <p className="text-xs text-forest-600 mt-2 font-medium">
-                  {req.location || 'Punjab Hub'}
-                </p>
-
-                <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-forest-100/60 text-xs">
-                  <div>
-                    <span className="text-[10px] text-slate-400 block font-semibold">Requested Quantity</span>
-                    <span className="text-sm font-extrabold text-forest-900">{req.quantity_requested} tonnes</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 block font-semibold">Offer Rate</span>
-                    <span className="text-sm font-extrabold text-forest-900">₹{req.offered_price_per_tonne} / tonne</span>
-                  </div>
-                </div>
-
-                <div className="mt-3 pt-2 text-[10px] text-forest-700 font-bold">
-                  Total Contract Value: <span className="text-forest-950 font-black text-xs">₹{req.total_amount || req.quantity_requested * req.offered_price_per_tonne}</span>
-                </div>
-              </div>
-
-              {/* Action Buttons & Status State */}
-              {req.status === 'Pending' ? (
-                <div className="flex gap-2 mt-5 pt-3 border-t border-forest-100">
-                  <button
-                    onClick={() => handleAcceptRequest(req)}
-                    disabled={submittingId === req.id}
-                    className="flex-1 bg-forest-600 hover:bg-forest-700 disabled:opacity-50 text-white text-xs font-bold py-2.5 rounded-xl shadow-sm transition-all flex items-center justify-center gap-1 cursor-pointer"
-                  >
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    {submittingId === req.id ? 'Processing...' : 'Accept Offer'}
-                  </button>
-                  <button
-                    onClick={() => handleRejectRequest(req)}
-                    disabled={submittingId === req.id}
-                    className="bg-clay-100 hover:bg-clay-200 disabled:opacity-50 text-clay-800 text-xs font-bold px-4 py-2.5 rounded-xl border border-clay-300 transition-all flex items-center gap-1 cursor-pointer"
-                  >
-                    <XCircle className="h-3.5 w-3.5" /> Decline
-                  </button>
-                </div>
-              ) : req.status === 'Accepted' || req.status === 'Confirmed' ? (
-                <div className="mt-4 pt-3 border-t border-emerald-100 text-xs font-semibold text-emerald-900 bg-emerald-50/70 p-3 rounded-xl">
-                  <div className="flex items-center gap-1.5 font-bold text-emerald-900">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-600" /> Accepted ✓
-                  </div>
-                  <p className="text-[11px] text-emerald-800 mt-1">
-                    Buyer: <strong>{req.buyer_name || 'GreenGrow Bio-Energy Plant'}</strong> • {req.quantity_requested} tonnes @ ₹{req.offered_price_per_tonne}/tonne
-                  </p>
-                  <span className="text-[10px] text-emerald-700 font-bold block mt-1 uppercase tracking-wide">
-                    Pickup planning pending
-                  </span>
-                </div>
-              ) : (
-                <div className="mt-4 pt-3 border-t border-red-100 text-xs font-semibold text-red-800 bg-red-50/50 p-3 rounded-xl">
-                  <div className="flex items-center gap-1.5 font-bold text-red-800">
-                    <XCircle className="h-4 w-4 text-red-600" /> Declined ✗
-                  </div>
-                  <p className="text-[11px] text-red-700 mt-0.5">Declined by farmer</p>
-                </div>
-              )}
-            </div>
-          ))}
+              </ScrollStackItem>
+            ))}
+          </ScrollStack>
         </div>
       </div>
 

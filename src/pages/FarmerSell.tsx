@@ -76,7 +76,7 @@ export const FarmerSell: React.FC<FarmerSellProps> = ({ onBack }) => {
         residueType,
         quantity,
         pickupLocation,
-        coordinates: latitude && longitude ? [longitude, latitude] : undefined,
+        coordinates: latitude && longitude ? [longitude, latitude] as [number, number] : [0, 0] as [number, number],
         pickupDate,
         images: selectedImages,
         estimatedPriceMin: valuationMin,

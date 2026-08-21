@@ -42,7 +42,7 @@ export interface HiddenCostResult {
   disclaimer: string;
 }
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+import { BACKEND_URL } from '../config/api';
 
 // Configurable environmental factor: 1.5 tCO2e per tonne of crop residue burning avoided
 export const EMISSIONS_FACTOR_TCO2E_PER_TONNE = 1.5;

@@ -6,10 +6,11 @@ import { motion } from "motion/react";
 
 interface AuthSectionThreeProps {
   onGoogleSignUp?: () => void;
+  onSandboxSignUp?: () => void;
   submitting?: boolean;
 }
 
-export default function AuthSectionThree({ onGoogleSignUp, submitting = false }: AuthSectionThreeProps) {
+export default function AuthSectionThree({ onGoogleSignUp, onSandboxSignUp, submitting = false }: AuthSectionThreeProps) {
   return (
     <section className="min-h-screen bg-cream-50 p-3 text-forest-950 antialiased selection:bg-forest-200">
       <div className="grid min-h-[calc(100vh-1.5rem)] gap-6 lg:grid-cols-[0.94fr_1.06fr]">
@@ -52,6 +53,20 @@ export default function AuthSectionThree({ onGoogleSignUp, submitting = false }:
                 <GoogleIcon />
                 <span className="whitespace-nowrap">
                   {submitting ? "Connecting to Google..." : "Continue with Google"}
+                </span>
+              </button>
+            </div>
+
+            {/* Sandbox Bypass Button */}
+            <div className="mt-3">
+              <button
+                type="button"
+                onClick={onSandboxSignUp}
+                disabled={submitting}
+                className="flex h-12 w-full items-center justify-center gap-3 rounded-2xl border border-dashed border-amber-350 bg-amber-50/10 px-4 text-sm font-bold text-amber-700 shadow-sm transition-all hover:bg-amber-50 hover:border-amber-400 disabled:opacity-50 cursor-pointer active:scale-[0.99]"
+              >
+                <span className="whitespace-nowrap">
+                  Bypass Sign-In (Sandbox Mode)
                 </span>
               </button>
             </div>

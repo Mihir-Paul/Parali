@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { updateFullUserProfile } from '../services/profileService';
 import { UserAvatar } from '../components/UserAvatar';
-import { User, Sprout, Briefcase, MapPin, Phone, Mail, Edit3, X, CheckCircle2, AlertCircle } from 'lucide-react';
+import { LocationPicker, LocationData } from '../components/LocationPicker';
+import { User, Sprout, Briefcase, MapPin, Phone, Mail, Edit3, X, CheckCircle2, AlertCircle, Navigation } from 'lucide-react';
 import { FarmType, BuyerType } from '../types/profile';
 
 export const ProfilePage: React.FC = () => {
@@ -20,6 +21,8 @@ export const ProfilePage: React.FC = () => {
   const [district, setDistrict] = useState(profile?.district || '');
   const [village, setVillage] = useState(profile?.village || '');
   const [address, setAddress] = useState(profile?.address || '');
+  const [latitude, setLatitude] = useState<number | undefined>(profile?.latitude ?? undefined);
+  const [longitude, setLongitude] = useState<number | undefined>(profile?.longitude ?? undefined);
 
   // Farmer specific edit fields
   const [primaryCrop, setPrimaryCrop] = useState(farmerProfile?.primary_crop || 'Wheat');
@@ -43,13 +46,15 @@ export const ProfilePage: React.FC = () => {
     setSuccessMsg(null);
 
     try {
-      const profileUpdates = {
+      const profileUpdates: Record<string, any> = {
         full_name: fullName.trim(),
         phone: phone.trim(),
         state: state.trim(),
         district: district.trim(),
         village: village.trim(),
-        address: address.trim()
+        address: address.trim(),
+        latitude: latitude ?? null,
+        longitude: longitude ?? null
       };
 
       let roleUpdates: any = null;
@@ -171,11 +176,19 @@ export const ProfilePage: React.FC = () => {
               <span className="font-extrabold text-forest-950">{profile.village || 'N/A'}</span>
             </div>
             {profile.address && (
-              <div className="flex justify-between py-2">
+              <div className="flex justify-between py-2 border-b border-forest-50">
                 <span className="text-forest-600 font-semibold">Address</span>
                 <span className="font-bold text-forest-900 text-right">{profile.address}</span>
               </div>
             )}
+            <div className="flex justify-between py-2">
+              <span className="text-forest-600 font-semibold flex items-center gap-1"><Navigation className="h-3 w-3" /> GPS Coordinates</span>
+              {profile.latitude != null && profile.longitude != null ? (
+                <span className="font-extrabold text-forest-950">{Number(profile.latitude).toFixed(4)}°N, {Number(profile.longitude).toFixed(4)}°E</span>
+              ) : (
+                <span className="font-bold text-amber-600">Location required</span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -315,6 +328,28 @@ export const ProfilePage: React.FC = () => {
                   onChange={(e) => setVillage(e.target.value)}
                   className="w-full p-3 rounded-xl border border-forest-200 font-semibold outline-none"
                   required
+                />
+              </div>
+
+              {/* Farm / Facility Location Section */}
+              <div className="border-t border-forest-100 pt-4">
+                <LocationPicker
+                  initialLocation={{
+                    latitude: latitude,
+                    longitude: longitude,
+                    district: district,
+                    state: state,
+                    village: village
+                  }}
+                  label={isFarmer ? 'Farm Location' : 'Facility Location'}
+                  helperText={isFarmer ? 'Set your farm GPS coordinates for logistics route optimization.' : 'Set your facility GPS coordinates for depot routing.'}
+                  onLocationChange={(loc: LocationData) => {
+                    if (loc.latitude != null) setLatitude(loc.latitude);
+                    if (loc.longitude != null) setLongitude(loc.longitude);
+                    if (loc.district) setDistrict(loc.district);
+                    if (loc.state) setState(loc.state);
+                    if (loc.village) setVillage(loc.village);
+                  }}
                 />
               </div>
 

@@ -175,6 +175,8 @@ export async function saveBuyerProfile(
     required_quantity_tonnes: input.required_quantity_tonnes,
     procurement_radius_km: input.procurement_radius_km,
     business_description: input.business_description || '',
+    latitude: input.latitude || undefined,
+    longitude: input.longitude || undefined,
     updated_at: new Date().toISOString()
   };
 
@@ -233,9 +235,17 @@ export async function updateFullUserProfile(
       farmerData = fData;
     }
   } else if (updatedMaster.role === 'buyer' && roleUpdates) {
+    // Sync facility coordinates from profiles to buyer_profiles if present
+    const buyerUpdates: Record<string, any> = {
+      ...roleUpdates,
+      updated_at: new Date().toISOString()
+    };
+    if (profileUpdates.latitude != null) buyerUpdates.latitude = profileUpdates.latitude;
+    if (profileUpdates.longitude != null) buyerUpdates.longitude = profileUpdates.longitude;
+
     const { data: bData, error: bErr } = await supabase
       .from('buyer_profiles')
-      .update({ ...roleUpdates, updated_at: new Date().toISOString() })
+      .update(buyerUpdates)
       .eq('id', userId)
       .select()
       .single();

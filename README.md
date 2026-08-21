@@ -107,8 +107,43 @@ Create a `.env` file in the project root:
 ```env
 VITE_SUPABASE_URL=https://your-supabase-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
-VITE_BACKEND_URL=http://localhost:8000
+VITE_API_BASE_URL=http://localhost:8000
 ```
+
+---
+
+## Production Deployment
+
+### Frontend (Vercel)
+- **Deployment Platform**: Vercel
+- **Build Settings**:
+  - Framework Preset: Vite
+  - Build Command: `npm run build`
+  - Output Directory: `dist`
+- **Required Environment Variables**:
+  - `VITE_SUPABASE_URL`: Your production Supabase project URL
+  - `VITE_SUPABASE_ANON_KEY`: Your production Supabase anonymous API key
+  - `VITE_API_BASE_URL`: Your deployed production backend URL (e.g., `https://parali-api.up.railway.app`)
+
+### Backend (Render/Railway)
+- **Deployment Platform**: Render, Railway, or VPS (due to precompiled OR-Tools binary requirements)
+- **Root Directory**: `backend` (if deploying sub-directory) or run from root
+- **Build Command**: `pip install -r backend/requirements.txt`
+- **Start Command**: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
+- **Required Environment Variables**:
+  - `NASA_FIRMS_MAP_KEY`: NASA FIRMS map key for thermal anomalies
+  - `OPENROUTESERVICE_API_KEY`: OpenRouteService API key for routing engine
+  - `FRONTEND_ORIGIN`: Deployed Vercel frontend URL (e.g., `https://your-app.vercel.app`)
+
+### Post-Deployment Configurations
+
+1. **Supabase Auth URL Configurations**:
+   Add the deployed Vercel domain in your Supabase project dashboard:
+   - **Authentication** → **URL Configuration**
+   - **Site URL**: `https://your-app.vercel.app`
+   - **Redirect URLs**:
+     - `https://your-app.vercel.app/**`
+     - `http://localhost:5173/**`
 
 ---
 

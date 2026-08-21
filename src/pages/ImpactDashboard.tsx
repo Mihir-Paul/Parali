@@ -10,6 +10,7 @@ import {
 } from '../services/impactService';
 import { FarmerHiddenCostCalculator } from '../components/FarmerHiddenCostCalculator';
 import { MapViewer } from '../components/MapViewer';
+import Folder from '../components/ui/Folder';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import {
   Sprout,
@@ -512,6 +513,110 @@ export const ImpactDashboard: React.FC = () => {
               <div className="bg-white p-4 rounded-2xl border border-forest-200 shadow-card">
                 <span className="text-forest-600 font-bold block mb-1 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Satellite Context</span>
                 <span className="text-forest-700 text-[11px]">NASA FIRMS thermal anomaly overlay</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Verified Audit Ledger Vault */}
+          <div className="bg-white border border-forest-100 p-8 rounded-3xl shadow-sm grid md:grid-cols-12 gap-8 items-center">
+            <div className="md:col-span-7">
+              <span className="text-[10px] bg-forest-100 text-forest-900 font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-forest-200">
+                Interactive Document Center
+              </span>
+              <h3 className="text-2xl font-black text-forest-950 mt-3">Verified Impact Ledger Vault</h3>
+              <p className="text-sm text-forest-700 mt-2 leading-relaxed">
+                Click on the folder to interactively view, verify, and download official environmental documents. Hover over the papers as they expand to reveal details of each audit track.
+              </p>
+              <div className="mt-6 space-y-3 text-xs">
+                <div className="flex items-start gap-2.5">
+                  <div className="w-5 h-5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-bold text-[10px] shrink-0">1</div>
+                  <div>
+                    <strong className="text-forest-900 font-bold block">Carbon Offset Certificates</strong>
+                    <span className="text-forest-700">Direct quantification of CO₂ averted under international compliance standards.</span>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <div className="w-5 h-5 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center font-bold text-[10px] shrink-0">2</div>
+                  <div>
+                    <strong className="text-forest-900 font-bold block">Biomass Weighbridge Ledger</strong>
+                    <span className="text-forest-700">Complete load logs mapping verified farmer stubble tonnage collected by trucks.</span>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5">
+                  <div className="w-5 h-5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center font-bold text-[10px] shrink-0">3</div>
+                  <div>
+                    <strong className="text-forest-900 font-bold block">NASA Satellite Hotspot Logs</strong>
+                    <span className="text-forest-700">Validation records verifying targeted crop fields remained free of thermal fire hotspots.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="md:col-span-5 flex justify-center items-center bg-cream-50/50 rounded-2xl border border-forest-100/60 p-8 h-[340px] relative overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(127,163,119,0.06)_0%,transparent_70%)] pointer-events-none" />
+              <div className="flex justify-center items-center h-full w-full select-none">
+                <Folder
+                  size={1.8}
+                  color="#2D6A4F"
+                  className="interactive-folder-vault"
+                  items={[
+                    // Item 1
+                    <div key="pdf" className="p-2.5 h-full flex flex-col justify-between text-left w-full">
+                      <div>
+                        <div className="flex items-center justify-between border-b border-forest-200/60 pb-1 mb-1">
+                          <span className="font-extrabold uppercase text-[5px] text-forest-700">ISO 14064-2</span>
+                          <span className="text-[5px] px-1 bg-emerald-100 text-emerald-800 rounded font-bold scale-[0.9]">VERIFIED</span>
+                        </div>
+                        <div className="font-black text-[7px] leading-tight text-forest-900">Carbon Offset Certificate</div>
+                        <p className="text-[5px] text-forest-600 mt-0.5 leading-tight">
+                          Certifies prevention of open-field stubble burning and avoidance of {isLoading ? '...' : (impactData?.estimated_emissions_avoided_tco2e || 0)} tonnes CO₂e.
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-center text-[5px] border-t border-forest-100 pt-0.5 text-forest-500 font-bold">
+                        <span>Ref: PR-2026-GS</span>
+                        <span className="text-[4.5px] text-forest-750 underline cursor-pointer hover:text-forest-950 font-black">Download PDF</span>
+                      </div>
+                    </div>,
+                    
+                    // Item 2
+                    <div key="csv" className="p-2.5 h-full flex flex-col justify-between text-left w-full">
+                      <div>
+                        <div className="flex items-center justify-between border-b border-forest-200/60 pb-1 mb-1">
+                          <span className="font-extrabold uppercase text-[5px] text-forest-700">Audit Ledger</span>
+                          <span className="text-[5px] px-1 bg-amber-100 text-amber-800 rounded font-bold scale-[0.9]">MRV PASS</span>
+                        </div>
+                        <div className="font-black text-[7px] leading-tight text-forest-900">Biomass Weighbridge Logs</div>
+                        <div className="mt-0.5 space-y-0.5 text-[5px] text-forest-750">
+                          <div className="flex justify-between"><span>Diverted straw:</span> <strong>{isLoading ? '...' : (impactData?.residue_diverted_tonnes || 0)} tonnes</strong></div>
+                          <div className="flex justify-between"><span>Earnings generated:</span> <strong>₹{isLoading ? '...' : (impactData?.farmer_income_inr || 0).toLocaleString('en-IN')}</strong></div>
+                          <div className="flex justify-between"><span>Remittance:</span> <strong>Direct Bank</strong></div>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center text-[5px] border-t border-forest-100 pt-0.5 text-forest-500 font-bold">
+                        <span>Audit: v1.0.4</span>
+                        <span className="text-[4.5px] text-forest-750 underline cursor-pointer hover:text-forest-950 font-black">Download CSV</span>
+                      </div>
+                    </div>,
+                    
+                    // Item 3
+                    <div key="sat" className="p-2.5 h-full flex flex-col justify-between text-left w-full">
+                      <div>
+                        <div className="flex items-center justify-between border-b border-forest-200/60 pb-1 mb-1">
+                          <span className="font-extrabold uppercase text-[5px] text-forest-700">NASA FIRMS</span>
+                          <span className="text-[5px] px-1 bg-blue-100 text-blue-800 rounded font-bold scale-[0.9]">LIVE SENSING</span>
+                        </div>
+                        <div className="font-black text-[7px] leading-tight text-forest-900">Satellite Thermal Scan</div>
+                        <p className="text-[5px] text-forest-600 mt-0.5 leading-tight">
+                          Verification logs pairing agricultural parcels with regional MODIS/VIIRS thermal imaging coordinates.
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-center text-[5px] border-t border-forest-100 pt-0.5 text-forest-500 font-bold">
+                        <span>Active: 2026 Season</span>
+                        <span className="text-[4.5px] text-forest-750 underline cursor-pointer hover:text-forest-950 font-black">Inspect Map</span>
+                      </div>
+                    </div>
+                  ]}
+                />
               </div>
             </div>
           </div>

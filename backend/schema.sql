@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS public.buyer_profiles (
     required_quantity_tonnes NUMERIC,
     procurement_radius_km NUMERIC,
     business_description TEXT,
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

@@ -39,12 +39,15 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
   const [isStale, setIsStale] = useState<boolean>(false);
   const [depotMissing, setDepotMissing] = useState<boolean>(false);
   const [missingFarmsCount, setMissingFarmsCount] = useState<number>(0);
+  const [routeError, setRouteError] = useState<string | null>(null);
+  const [totalAcceptedCount, setTotalAcceptedCount] = useState<number>(0);
 
   // Load route data on component mount
   const loadRouteOptimization = async () => {
     setLoading(true);
     setDepotMissing(false);
     setMissingFarmsCount(0);
+    setRouteError(null);
 
     try {
       // 1. Determine buyer depot facility coordinates (use regional receiving hub if profile coordinates not set)
@@ -76,8 +79,8 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
             farmer_name: req.farmer_name || `Supplier ${index + 1}`,
             listing_id: req.listing_id || `listing_${index + 1}`,
             purchase_request_id: req.id,
-            latitude: listing?.latitude,
-            longitude: listing?.longitude,
+            latitude: (req.latitude ?? listing?.latitude) as number,
+            longitude: (req.longitude ?? listing?.longitude) as number,
             accepted_quantity_tonnes: req.quantity_requested || 3.0,
             residue_type: listing?.residue_type || 'Crop Residue',
             price_per_tonne: req.offered_price_per_tonne || 1100
@@ -89,6 +92,7 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
       const validPickups = farmPickups.filter((f) => validateCoordinates(f.latitude, f.longitude));
       const invalidCount = farmPickups.length - validPickups.length;
 
+      setTotalAcceptedCount(farmPickups.length);
       setAcceptedFarmsCount(validPickups.length);
       setMissingFarmsCount(invalidCount);
 
@@ -123,8 +127,9 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
       } else {
         setRouteData(null);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error loading route optimization:', err);
+      setRouteError(err?.message || 'Route optimization failed. Please check that the backend server is running.');
     } finally {
       setLoading(false);
     }
@@ -143,8 +148,9 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
     ? activeRoutes 
     : activeRoutes.filter(r => r.vehicle_index === selectedVehicleIndex);
 
-  // Calculated totals
+  // Calculated totals — only show real values when a valid route exists
   const totalFarmsCount = activeRoutes.reduce((acc, r) => acc + r.stops.filter(s => s.type === 'farm' || (s.type as string) === 'farm_pickup').length, 0);
+  const hasValidRoute = activeRoutes.length > 0 && totalFarmsCount > 0;
   const totalTonnage = routeData?.total_quantity_tonnes || 0;
   const totalDistanceKm = routeData?.total_distance_km || 0;
   const totalDurationMin = routeData?.total_duration_minutes || 0;
@@ -171,7 +177,17 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
         <div className="bg-amber-900 text-white p-4 rounded-2xl mb-6 shadow-lg border border-amber-700 flex items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2 font-bold">
             <AlertTriangle className="h-5 w-5 text-amber-300 shrink-0" />
-            <span>Farm location missing for {missingFarmsCount} accepted supplier(s). Update farm coordinates to include in logistics routing.</span>
+            <span>{missingFarmsCount} accepted supplier(s) require farm locations before routing. Ask farmers to set their GPS coordinates in their profile.</span>
+          </div>
+        </div>
+      )}
+
+      {/* No Accepted Requests Info Banner */}
+      {!loading && totalAcceptedCount === 0 && !routeError && (
+        <div className="bg-paper-50 text-ink-700 p-4 rounded-2xl mb-6 border border-line-200 flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-2 font-bold">
+            <AlertCircle className="h-5 w-5 text-ink-400 shrink-0" />
+            <span>No accepted suppliers available for route planning. Purchase requests must be accepted by farmers first.</span>
           </div>
         </div>
       )}
@@ -188,6 +204,25 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
             className="bg-amber-400 hover:bg-amber-300 text-amber-950 font-black px-4 py-1.5 rounded-xl transition-all cursor-pointer"
           >
             Recalculate route
+          </button>
+        </div>
+      )}
+
+      {/* Route Optimization Error Banner */}
+      {routeError && (
+        <div className="bg-red-900 text-white p-4 rounded-2xl mb-6 shadow-lg border border-red-700 flex items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 font-bold">
+            <AlertCircle className="h-5 w-5 text-red-300 shrink-0" />
+            <div>
+              <strong className="block text-red-100 font-extrabold">Route Optimization Error</strong>
+              <span className="text-red-200 font-medium">{routeError}</span>
+            </div>
+          </div>
+          <button
+            onClick={handleRunOptimizer}
+            className="bg-red-400 hover:bg-red-300 text-red-950 font-black px-4 py-1.5 rounded-xl transition-all cursor-pointer shrink-0"
+          >
+            Retry
           </button>
         </div>
       )}
@@ -288,27 +323,27 @@ export const RouteOptimizer: React.FC<RouteOptimizerProps> = ({ onNavigateToMatc
             <div className="grid grid-cols-2 gap-3 font-mono text-xs">
               <div className="p-3 bg-paper-50 rounded-card border border-line-200">
                 <span className="text-[10px] font-sans text-ink-500 block uppercase">Total distance</span>
-                <span className="text-base font-bold text-ink-900">{totalDistanceKm.toFixed(1)} km</span>
+                <span className="text-base font-bold text-ink-900">{hasValidRoute ? `${totalDistanceKm.toFixed(1)} km` : '—'}</span>
               </div>
 
               <div className="p-3 bg-paper-50 rounded-card border border-line-200">
                 <span className="text-[10px] font-sans text-ink-500 block uppercase">Est. duration</span>
-                <span className="text-base font-bold text-ink-900">{hours > 0 ? `${hours}h ` : ''}{mins}m</span>
+                <span className="text-base font-bold text-ink-900">{hasValidRoute ? `${hours > 0 ? `${hours}h ` : ''}${mins}m` : '—'}</span>
               </div>
 
               <div className="p-3 bg-paper-50 rounded-card border border-line-200">
                 <span className="text-[10px] font-sans text-ink-500 block uppercase">Farms collected</span>
-                <span className="text-base font-bold text-ink-900">{totalFarmsCount} farms</span>
+                <span className="text-base font-bold text-ink-900">{hasValidRoute ? `${totalFarmsCount} farms` : '—'}</span>
               </div>
 
               <div className="p-3 bg-paper-50 rounded-card border border-line-200">
                 <span className="text-[10px] font-sans text-ink-500 block uppercase">Payload biomass</span>
-                <span className="text-base font-bold text-pine-700">{totalTonnage.toFixed(1)} t</span>
+                <span className="text-base font-bold text-pine-700">{hasValidRoute ? `${totalTonnage.toFixed(1)} t` : '—'}</span>
               </div>
             </div>
 
             {/* Baseline comparison callout */}
-            {baseline && (
+            {baseline && hasValidRoute && (
               <div className="mt-4 pt-3 border-t border-line-200 text-xs flex justify-between items-center text-ink-500 font-mono">
                 <span>Distance saved vs unoptimized:</span>
                 <span className="font-bold text-pine-700 font-sans flex items-center gap-1">

@@ -1,6 +1,9 @@
 import sys
 import os
+from dotenv import load_dotenv
+
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv()
 
 from fastapi import FastAPI, HTTPException, Header, Depends
 from pydantic import BaseModel
@@ -22,9 +25,18 @@ app = FastAPI(
     version="1.0.0"
 )
 
+frontend_origin = os.environ.get("FRONTEND_ORIGIN", "http://localhost:5173")
+origins = [origin.strip() for origin in frontend_origin.split(",")] if frontend_origin else ["http://localhost:5173"]
+
+# Always allow standard development localhost ports for testing
+if "http://localhost:5173" not in origins:
+    origins.append("http://localhost:5173")
+if "http://127.0.0.1:5173" not in origins:
+    origins.append("http://127.0.0.1:5173")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

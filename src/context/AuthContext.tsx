@@ -14,6 +14,7 @@ interface AuthContextType {
   onboardingCompleted: boolean;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
+  signInWithSandbox: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   setFullProfileState: (updated: FullUserProfile | null) => void;
@@ -102,6 +103,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signInWithSandbox = async () => {
+    const sandboxUser = {
+      id: 'sih-sandbox-user-id',
+      email: 'sandbox@parali.in',
+      user_metadata: { full_name: 'Sandbox Demo User' }
+    } as any;
+    
+    setUser(sandboxUser);
+    setSession({
+      user: sandboxUser,
+      access_token: 'sandbox-access-token'
+    } as any);
+    
+    setFullProfile({
+      profile: {
+        id: 'sih-sandbox-user-id',
+        role: 'admin',
+        full_name: 'Sandbox Demo User',
+        onboarding_completed: true,
+        village: 'Sangrur',
+        district: 'Sangrur',
+        state: 'Punjab'
+      },
+      farmerProfile: {
+        primary_crop: 'Paddy',
+        land_area_acres: 10,
+        estimated_residue_tonnes: 15
+      },
+      buyerProfile: {
+        business_name: 'Bathinda Biomass Power Plant',
+        buyer_type: 'bio_power_plant',
+        required_quantity_tonnes: 500,
+        procurement_radius_km: 75
+      }
+    } as any);
+  };
+
   const signOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
@@ -130,6 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       onboardingCompleted,
       loading,
       signInWithGoogle,
+      signInWithSandbox,
       signOut,
       refreshProfile,
       setFullProfileState

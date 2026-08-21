@@ -18,6 +18,7 @@ import { useAuth } from './context/AuthContext';
 import { AuthLogin } from './pages/AuthLogin';
 import { Onboarding } from './pages/Onboarding';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import Lightfall from './components/ui/Lightfall';
 import { BuyerDemandItem } from './types/marketplace';
 import {
   LayoutDashboard,
@@ -158,9 +159,29 @@ export default function App() {
   );
 
   return (
-    <div className="min-h-screen bg-paper-50 flex flex-col font-sans">
-      <Navbar
-        currentView={currentView}
+    <div className="min-h-screen bg-paper-50/90 flex flex-col font-sans relative">
+      <div className="fixed inset-0 z-[0] pointer-events-none opacity-40 mix-blend-multiply">
+        <Lightfall
+          colors={['#8FA991', '#18392C', '#B9793D']}
+          backgroundColor="#FAF9F4"
+          speed={0.6}
+          streakCount={3}
+          streakWidth={1.5}
+          streakLength={1.5}
+          glow={0.8}
+          density={0.5}
+          twinkle={1.5}
+          zoom={2.5}
+          backgroundGlow={0.2}
+          mouseInteraction={true}
+          mouseStrength={0.4}
+          mouseRadius={1.2}
+        />
+      </div>
+
+      <div className="relative z-10 flex flex-col flex-1 h-full w-full">
+        <Navbar
+          currentView={currentView}
         onNavigateProfile={() => setCurrentView(currentView === 'profile' ? 'main' : 'profile')}
         onNavigateLanding={() => setShowLanding(true)}
         farmerView={farmerView}
@@ -178,9 +199,9 @@ export default function App() {
         ) : currentRole === 'none' ? (
           <RoleSelect />
         ) : (
-          <div className="flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col relative z-10">
             {/* Page content switcher */}
-            <div className="flex-1 bg-cream-50">
+            <div className="flex-1 bg-cream-50/70">
               <ErrorBoundary fallbackTitle="Operations View Unavailable">
                 {currentRole === 'Farmer' && (
                   farmerView === 'dashboard' ? (
@@ -276,6 +297,7 @@ export default function App() {
           )}
         </nav>
       )}
+      </div>
     </div>
   );
 }

@@ -36,7 +36,9 @@ export class ErrorBoundary extends Component<Props, State> {
             {this.props.fallbackTitle || 'Section Unavailable'}
           </h3>
           <p className="text-xs text-slate-600 leading-relaxed">
-            {this.state.error?.message || 'An unexpected error occurred while loading this view.'}
+            {import.meta.env.PROD 
+              ? 'Something went wrong. Please refresh or return to dashboard.' 
+              : (this.state.error?.message || 'An unexpected error occurred while loading this view.')}
           </p>
           <button
             onClick={() => {

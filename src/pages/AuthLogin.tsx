@@ -4,7 +4,7 @@ import AuthSectionThree from '../components/ui/auth-section-3';
 import { AlertCircle } from 'lucide-react';
 
 export const AuthLogin: React.FC = () => {
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle, signInWithSandbox } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -22,6 +22,20 @@ export const AuthLogin: React.FC = () => {
     }
   };
 
+  const handleSandboxLogin = async () => {
+    if (submitting) return;
+    setSubmitting(true);
+    setErrorMsg(null);
+
+    try {
+      await signInWithSandbox();
+    } catch (err: any) {
+      console.error(err);
+      setErrorMsg("We couldn't complete Sandbox sign-in. Please try again.");
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="relative">
       {errorMsg && (
@@ -30,7 +44,11 @@ export const AuthLogin: React.FC = () => {
           <span>{errorMsg}</span>
         </div>
       )}
-      <AuthSectionThree onGoogleSignUp={handleGoogleLogin} submitting={submitting} />
+      <AuthSectionThree 
+        onGoogleSignUp={handleGoogleLogin} 
+        onSandboxSignUp={handleSandboxLogin} 
+        submitting={submitting} 
+      />
     </div>
   );
 };

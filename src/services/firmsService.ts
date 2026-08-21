@@ -26,7 +26,7 @@ export interface FirmsApiResponse {
   message: string;
 }
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+import { BACKEND_URL } from '../config/api';
 
 /**
  * Fetches real satellite fire / thermal anomaly detection data from FastAPI backend NASA FIRMS endpoint.
@@ -43,12 +43,21 @@ export async function fetchFirmsData(
 
   const url = `${BACKEND_URL}/api/firms/test?days=${days}&source=${encodeURIComponent(source)}&area=${encodeURIComponent(area)}`;
 
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+      },
+    });
+  } catch (networkError: any) {
+    // Network-level failure: backend unreachable, CORS, DNS, etc.
+    console.error('[FIRMS] Network error — backend unreachable:', networkError);
+    throw new Error(
+      `Backend server unreachable at ${BACKEND_URL}. Ensure the FastAPI backend is running (python -m uvicorn backend.main:app --port 8000).`
+    );
+  }
 
   if (!response.ok) {
     let errorDetail = `NASA FIRMS backend request failed (HTTP ${response.status})`;
@@ -61,9 +70,16 @@ export async function fetchFirmsData(
     } catch {
       // Fallback to default message
     }
-    if (response.status === 429) {
-      errorDetail = 'Satellite data temporarily unavailable — rate limit reached.';
+
+    // Map HTTP status codes to structured, user-actionable messages
+    if (response.status === 401 || response.status === 403) {
+      errorDetail = `NASA FIRMS authentication failed — the API key is invalid or unauthorized (HTTP ${response.status}).`;
+    } else if (response.status === 429) {
+      errorDetail = 'NASA FIRMS rate limit reached. Satellite data will be available again shortly — please retry in a few minutes.';
+    } else if (response.status === 504) {
+      errorDetail = 'NASA FIRMS service timed out. The satellite data service may be temporarily slow — please retry.';
     }
+
     console.error(`[FIRMS] HTTP ${response.status} error from backend:`, errorDetail);
     throw new Error(errorDetail);
   }

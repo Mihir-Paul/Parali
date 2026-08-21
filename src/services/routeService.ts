@@ -1,31 +1,51 @@
 import { OptimizeRouteRequest, OptimizeRouteResponse, FarmPickupInput, RouteStop } from '../types/route';
 import { validateCoordinates } from './geolocationService';
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+import { BACKEND_URL } from '../config/api';
 
 export async function fetchOptimizedRoute(
   requestData?: OptimizeRouteRequest
 ): Promise<OptimizeRouteResponse> {
+  let response: Response;
   try {
-    const response = await fetch(`${BACKEND_URL}/api/optimize-route`, {
+    response = await fetch(`${BACKEND_URL}/api/optimize-route`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(requestData || {}),
     });
-
-    if (response.ok) {
-      const data = await response.json();
-      return data as OptimizeRouteResponse;
-    } else {
-      console.warn(`Backend endpoint returned status ${response.status}. Using dynamic coordinate route computation.`);
-    }
-  } catch (err) {
-    console.warn('Backend API server unreachable at localhost:8000. Running dynamic client-side route matrix fallback.', err);
+  } catch (networkError: any) {
+    // Network-level failure: backend server is not running
+    console.error('[RouteOptimizer] Backend unreachable:', networkError);
+    throw new Error(
+      `Route optimizer backend unreachable at ${BACKEND_URL}. Ensure the FastAPI backend is running.`
+    );
   }
 
-  // Dynamic route computation using exact passed depot and farm coordinates
+  if (response.ok) {
+    const data = await response.json();
+    return data as OptimizeRouteResponse;
+  }
+
+  // HTTP error from backend — extract structured detail
+  let errorDetail = `Route optimization failed (HTTP ${response.status})`;
+  try {
+    const errorJson = await response.json();
+    if (errorJson && errorJson.detail) {
+      errorDetail = errorJson.detail;
+    }
+  } catch {
+    // Fallback to default message
+  }
+
+  if (response.status === 400) {
+    // Validation error from backend (missing depot, no farms, etc.) — throw with detail
+    throw new Error(errorDetail);
+  }
+
+  // For other server errors, fall back to client-side computation
+  console.warn(`[RouteOptimizer] Backend returned status ${response.status}: ${errorDetail}. Using client-side fallback.`);
   return buildDynamicRouteResponse(requestData);
 }
 
