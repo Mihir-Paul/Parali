@@ -1,0 +1,12 @@
+{
+  "name": "parali-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Parali Backend API Service",
+  "main": "main.py",
+  "type": "module",
+  "scripts": {
+    "start": "python main.py",
+    "dev": "python main.py"
+  }
+}

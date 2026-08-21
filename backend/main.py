@@ -26,17 +26,23 @@ app = FastAPI(
 )
 
 frontend_origin = os.environ.get("FRONTEND_ORIGIN", "http://localhost:5173")
-origins = [origin.strip() for origin in frontend_origin.split(",")] if frontend_origin else ["http://localhost:5173"]
+origins = [origin.strip() for origin in frontend_origin.split(",") if origin.strip()] if frontend_origin else []
 
-# Always allow standard development localhost ports for testing
-if "http://localhost:5173" not in origins:
-    origins.append("http://localhost:5173")
-if "http://127.0.0.1:5173" not in origins:
-    origins.append("http://127.0.0.1:5173")
+default_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000"
+]
+
+for o in default_origins:
+    if o not in origins:
+        origins.append(o)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -192,4 +198,7 @@ def calculate_hidden_cost(
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    port = int(os.environ.get("PORT", 5000))
+    is_dev = os.environ.get("PORT") is None and os.environ.get("ENVIRONMENT", "development") == "development"
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=is_dev)
+
