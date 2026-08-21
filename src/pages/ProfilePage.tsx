@@ -133,7 +133,7 @@ export const ProfilePage: React.FC = () => {
                 <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider ${
                   isFarmer ? 'bg-forest-100 text-forest-800' : 'bg-clay-100 text-clay-800'
                 }`}>
-                  {isFarmer ? '🌾 Farmer' : '🏭 Buyer'}
+                  {isFarmer ? 'Farmer' : 'Buyer'}
                 </span>
               </div>
               <p className="text-xs text-forest-700 font-medium flex items-center gap-1.5 mt-1">

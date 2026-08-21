@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { fetchResidueListings, calculateMatches, createPurchaseRequest } from '../services/marketplaceService';
 import { BuyerDemandItem, ResidueMatchItem, ResidueListingItem } from '../types/marketplace';
-import { Sparkles, MapPin, Calendar, CheckCircle2, ArrowRight, X, Send } from 'lucide-react';
+import { Sparkles, MapPin, Calendar, CheckCircle2, ArrowRight, X, Send, Target } from 'lucide-react';
 
 interface BuyerMatchesProps {
   activeDemand?: BuyerDemandItem | null;
@@ -172,8 +172,8 @@ export const BuyerMatches: React.FC<BuyerMatchesProps> = ({
 
       {/* Matched Listings Section */}
       <div className="space-y-6">
-        <h3 className="text-base font-extrabold text-forest-950 uppercase tracking-wider flex items-center gap-2">
-          <span>🎯</span> Matched Farmer Listings ({matches.length})
+        <h3 className="text-xl font-extrabold text-forest-950 flex items-center gap-2">
+          <Target className="h-5 w-5 text-forest-600" /> Matched Farmer Listings ({matches.length})
         </h3>
 
         {loading ? (

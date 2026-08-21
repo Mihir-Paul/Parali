@@ -173,7 +173,11 @@ export const BuyerRequests: React.FC<BuyerRequestsProps> = ({ onBackToMarketplac
 
                 <p className="text-xs text-forest-700 font-semibold flex items-center gap-3">
                   <span>Farmer: <strong>{req.farmer_name || 'Verified Farmer'}</strong></span>
-                  {req.location && <span>• 📍 {req.location}</span>}
+                  {req.location && (
+                    <span className="flex items-center gap-1">
+                      • <MapPin className="h-3.5 w-3.5 text-forest-600" /> {req.location}
+                    </span>
+                  )}
                 </p>
               </div>
 

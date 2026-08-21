@@ -160,22 +160,20 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-paper-50/90 flex flex-col font-sans relative">
-      <div className="fixed inset-0 z-[0] pointer-events-none opacity-40 mix-blend-multiply">
+      <div className="fixed inset-0 z-[0] pointer-events-none opacity-25">
         <Lightfall
           colors={['#8FA991', '#18392C', '#B9793D']}
-          backgroundColor="#FAF9F4"
+          backgroundColor="transparent"
           speed={0.6}
           streakCount={3}
           streakWidth={1.5}
           streakLength={1.5}
-          glow={0.8}
-          density={0.5}
-          twinkle={1.5}
+          glow={0.5}
+          density={0.4}
+          twinkle={1.0}
           zoom={2.5}
-          backgroundGlow={0.2}
-          mouseInteraction={true}
-          mouseStrength={0.4}
-          mouseRadius={1.2}
+          backgroundGlow={0.1}
+          mouseInteraction={false}
         />
       </div>
 

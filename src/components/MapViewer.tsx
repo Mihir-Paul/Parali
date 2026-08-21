@@ -5,7 +5,7 @@ import { OptimizeRouteResponse, VehicleRoute, RouteStop } from '../types/route';
 import { useAppStore } from '../store/useAppStore';
 import { FirmsFireRecord, normalizeFirmsConfidence } from '../services/firmsService';
 import { getCurrentPosition, validateCoordinates } from '../services/geolocationService';
-import { Layers, ChevronDown, ChevronUp, Maximize2, Flame, Navigation } from 'lucide-react';
+import { Layers, ChevronDown, ChevronUp, Maximize2, Flame, Navigation, Building2 } from 'lucide-react';
 
 interface MapViewerProps {
   routeData?: OptimizeRouteResponse | null;
@@ -258,14 +258,14 @@ export const MapViewer: React.FC<MapViewerProps> = ({
                 border: 2.5px solid #ffffff;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.35);
                 cursor: pointer;
-              ">🏭</div>
+              "><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/></svg></div>
             `;
 
             const popup = new maplibregl.Popup({ offset: 20, closeButton: false }).setHTML(`
               <div style="font-family: system-ui, sans-serif; padding: 4px; min-width: 200px;">
                 <span style="background: #fef3c7; color: #92400e; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 12px;">Central Buyer Depot</span>
                 <h4 style="font-weight: 900; font-size: 14px; color: #0f172a; margin: 6px 0 2px 0;">${stop.name}</h4>
-                <p style="font-size: 11px; color: #475569; margin: 0;">📍 (${stop.latitude.toFixed(4)}, ${stop.longitude.toFixed(4)})</p>
+                <p style="font-size: 11px; color: #475569; margin: 0;">Location: (${stop.latitude.toFixed(4)}, ${stop.longitude.toFixed(4)})</p>
               </div>
             `);
 
@@ -366,7 +366,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
             cursor: pointer;
             transform: ${transformScale};
             transition: transform 0.2s ease;
-          ">🔥</div>
+          "><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></div>
         `;
 
         if (onHotspotClick) {
@@ -384,7 +384,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
               </span>
             </div>
             <h4 style="font-weight: 900; font-size: 13px; color: #0f172a; margin: 0 0 4px 0;">Satellite Thermal Anomaly</h4>
-            <p style="font-size: 11px; color: #475569; margin: 0 0 6px 0;">📍 (${fire.latitude.toFixed(4)}, ${fire.longitude.toFixed(4)})</p>
+            <p style="font-size: 11px; color: #475569; margin: 0 0 6px 0;">Coord: (${fire.latitude.toFixed(4)}, ${fire.longitude.toFixed(4)})</p>
             <div style="font-size: 11px; color: #334155; border-top: 1px solid #f1f5f9; padding-top: 6px; space-y: 2px;">
               <div><strong>Sensor:</strong> ${fire.instrument || 'VIIRS'} (${fire.satellite || 'N'})</div>
               <div><strong>Acquired:</strong> ${fire.acq_date} ${fire.acq_time} UTC</div>
@@ -434,14 +434,14 @@ export const MapViewer: React.FC<MapViewerProps> = ({
             border: 2px solid white;
             box-shadow: 0 2px 6px rgba(0,0,0,0.25);
             cursor: pointer;
-          " title="${farmer.name} (${farmer.location})">🌾</div>
+          " title="${farmer.name} (${farmer.location})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22V12"/><path d="M17 7c0-2.76-2.24-5-5-5s-5 2.24-5 5c0 3 3 7 5 7s5-4 5-7z"/></svg></div>
         `;
 
         const popup = new maplibregl.Popup({ offset: 14, closeButton: false }).setHTML(`
           <div style="font-family: system-ui, sans-serif; padding: 4px; min-width: 180px;">
             <span style="background: #d1fae5; color: #065f46; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 2px 8px; border-radius: 12px;">Parali Partner Farm</span>
             <h4 style="font-weight: 900; font-size: 13px; color: #0f172a; margin: 4px 0 2px 0;">${farmer.name}</h4>
-            <p style="font-size: 11px; color: #475569; margin: 0;">📍 ${farmer.location}</p>
+            <p style="font-size: 11px; color: #475569; margin: 0;">Location: ${farmer.location}</p>
           </div>
         `);
 
@@ -580,7 +580,7 @@ export const MapViewer: React.FC<MapViewerProps> = ({
 
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-lg bg-amber-900 text-white flex items-center justify-center text-[11px] shadow-xs">
-                    🏭
+                    <Building2 className="w-3 h-3 text-white" />
                   </div>
                   <span className="font-semibold text-slate-700">Central Biomass Buyer Depot</span>
                 </div>

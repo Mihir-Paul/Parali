@@ -18,7 +18,8 @@ import {
   Map,
   Info,
   Send,
-  AlertCircle
+  AlertCircle,
+  Sprout
 } from 'lucide-react';
 
 interface BuyerMarketplaceProps {
@@ -409,8 +410,8 @@ export const BuyerMarketplace: React.FC<BuyerMarketplaceProps> = ({
           ) : listings.length === 0 ? (
             /* Empty Filter State */
             <div className="bg-white border border-forest-100 rounded-3xl p-12 text-center shadow-sm">
-              <div className="w-16 h-16 rounded-full bg-cream-100 text-forest-700 flex items-center justify-center mx-auto mb-4 text-2xl">
-                🌾
+              <div className="w-16 h-16 rounded-full bg-cream-100 text-forest-700 flex items-center justify-center mx-auto mb-4">
+                <Sprout className="h-8 w-8 text-forest-700" />
               </div>
               <h3 className="text-lg font-bold text-forest-950">No residue listings match your current filters</h3>
               <p className="text-xs text-forest-700 max-w-md mx-auto mt-2 leading-relaxed">
@@ -592,8 +593,8 @@ export const BuyerMarketplace: React.FC<BuyerMarketplaceProps> = ({
             <h2 className="text-2xl font-extrabold text-forest-950 mt-2">
               {selectedDetailsListing.quantity} tonnes available
             </h2>
-            <p className="text-xs text-forest-700 font-semibold mt-1">
-              📍 {selectedDetailsListing.pickup_location}, {selectedDetailsListing.district}, {selectedDetailsListing.state}
+            <p className="text-xs text-forest-700 font-semibold mt-1 flex items-center gap-1">
+              <MapPin className="h-3.5 w-3.5 text-forest-600" /> {selectedDetailsListing.pickup_location}, {selectedDetailsListing.district}, {selectedDetailsListing.state}
             </p>
 
             <div className="bg-cream-50 border border-forest-150 rounded-2xl p-4 my-5 space-y-3 text-xs">

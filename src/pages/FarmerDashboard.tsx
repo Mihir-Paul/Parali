@@ -7,7 +7,7 @@ import {
   fetchFarmerPurchaseRequests
 } from '../services/purchaseRequestService';
 import { PurchaseRequestItem } from '../types/marketplace';
-import { IndianRupee, Sprout, ShieldCheck, CheckCircle2, FileSpreadsheet, MapPin, XCircle, Clock, Calculator, AlertTriangle } from 'lucide-react';
+import { IndianRupee, Sprout, ShieldCheck, CheckCircle2, FileSpreadsheet, MapPin, XCircle, Clock, Calculator, AlertTriangle, Truck, Inbox } from 'lucide-react';
 import { FarmerHiddenCostCalculator } from '../components/FarmerHiddenCostCalculator';
 import ScrollStack, { ScrollStackItem } from '../components/ui/ScrollStack';
 
@@ -147,7 +147,7 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
             <span>{locationText} • {landArea} Acres ({primaryCrop})</span>
           </div>
           <h2 className="text-3xl font-extrabold text-forest-950">
-            Good morning, {farmerName} 👋
+            Good morning, {farmerName}
           </h2>
           <p className="text-sm text-forest-700 mt-1">
             Here is what's happening with your agricultural residue listings.
@@ -193,10 +193,15 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
         </div>
 
         <div className="bg-white border border-forest-100 p-6 rounded-3xl shadow-sm hover:translate-y-[-2px] hover:shadow-md transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-[10px] font-bold text-forest-600 uppercase tracking-wider">Burning Avoided</span>
-            <div className="p-2.5 bg-forest-50 text-forest-600 rounded-xl"><ShieldCheck className="h-4 w-4" /></div>
-          </div>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-forest-100 flex items-center justify-center">
+                <Truck className="h-5 w-5 text-forest-700" />
+              </div>
+              <div>
+                <span className="text-[10px] font-extrabold text-forest-600 uppercase tracking-wider block">Pickup Protocol</span>
+                <span className="text-sm font-bold text-forest-950">Biomass Transporter Assigned</span>
+              </div>
+            </div>
           <h3 className="text-2xl font-black text-forest-950">{(metrics.divertedTonnes * 1.5).toFixed(1)} tCO₂e</h3>
           <p className="text-[10px] text-forest-500 font-semibold mt-1">Prevented from stubble fires</p>
         </div>
@@ -219,7 +224,9 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
 
             {rameshListing.status === 'Confirmed' && (
               <div className="flex items-center gap-4 bg-forest-50/80 border border-forest-100 p-4 rounded-2xl">
-                <span className="text-2xl">🚛</span>
+                <div className="w-9 h-9 rounded-xl bg-forest-100 flex items-center justify-center shrink-0">
+                  <Truck className="h-5 w-5 text-forest-700" />
+                </div>
                 <div>
                   <h4 className="font-extrabold text-xs text-forest-900 leading-none">Truck #PB-08-AX-2411</h4>
                   <p className="text-[10px] text-forest-600 mt-1">Arriving today at 10:40 AM (2.8 km away)</p>
@@ -274,7 +281,9 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
         </div>
       ) : (
         <div className="bg-white border border-forest-100 rounded-3xl p-12 text-center shadow-sm mb-10">
-          <div className="w-16 h-16 rounded-full bg-cream-100 text-cream-700 flex items-center justify-center mx-auto mb-6 text-2xl">🌾</div>
+          <div className="w-16 h-16 rounded-full bg-cream-100 text-forest-700 flex items-center justify-center mx-auto mb-6">
+            <Sprout className="h-8 w-8 text-forest-700" />
+          </div>
           <h3 className="text-xl font-bold text-forest-950">No active residue listings</h3>
           <p className="text-sm text-forest-700 max-w-sm mx-auto mt-2">
             Earn money from crop stubble rather than burning it. AI valuations take less than a minute.
@@ -293,7 +302,7 @@ export const FarmerDashboard: React.FC<FarmerDashboardProps> = ({ onNavigateToSe
       {/* ============================================================ */}
       <div className="bg-white border border-forest-100 rounded-3xl p-6 shadow-sm mb-10">
         <h4 className="font-extrabold text-base text-forest-950 mb-4 flex items-center gap-2">
-          <span>📨</span> Incoming Buyer Purchase Requests
+          <Inbox className="h-5 w-5 text-forest-600" /> Incoming Buyer Purchase Requests
         </h4>
 
         <div className="h-[600px] relative border border-forest-100 rounded-2xl overflow-hidden bg-white/50">
