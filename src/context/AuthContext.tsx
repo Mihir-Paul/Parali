@@ -51,19 +51,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     let mounted = true;
 
-    // Check active session on initial load
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!mounted) return;
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        loadProfile(session.user.id).finally(() => {
-          if (mounted) setLoading(false);
+    // Safety fallback timeout: ensure loading state never hangs for more than 2.5s
+    const timeoutId = setTimeout(() => {
+      if (mounted) {
+        setLoading((prevLoading) => {
+          if (prevLoading) {
+            console.warn('[AuthContext] Session resolution timed out. Defaulting loading to false.');
+            return false;
+          }
+          return prevLoading;
         });
-      } else {
-        setLoading(false);
       }
-    });
+    }, 2500);
+
+    // Check active session on initial load
+    supabase.auth.getSession()
+      .then(({ data: { session } }) => {
+        if (!mounted) return;
+        setSession(session);
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          loadProfile(session.user.id).finally(() => {
+            if (mounted) setLoading(false);
+          });
+        } else {
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.warn('[AuthContext] Error retrieving session:', err);
+        if (mounted) setLoading(false);
+      });
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, newSession) => {
@@ -84,7 +102,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
+      clearTimeout(timeoutId);
+      subscription?.unsubscribe();
     };
   }, []);
 

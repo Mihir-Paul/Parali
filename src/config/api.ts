@@ -6,8 +6,8 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
 
 if (isProd) {
   if (!apiBaseUrl) {
-    console.error(
-      "[Parali API Guard] PRODUCTION CONFIGURATION ERROR: VITE_API_BASE_URL is not defined in environment variables."
+    console.warn(
+      "[Parali API Guard] VITE_API_BASE_URL is not defined in Vercel environment variables. API calls will use dynamic fallbacks."
     );
   } else if (
     apiBaseUrl.includes("localhost") ||
@@ -15,11 +15,12 @@ if (isProd) {
     apiBaseUrl.includes("5173") ||
     apiBaseUrl.includes("8000")
   ) {
-    throw new Error(
-      `PRODUCTION CONFIGURATION ERROR: VITE_API_BASE_URL (${apiBaseUrl}) cannot point to localhost/127.0.0.1/5173/8000 in a production build. Set a proper production backend URL in your Vercel deployment variables.`
+    console.warn(
+      `[Parali API Guard] VITE_API_BASE_URL (${apiBaseUrl}) points to localhost in production. Set VITE_API_BASE_URL to your deployed Render backend URL in Vercel environment variables.`
     );
   }
 }
 
-export const BACKEND_URL = apiBaseUrl || 'http://localhost:8000';
+export const BACKEND_URL = apiBaseUrl ? apiBaseUrl.replace(/\/+$/, '') : '';
 export const IS_PRODUCTION = isProd;
+

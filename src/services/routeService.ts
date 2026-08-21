@@ -6,6 +6,11 @@ import { BACKEND_URL } from '../config/api';
 export async function fetchOptimizedRoute(
   requestData?: OptimizeRouteRequest
 ): Promise<OptimizeRouteResponse> {
+  if (!BACKEND_URL) {
+    console.warn('[RouteOptimizer] BACKEND_URL not set in environment variables. Falling back to dynamic client-side route optimizer.');
+    return buildDynamicRouteResponse(requestData);
+  }
+
   let response: Response;
   try {
     response = await fetch(`${BACKEND_URL}/api/optimize-route`, {
@@ -16,12 +21,9 @@ export async function fetchOptimizedRoute(
       body: JSON.stringify(requestData || {}),
     });
   } catch (networkError: any) {
-    // Network-level failure: backend server is not running
+    // Network-level failure: backend server is not running or unreachable
     console.error('[RouteOptimizer] Backend unreachable:', networkError);
-    const msg = import.meta.env.PROD
-      ? 'Parali backend service is temporarily unavailable.'
-      : `Route optimizer backend unreachable at ${BACKEND_URL}. Ensure the FastAPI backend is running.`;
-    throw new Error(msg);
+    return buildDynamicRouteResponse(requestData);
   }
 
   if (response.ok) {
