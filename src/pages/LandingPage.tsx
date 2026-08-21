@@ -7,12 +7,16 @@ import ScrollReveal from '../components/ui/ScrollReveal';
 import ScrollStack, { ScrollStackItem } from '../components/ui/ScrollStack';
 import { motion, useMotionValue, useTransform, useReducedMotion, useSpring, useScroll } from 'framer-motion';
 import CountUp from '../components/ui/CountUp';
+import { useTheme } from '../context/ThemeContext';
 
 interface LandingPageProps {
   onStart: () => void;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   const [activeStory, setActiveStory] = useState<'before' | 'after'>('before');
   const prefersReducedMotion = useReducedMotion() ?? undefined;
 
@@ -76,32 +80,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       className="landing-page-root"
       style={{
         minHeight: '100vh',
-        backgroundColor: '#FAF9F4',
-        color: '#17251E',
+        backgroundColor: isDark ? '#0D1713' : '#FAFAF7',
+        color: isDark ? '#F1F5F2' : '#102F24',
         fontFamily: "'Manrope', sans-serif",
         position: 'relative',
         overflow: 'hidden',
+        transition: 'all 0.2s ease',
       }}
     >
       {/* Background Parallax Shapes */}
       <motion.div 
         style={{ 
           position: 'absolute', top: '-10%', right: '-10%', width: '120%', height: '120%', 
-          zIndex: 1, pointerEvents: 'none', opacity: 0.4,
+          zIndex: 1, pointerEvents: 'none', opacity: isDark ? 0.15 : 0.06,
           y: prefersReducedMotion ? 0 : backgroundY 
         }}
       >
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: '100%', height: '100%' }}>
-          <path d="M0,50 Q25,30 50,50 T100,50 L100,100 L0,100 Z" fill="#F1F4EC" />
-          <path d="M0,80 Q30,60 70,90 T100,70 L100,100 L0,100 Z" fill="#EBF0E6" />
+          <path d="M0,50 Q25,30 50,50 T100,50 L100,100 L0,100 Z" fill="rgba(111, 175, 138, 0.08)" />
+          <path d="M0,80 Q30,60 70,90 T100,70 L100,100 L0,100 Z" fill="rgba(139, 199, 163, 0.06)" />
         </svg>
       </motion.div>
 
       <div style={{ position: 'relative', zIndex: 2 }}>
         {/* Top Banner */}
         <div style={{
-          background: '#DCE7DC',
-          borderBottom: '1px solid #DCE3DC',
+          background: isDark ? '#101F18' : '#EAF3ED',
+          borderBottom: isDark ? '1px solid #294237' : '1px solid #D8E2DC',
           padding: '10px 24px',
           textAlign: 'center',
           display: 'flex',
@@ -111,7 +116,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           fontFamily: "'JetBrains Mono', monospace",
           fontSize: 11,
           fontWeight: 600,
-          color: '#18392C',
+          color: isDark ? '#8BC7A3' : '#174C38',
           letterSpacing: '0.08em',
           textTransform: 'uppercase',
         }}>
@@ -130,12 +135,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             <motion.div variants={itemVariants} style={{
               display: 'inline-flex', alignItems: 'center', gap: 8,
               padding: '6px 14px', borderRadius: 999,
-              background: '#F1F4EC',
-              border: '1px solid #DCE3DC',
+              background: isDark ? '#14251D' : '#EAF3ED',
+              border: isDark ? '1px solid #294237' : '1px solid #D8E2DC',
               marginBottom: 28,
             }}>
-              <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#315C47' }} />
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 700, color: '#18392C', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              <span style={{ width: 7, height: 7, borderRadius: '50%', background: isDark ? '#8BC7A3' : '#174C38' }} />
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, fontWeight: 700, color: isDark ? '#8BC7A3' : '#174C38', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                 AI-Powered Agritech Platform
               </span>
             </motion.div>
@@ -146,16 +151,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
               fontWeight: 800,
               lineHeight: 1.1,
               letterSpacing: '-0.03em',
-              color: '#18392C',
+              color: isDark ? '#F1F5F2' : '#102F24',
               margin: 0,
             }}>
               Turn crop waste into{' '}
-              <span style={{ color: '#B9793D' }}>
+              <span style={{ color: isDark ? '#E2903F' : '#174C38' }}>
                 farmer income.
               </span>
             </motion.h1>
 
-            <motion.p variants={itemVariants} style={{ fontSize: 18, color: '#5D6B63', marginTop: 20, maxWidth: 500, lineHeight: 1.7 }}>
+            <motion.p variants={itemVariants} style={{ fontSize: 18, color: isDark ? '#B8C8BF' : '#40594D', marginTop: 20, maxWidth: 500, lineHeight: 1.7 }}>
               Parali connects farmers with industrial buyers who value crop residue, while AI optimizes collection routes, prices materials, and tracks direct CO₂ prevention.
             </motion.p>
 
@@ -165,7 +170,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 className="primary-cta"
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8,
-                  background: '#315C47',
+                  background: isDark ? '#24563E' : '#174C38',
                   color: '#FFFFFF',
                   fontFamily: "'Sora', sans-serif",
                   fontWeight: 700,
@@ -184,14 +189,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 className="secondary-cta"
                 style={{
                   display: 'flex', alignItems: 'center', gap: 8,
-                  background: '#FFFFFF',
-                  color: '#18392C',
+                  background: isDark ? '#14251D' : '#FFFFFF',
+                  color: isDark ? '#F1F5F2' : '#102F24',
                   fontFamily: "'Manrope', sans-serif",
                   fontWeight: 600,
                   fontSize: 15,
                   padding: '14px 28px',
                   borderRadius: 12,
-                  border: '1px solid #DCE3DC',
+                  border: isDark ? '1px solid #294237' : '1px solid #D8E2DC',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                 }}
@@ -201,26 +206,26 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             </motion.div>
 
             {/* Stats row */}
-            <motion.div variants={itemVariants} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginTop: 48, paddingTop: 32, borderTop: '1px solid #DCE3DC', width: '100%' }}>
+            <motion.div variants={itemVariants} style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginTop: 48, paddingTop: 32, borderTop: isDark ? '1px solid #294237' : '1px solid #D8E2DC', width: '100%' }}>
               <div className="stat-card-hover" style={{ padding: '8px', borderRadius: '12px' }}>
-                <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 26, color: '#18392C' }}>
+                <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 26, color: isDark ? '#F1F5F2' : '#102F24' }}>
                   <CountUp to={1284} suffix=" t" useReducedMotion={prefersReducedMotion} />
                 </div>
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: '#5D6B63', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Residue Diverted</div>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: isDark ? '#B8C8BF' : '#687B72', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Residue Diverted</div>
               </div>
               <div className="stat-card-hover" style={{ padding: '8px', borderRadius: '12px' }}>
-                <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 26, color: '#18392C' }}>
+                <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 26, color: isDark ? '#F1F5F2' : '#102F24' }}>
                   <CountUp prefix="₹" to={18.7} decimals={1} suffix="L+" delay={0.2} useReducedMotion={prefersReducedMotion} />
                 </div>
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: '#5D6B63', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Farmer Income Generated</div>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: isDark ? '#B8C8BF' : '#687B72', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Farmer Income Generated</div>
               </div>
               <div className="stat-card-hover" style={{ padding: '8px', borderRadius: '12px' }}>
-                <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 26, color: '#18392C' }}>
+                <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 26, color: isDark ? '#F1F5F2' : '#102F24' }}>
                   <CountUp to={1926} suffix=" t" delay={0.4} useReducedMotion={prefersReducedMotion} />
                 </div>
-                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: '#5D6B63', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Estimated CO₂e Avoided</div>
+                <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: isDark ? '#B8C8BF' : '#687B72', marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Estimated CO₂e Avoided</div>
               </div>
-              <div style={{ gridColumn: 'span 3', fontSize: 11, color: '#8FA991', marginTop: 8 }}>
+              <div style={{ gridColumn: 'span 3', fontSize: 11, color: isDark ? '#81958A' : '#687B72', marginTop: 8 }}>
                 * Metrics are based on sample projected data.
               </div>
             </motion.div>
@@ -244,7 +249,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 padding: 32, width: '100%', maxWidth: 460, 
                 rotateX: prefersReducedMotion ? 0 : rotateX, 
                 rotateY: prefersReducedMotion ? 0 : rotateY,
-                transformStyle: 'preserve-3d'
+                transformStyle: 'preserve-3d',
+                background: isDark ? '#14251D' : '#FFFFFF',
+                border: isDark ? '1px solid #294237' : '1px solid #D8E2DC',
+                boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 16px rgba(16, 47, 36, 0.06)'
               }}
             >
               <div style={{ display: 'flex', flexDirection: 'column', gap: 0, transformStyle: 'preserve-3d' }}>
@@ -255,13 +263,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                   transition={{ delay: 0.5, duration: 0.5 }}
                   style={{ display: 'flex', alignItems: 'center', gap: 12, transform: 'translateZ(12px)' }}
                 >
-                  <div style={{ flex: 1, padding: 16, background: '#F1F4EC', borderRadius: 12, border: '1px solid #DCE3DC', display: 'flex', alignItems: 'center', gap: 12 }}>
-                     <div className="icon-wrapper" style={{ width: 36, height: 36, borderRadius: 8, background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #DCE3DC' }}>
-                       <Sprout className="icon-sprout" style={{ color: '#315C47', width: 20, height: 20 }} />
+                  <div style={{ flex: 1, padding: 16, background: isDark ? '#183328' : '#F1F6F3', borderRadius: 12, border: isDark ? '1px solid #294237' : '1px solid #D8E2DC', display: 'flex', alignItems: 'center', gap: 12 }}>
+                     <div className="icon-wrapper" style={{ width: 36, height: 36, borderRadius: 8, background: isDark ? '#101F18' : '#EAF3ED', display: 'flex', alignItems: 'center', justifyContent: 'center', border: isDark ? '1px solid #294237' : '1px solid #D8E2DC' }}>
+                       <Sprout className="icon-sprout" style={{ color: isDark ? '#8BC7A3' : '#174C38', width: 20, height: 20 }} />
                      </div>
                      <div>
-                       <div style={{ fontSize: 12, color: '#5D6B63', fontWeight: 600 }}>Source</div>
-                       <div style={{ fontSize: 14, color: '#18392C', fontWeight: 700 }}>Farm A (Punjab)</div>
+                       <div style={{ fontSize: 12, color: isDark ? '#B8C8BF' : '#40594D', fontWeight: 600 }}>Source</div>
+                       <div style={{ fontSize: 14, color: isDark ? '#F1F5F2' : '#102F24', fontWeight: 700 }}>Farm A (Punjab)</div>
                      </div>
                   </div>
                 </motion.div>
@@ -269,7 +277,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 <div style={{ display: 'flex', paddingLeft: 34 }}>
                   <motion.div 
                     initial={{ height: 0 }} animate={{ height: 24 }} transition={{ delay: 0.7, duration: 0.4 }}
-                    style={{ width: 2, background: '#DCE3DC', transform: 'translateZ(6px)' }}
+                    style={{ width: 2, background: isDark ? '#294237' : '#D8E2DC', transform: 'translateZ(6px)' }}
                   />
                 </div>
                 
@@ -280,13 +288,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                   transition={{ delay: 0.9, duration: 0.5 }}
                   style={{ display: 'flex', alignItems: 'center', gap: 12, transform: 'translateZ(16px)' }}
                 >
-                  <div style={{ flex: 1, padding: 16, background: '#F3E7D6', borderRadius: 12, border: '1px solid #E4D5C1', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 4px 12px rgba(185, 121, 61, 0.05)' }}>
-                     <div className="icon-wrapper" style={{ width: 36, height: 36, borderRadius: 8, background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #E4D5C1' }}>
-                       <Network className="icon-compass" style={{ color: '#B9793D', width: 20, height: 20 }} />
+                  <div style={{ flex: 1, padding: 16, background: isDark ? '#1C3429' : '#EAF3ED', borderRadius: 12, border: isDark ? '1px solid #294237' : '1px solid #D8E2DC', display: 'flex', alignItems: 'center', gap: 12, boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
+                     <div className="icon-wrapper" style={{ width: 36, height: 36, borderRadius: 8, background: isDark ? '#101F18' : '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', border: isDark ? '1px solid #294237' : '1px solid #D8E2DC' }}>
+                       <Network className="icon-compass" style={{ color: '#E2903F', width: 20, height: 20 }} />
                      </div>
                      <div>
-                       <div style={{ fontSize: 12, color: '#8FA991', fontWeight: 600 }}>Parali Engine</div>
-                       <div style={{ fontSize: 14, color: '#18392C', fontWeight: 700 }}>Optimizing Route...</div>
+                       <div style={{ fontSize: 12, color: isDark ? '#8BC7A3' : '#174C38', fontWeight: 600 }}>Parali Engine</div>
+                       <div style={{ fontSize: 14, color: isDark ? '#F1F5F2' : '#102F24', fontWeight: 700 }}>Optimizing Route...</div>
                      </div>
                   </div>
                 </motion.div>
@@ -294,7 +302,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 <div style={{ display: 'flex', paddingLeft: 34 }}>
                   <motion.div 
                     initial={{ height: 0 }} animate={{ height: 24 }} transition={{ delay: 1.1, duration: 0.4 }}
-                    style={{ width: 2, background: '#DCE3DC', transform: 'translateZ(6px)' }}
+                    style={{ width: 2, background: isDark ? '#294237' : '#D8E2DC', transform: 'translateZ(6px)' }}
                   />
                 </div>
 
@@ -305,13 +313,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                   transition={{ delay: 1.3, duration: 0.5 }}
                   style={{ display: 'flex', alignItems: 'center', gap: 12, transform: 'translateZ(12px)' }}
                 >
-                  <div style={{ flex: 1, padding: 16, background: '#F1F4EC', borderRadius: 12, border: '1px solid #DCE3DC', display: 'flex', alignItems: 'center', gap: 12 }}>
-                     <div className="icon-wrapper" style={{ width: 36, height: 36, borderRadius: 8, background: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #DCE3DC' }}>
-                       <Factory className="icon-truck" style={{ color: '#315C47', width: 20, height: 20 }} />
+                  <div style={{ flex: 1, padding: 16, background: isDark ? '#183328' : '#F1F6F3', borderRadius: 12, border: isDark ? '1px solid #294237' : '1px solid #D8E2DC', display: 'flex', alignItems: 'center', gap: 12 }}>
+                     <div className="icon-wrapper" style={{ width: 36, height: 36, borderRadius: 8, background: isDark ? '#101F18' : '#EAF3ED', display: 'flex', alignItems: 'center', justifyContent: 'center', border: isDark ? '1px solid #294237' : '1px solid #D8E2DC' }}>
+                       <Factory className="icon-truck" style={{ color: isDark ? '#8BC7A3' : '#174C38', width: 20, height: 20 }} />
                      </div>
                      <div>
-                       <div style={{ fontSize: 12, color: '#5D6B63', fontWeight: 600 }}>Destination</div>
-                       <div style={{ fontSize: 14, color: '#18392C', fontWeight: 700 }}>Bio-Energy Plant</div>
+                       <div style={{ fontSize: 12, color: isDark ? '#B8C8BF' : '#40594D', fontWeight: 600 }}>Destination</div>
+                       <div style={{ fontSize: 14, color: isDark ? '#F1F5F2' : '#102F24', fontWeight: 700 }}>Bio-Energy Plant</div>
                      </div>
                   </div>
                 </motion.div>
@@ -334,24 +342,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         </section>
 
         {/* Storytelling Before/After */}
-        <section id="storytelling" style={{ padding: '80px 32px', background: '#FFFFFF', borderTop: '1px solid #DCE3DC', borderBottom: '1px solid #DCE3DC' }}>
+        <section id="storytelling" style={{ padding: '80px 32px', background: isDark ? '#0D1713' : '#FAFAF7', borderTop: isDark ? '1px solid #294237' : '1px solid #D8E2DC', borderBottom: isDark ? '1px solid #294237' : '1px solid #D8E2DC' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
-            <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 'clamp(1.8rem, 3vw, 2.8rem)', color: '#18392C', margin: 0 }}>
+            <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 'clamp(1.8rem, 3vw, 2.8rem)', color: isDark ? '#F1F5F2' : '#102F24', margin: 0 }}>
               How Parali Alters the Lifecycle of Crop Residue
             </h2>
-            <p style={{ color: '#5D6B63', marginTop: 12, maxWidth: 520, marginInline: 'auto', fontSize: 15 }}>
+            <p style={{ color: isDark ? '#B8C8BF' : '#40594D', marginTop: 12, maxWidth: 520, marginInline: 'auto', fontSize: 15 }}>
               Stubble burning is a result of tight sowing timelines and lack of market routes. Parali creates the alternative.
             </p>
 
-            <div style={{ display: 'inline-flex', background: '#F1F4EC', border: '1px solid #DCE3DC', borderRadius: 14, padding: 5, marginTop: 32, marginBottom: 48 }}>
+            <div style={{ display: 'inline-flex', background: isDark ? '#101F18' : '#EAF3ED', border: isDark ? '1px solid #294237' : '1px solid #D8E2DC', borderRadius: 14, padding: 5, marginTop: 32, marginBottom: 48 }}>
               <button
                 onClick={() => setActiveStory('before')}
                 style={{
                   padding: '10px 22px', borderRadius: 10, fontSize: 13, fontWeight: 700, fontFamily: "'Manrope', sans-serif",
                   display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', border: 'none', transition: 'all 0.2s',
-                  background: activeStory === 'before' ? '#FFFFFF' : 'transparent',
-                  color: activeStory === 'before' ? '#B9793D' : '#5D6B63',
-                  boxShadow: activeStory === 'before' ? '0 2px 8px rgba(30, 60, 45, 0.05)' : 'none',
+                  background: activeStory === 'before' ? (isDark ? '#14251D' : '#FFFFFF') : 'transparent',
+                  color: activeStory === 'before' ? '#E2903F' : (isDark ? '#81958A' : '#687B72'),
+                  boxShadow: activeStory === 'before' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
                 }}
               >
                 <Flame style={{ width: 16, height: 16 }} /> Before Parali
@@ -361,9 +369,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 style={{
                   padding: '10px 22px', borderRadius: 10, fontSize: 13, fontWeight: 700, fontFamily: "'Manrope', sans-serif",
                   display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', border: 'none', transition: 'all 0.2s',
-                  background: activeStory === 'after' ? '#FFFFFF' : 'transparent',
-                  color: activeStory === 'after' ? '#315C47' : '#5D6B63',
-                  boxShadow: activeStory === 'after' ? '0 2px 8px rgba(30, 60, 45, 0.05)' : 'none',
+                  background: activeStory === 'after' ? (isDark ? '#14251D' : '#FFFFFF') : 'transparent',
+                  color: activeStory === 'after' ? (isDark ? '#8BC7A3' : '#174C38') : (isDark ? '#81958A' : '#687B72'),
+                  boxShadow: activeStory === 'after' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none',
                 }}
               >
                 <Sprout style={{ width: 16, height: 16 }} /> After Parali
@@ -394,16 +402,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         className={`clean-card ${beforeItem.highlight ? 'story-card-highlight-bad' : ''}`} 
                         style={{ 
                           position: 'absolute', width: '100%', height: '100%', backfaceVisibility: 'hidden',
-                          padding: '22px 18px', textAlign: 'left', background: beforeItem.highlight ? '#FAF4F1' : '#FFFFFF',
+                          padding: '22px 18px', textAlign: 'left',
+                          background: beforeItem.highlight ? (isDark ? '#2A1D1A' : '#FEF3F2') : (isDark ? '#14251D' : '#FFFFFF'),
+                          border: beforeItem.highlight ? (isDark ? '1px solid #5C2D24' : '1px solid #FECDCA') : (isDark ? '1px solid #294237' : '1px solid #D8E2DC'),
                           zIndex: activeStory === 'before' || prefersReducedMotion ? 2 : 1,
                           opacity: prefersReducedMotion && activeStory === 'after' ? 0 : 1
                         }}
                       >
-                        <div className="icon-wrapper" style={{ marginBottom: 14, width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: beforeItem.highlight ? '#F3E7D6' : '#F1F4EC' }}>
-                          <beforeItem.icon style={{ width: 22, height: 22, color: beforeItem.highlight ? '#B9793D' : '#8FA991' }} />
+                        <div className="icon-wrapper" style={{ marginBottom: 14, width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: isDark ? '#101F18' : '#F1F6F3' }}>
+                          <beforeItem.icon style={{ width: 22, height: 22, color: beforeItem.highlight ? (isDark ? '#E2903F' : '#B84A3A') : (isDark ? '#81958A' : '#687B72') }} />
                         </div>
-                        <h4 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 12, color: beforeItem.highlight ? '#B9793D' : '#18392C', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>{beforeItem.title}</h4>
-                        <p style={{ fontSize: 12, color: '#5D6B63', lineHeight: 1.6, margin: 0 }}>{beforeItem.desc}</p>
+                        <h4 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 12, color: beforeItem.highlight ? (isDark ? '#E2903F' : '#B84A3A') : (isDark ? '#F1F5F2' : '#102F24'), textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>{beforeItem.title}</h4>
+                        <p style={{ fontSize: 12, color: isDark ? '#B8C8BF' : '#40594D', lineHeight: 1.6, margin: 0 }}>{beforeItem.desc}</p>
                       </div>
 
                       {/* BACK FACE (AFTER) */}
@@ -412,16 +422,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                         style={{ 
                           position: 'absolute', width: '100%', height: '100%', backfaceVisibility: 'hidden',
                           transform: prefersReducedMotion ? 'none' : 'rotateY(180deg)',
-                          padding: '22px 18px', textAlign: 'left', background: afterItem.highlight ? '#F1F4EC' : '#FFFFFF',
+                          padding: '22px 18px', textAlign: 'left',
+                          background: afterItem.highlight ? (isDark ? '#183328' : '#EAF3ED') : (isDark ? '#14251D' : '#FFFFFF'),
+                          border: afterItem.highlight ? (isDark ? '1px solid #294237' : '1px solid #D8E2DC') : (isDark ? '1px solid #294237' : '1px solid #D8E2DC'),
                           zIndex: activeStory === 'after' || prefersReducedMotion ? 2 : 1,
                           opacity: prefersReducedMotion && activeStory === 'before' ? 0 : 1
                         }}
                       >
-                        <div className="icon-wrapper" style={{ marginBottom: 14, width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: afterItem.highlight ? '#DCE7DC' : '#F1F4EC' }}>
-                          <afterItem.icon style={{ width: 22, height: 22, color: afterItem.highlight ? '#315C47' : '#8FA991' }} />
+                        <div className="icon-wrapper" style={{ marginBottom: 14, width: 40, height: 40, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: isDark ? '#101F18' : '#F1F6F3' }}>
+                          <afterItem.icon style={{ width: 22, height: 22, color: afterItem.highlight ? (isDark ? '#8BC7A3' : '#174C38') : (isDark ? '#81958A' : '#687B72') }} />
                         </div>
-                        <h4 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 12, color: afterItem.highlight ? '#315C47' : '#18392C', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>{afterItem.title}</h4>
-                        <p style={{ fontSize: 12, color: '#5D6B63', lineHeight: 1.6, margin: 0 }}>{afterItem.desc}</p>
+                        <h4 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 12, color: afterItem.highlight ? (isDark ? '#8BC7A3' : '#174C38') : (isDark ? '#F1F5F2' : '#102F24'), textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 8px' }}>{afterItem.title}</h4>
+                        <p style={{ fontSize: 12, color: isDark ? '#B8C8BF' : '#40594D', lineHeight: 1.6, margin: 0 }}>{afterItem.desc}</p>
                       </div>
                     </motion.div>
                   </div>
@@ -434,7 +446,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
         {/* Core Features */}
         <section style={{ padding: '80px 32px', maxWidth: 800, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 40 }}>
-             <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 'clamp(1.8rem, 3vw, 2.8rem)', color: '#18392C', margin: 0 }}>
+             <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 'clamp(1.8rem, 3vw, 2.8rem)', color: isDark ? '#F1F5F2' : '#102F24', margin: 0 }}>
                Core Technology
              </h2>
           </div>
@@ -446,17 +458,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
                 { Icon: ShieldAlert, title: 'Satellite Fire Spotting', desc: 'Automated alerts connect local burning fire regions with instant commercial procurement teams, offering a financial incentive to stop the burn.' },
               ].map(({ Icon, title, desc }) => (
                 <ScrollStackItem key={title} itemClassName="clean-card" >
-                  <div style={{ padding: '32px 28px', height: '100%' }}>
+                  <div style={{ padding: '32px 28px', height: '100%', background: isDark ? '#14251D' : '#FFFFFF', border: isDark ? '1px solid #294237' : '1px solid #D8E2DC', borderRadius: '16px' }}>
                     <div style={{
                       width: 48, height: 48, borderRadius: 12,
-                      background: '#F3E7D6',
+                      background: isDark ? '#1C3429' : '#EAF3ED',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       marginBottom: 20,
                     }}>
-                      <Icon style={{ width: 22, height: 22, color: '#B9793D' }} />
+                      <Icon style={{ width: 22, height: 22, color: isDark ? '#8BC7A3' : '#174C38' }} />
                     </div>
-                    <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 17, color: '#18392C', margin: '0 0 12px' }}>{title}</h3>
-                    <p style={{ fontSize: 14, color: '#5D6B63', lineHeight: 1.7, margin: 0 }}>{desc}</p>
+                    <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 17, color: isDark ? '#F1F5F2' : '#102F24', margin: '0 0 12px' }}>{title}</h3>
+                    <p style={{ fontSize: 14, color: isDark ? '#B8C8BF' : '#40594D', lineHeight: 1.7, margin: 0 }}>{desc}</p>
                   </div>
                 </ScrollStackItem>
               ))}
@@ -473,18 +485,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           style={{ padding: '80px 32px', textAlign: 'center' }}
         >
           <div style={{ maxWidth: 640, margin: '0 auto' }}>
-            <div className="clean-card" style={{ padding: '52px 40px', background: '#F1F4EC' }}>
-              <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', color: '#18392C', margin: '0 0 12px' }}>
+            <div className="clean-card" style={{ padding: '52px 40px', background: isDark ? '#101F18' : '#FFFFFF', border: isDark ? '1px solid #294237' : '1px solid #D8E2DC', boxShadow: isDark ? 'none' : '0 4px 16px rgba(16, 47, 36, 0.06)' }}>
+              <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: 'clamp(1.6rem, 3vw, 2.4rem)', color: isDark ? '#F1F5F2' : '#102F24', margin: '0 0 12px' }}>
                 The next harvest shouldn't end in a fire.
               </h2>
-              <p style={{ color: '#5D6B63', fontSize: 15, marginBottom: 32 }}>
+              <p style={{ color: isDark ? '#B8C8BF' : '#40594D', fontSize: 15, marginBottom: 32 }}>
                 Join progressive farmers and sustainable buyers across Punjab &amp; Haryana today.
               </p>
               <button
                 onClick={onStart}
                 className="primary-cta"
                 style={{
-                  background: '#315C47',
+                  background: isDark ? '#24563E' : '#174C38',
                   color: '#FFFFFF',
                   fontFamily: "'Sora', sans-serif",
                   fontWeight: 700,
@@ -508,10 +520,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
       <style>{`
         /* Global Typography Resets */
         .landing-page-root h1, .landing-page-root h2, .landing-page-root h3, .landing-page-root h4, .landing-page-root h5, .landing-page-root h6, .landing-page-root p {
-          color: inherit !important;
+          color: inherit;
         }
 
-        /* 1. Global Motion System (180-250ms for buttons, 250-350ms for cards) */
+        /* 1. Global Motion System */
         @media (prefers-reduced-motion: no-preference) {
           .clean-card {
             transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms cubic-bezier(0.22, 1, 0.36, 1), border-color 300ms ease;
@@ -519,80 +531,23 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           .primary-cta, .secondary-cta {
             transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), background-color 200ms ease, box-shadow 200ms ease;
           }
-          /* Button SVG Arrow Motion */
           .primary-cta svg {
             transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
           }
           .primary-cta:hover svg {
             transform: translateX(4px);
           }
-          /* Card Icon Micro-interactions */
-          .clean-card .icon-wrapper svg {
-            transition: transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
-          }
-          .clean-card:hover .icon-truck { transform: translateX(2px); }
-          .clean-card:hover .icon-sprout { transform: rotate(2deg); }
-          .clean-card:hover .icon-compass { transform: rotate(15deg); }
-          .clean-card:hover .icon-shield { transform: translateY(-2px); }
-          .clean-card:hover .icon-trending { transform: translateY(-2px) translateX(2px); }
         }
 
         /* 4. Card Hover Effects */
         .clean-card {
-          background: #FFFFFF;
-          border: 1px solid #DCE3DC;
           border-radius: 16px;
-          box-shadow: 0 4px 20px rgba(24, 57, 44, 0.02);
         }
-        @media (hover: hover) and (pointer: fine) {
-          .clean-card:hover {
-            transform: translateY(-4px) scale(1.01);
-            box-shadow: 0 12px 40px rgba(24, 57, 44, 0.06);
-            border-color: rgba(49, 92, 71, 0.2);
-          }
-          
-          /* 6. Button Interactions */
-          .primary-cta:hover {
-            transform: translateY(-2px) scale(1.01);
-            background: #254A38 !important; /* Slightly darker green */
-            box-shadow: 0 8px 24px rgba(49, 92, 71, 0.2);
-          }
-          .primary-cta:active {
-            transform: translateY(0) scale(0.98);
-          }
-          
-          .secondary-cta:hover {
-            transform: translateY(-2px);
-            background: #FAF9F4 !important;
-            border-color: #B9793D !important;
-            box-shadow: 0 4px 12px rgba(185, 121, 61, 0.1);
-          }
-        }
-
-        /* 14. 3D Stat Cards Depth (No Glow) */
-        .stat-card-hover {
-          transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 300ms ease;
-        }
-        @media (hover: hover) and (pointer: fine) {
-          .stat-card-hover:hover {
-            transform: translateY(-2px) scale(1.02);
-            /* Soft shadow, light border contrast, no glow */
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 8px 30px rgba(24, 57, 44, 0.06);
-          }
-        }
-
-        /* Story Highlight State Colors */
-        .story-card-highlight-bad {
-          border-color: #E4D5C1;
-        }
-        .story-card-highlight-good {
-          border-color: #DCE7DC;
-        }
-
+        
         /* Scroll Reveal Overrides */
         .landing-scroll-reveal .scroll-reveal-text {
           font-size: clamp(1.4rem, 2.5vw, 2.2rem) !important;
-          color: #17251E !important;
+          color: ${isDark ? '#F1F5F2' : '#102F24'} !important;
           font-weight: 600 !important;
           line-height: 1.6 !important;
         }

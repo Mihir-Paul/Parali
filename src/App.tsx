@@ -19,6 +19,7 @@ import { AuthLogin } from './pages/AuthLogin';
 import { Onboarding } from './pages/Onboarding';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import Lightfall from './components/ui/Lightfall';
+import { useTheme } from './context/ThemeContext';
 import { BuyerDemandItem } from './types/marketplace';
 import {
   LayoutDashboard,
@@ -158,48 +159,53 @@ export default function App() {
     </button>
   );
 
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   return (
-    <div className="min-h-screen bg-paper-50/90 flex flex-col font-sans relative">
-      <div className="fixed inset-0 z-[0] pointer-events-none opacity-25">
-        <Lightfall
-          colors={['#8FA991', '#18392C', '#B9793D']}
-          backgroundColor="transparent"
-          speed={0.6}
-          streakCount={3}
-          streakWidth={1.5}
-          streakLength={1.5}
-          glow={0.5}
-          density={0.4}
-          twinkle={1.0}
-          zoom={2.5}
-          backgroundGlow={0.1}
-          mouseInteraction={false}
-        />
-      </div>
+    <div className="min-h-screen bg-[#FAFAF7] dark:bg-[#0D1713] text-[#102F24] dark:text-[#F1F5F2] flex flex-col font-sans relative transition-colors duration-200">
+      {isDark && (
+        <div className="fixed inset-0 z-[0] pointer-events-none opacity-25">
+          <Lightfall
+            colors={['#8FA991', '#18392C', '#B9793D']}
+            backgroundColor="transparent"
+            speed={0.6}
+            streakCount={3}
+            streakWidth={1.5}
+            streakLength={1.5}
+            glow={0.5}
+            density={0.4}
+            twinkle={1.0}
+            zoom={2.5}
+            backgroundGlow={0.1}
+            mouseInteraction={false}
+          />
+        </div>
+      )}
 
       <div className="relative z-10 flex flex-col flex-1 h-full w-full">
         <Navbar
           currentView={currentView}
-        onNavigateProfile={() => setCurrentView(currentView === 'profile' ? 'main' : 'profile')}
-        onNavigateLanding={() => setShowLanding(true)}
-        farmerView={farmerView}
-        setFarmerView={setFarmerView}
-        buyerView={buyerView}
-        setBuyerView={setBuyerView}
-        adminTab={adminTab}
-        setAdminTab={setAdminTab}
-      />
+          onNavigateProfile={() => setCurrentView(currentView === 'profile' ? 'main' : 'profile')}
+          onNavigateLanding={() => setShowLanding(true)}
+          farmerView={farmerView}
+          setFarmerView={setFarmerView}
+          buyerView={buyerView}
+          setBuyerView={setBuyerView}
+          adminTab={adminTab}
+          setAdminTab={setAdminTab}
+        />
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col pb-16 md:pb-0">
-        {currentView === 'profile' ? (
-          <ProfilePage />
-        ) : currentRole === 'none' ? (
-          <RoleSelect />
-        ) : (
-          <div className="flex-1 flex flex-col relative z-10">
-            {/* Page content switcher */}
-            <div className="flex-1 bg-cream-50/70">
+        {/* Main Content Area */}
+        <main className="flex-1 flex flex-col pb-16 md:pb-0">
+          {currentView === 'profile' ? (
+            <ProfilePage />
+          ) : currentRole === 'none' ? (
+            <RoleSelect />
+          ) : (
+            <div className="flex-1 flex flex-col relative z-10">
+              {/* Page content switcher */}
+              <div className="flex-1 bg-[#FAFAF7] dark:bg-[#0D1713] transition-colors duration-200">
               <ErrorBoundary fallbackTitle="Operations View Unavailable">
                 {currentRole === 'Farmer' && (
                   farmerView === 'dashboard' ? (

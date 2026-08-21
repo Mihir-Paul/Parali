@@ -60,14 +60,14 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <div className="flex items-center gap-2 text-xs font-extrabold mb-1 uppercase tracking-wider" style={{ color: '#2F6B4F' }}>
-            <MapPin className="h-3.5 w-3.5 text-[#2F6B4F]" />
+          <div className="flex items-center gap-2 text-xs font-extrabold text-clay-700 mb-1 uppercase tracking-wider">
+            <MapPin className="h-3.5 w-3.5" />
             <span>{locationText} • {radiusKm} km radius ({buyerTypeFormatted})</span>
           </div>
-          <h2 className="text-3xl font-extrabold" style={{ color: '#102F24' }}>
+          <h2 className="text-3xl font-extrabold text-forest-950">
             Good morning, {buyerName}
           </h2>
-          <p className="text-sm mt-1" style={{ color: '#40594D' }}>
+          <p className="text-sm text-forest-700 mt-1">
             Biomass procurement overview & automated supply network matching.
           </p>
         </div>
@@ -76,8 +76,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
           {onNavigateToDemand && (
             <button
               onClick={onNavigateToDemand}
-              style={{ backgroundColor: '#B86B27', color: '#FFFFFF' }}
-              className="hover:opacity-90 font-extrabold px-5 py-3 rounded-2xl shadow-md transition-all text-xs flex items-center gap-2"
+              className="bg-clay-600 hover:bg-clay-700 text-white font-extrabold px-5 py-3 rounded-2xl shadow-md transition-all text-xs flex items-center gap-2"
             >
               <PlusCircle className="h-4 w-4" /> Post Requirement
             </button>
@@ -85,8 +84,7 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
 
           <button
             onClick={onNavigateToMarketplace}
-            style={{ backgroundColor: '#12372A', color: '#FFFFFF' }}
-            className="hover:opacity-90 font-extrabold px-5 py-3 rounded-2xl shadow-md transition-all text-xs flex items-center gap-1.5"
+            className="bg-forest-600 hover:bg-forest-700 text-white font-extrabold px-5 py-3 rounded-2xl shadow-md transition-all text-xs flex items-center gap-1.5"
           >
             Biomass Marketplace <ArrowRight className="h-4 w-4" />
           </button>
@@ -95,49 +93,48 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
 
       {/* Buyer Key Metrics Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <div style={{ backgroundColor: '#12372A', borderColor: '#294237' }} className="border p-6 rounded-3xl shadow-sm hover:-translate-y-1 transition-all">
-          <span style={{ color: '#B8C8BF' }} className="text-[10px] font-extrabold uppercase tracking-wider block">Total Requirements</span>
-          <h3 style={{ color: '#F1F5F2' }} className="text-2xl font-black mt-2">{requirements.length + 1} active</h3>
-          <p style={{ color: '#81958A' }} className="text-[10px] font-bold mt-1">Target volume: {targetQuantity} tonnes</p>
+        <div className="bg-white border border-forest-100 p-6 rounded-3xl shadow-sm hover:-translate-y-1 transition-all">
+          <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Total Requirements</span>
+          <h3 className="text-2xl font-black text-forest-950 mt-2">{requirements.length + 1} active</h3>
+          <p className="text-[10px] text-forest-600 font-bold mt-1">Target volume: {targetQuantity} tonnes</p>
         </div>
 
-        <div style={{ backgroundColor: '#12372A', borderColor: '#294237' }} className="border p-6 rounded-3xl shadow-sm hover:-translate-y-1 transition-all">
-          <span style={{ color: '#B8C8BF' }} className="text-[10px] font-extrabold uppercase tracking-wider block">Active Sourcing</span>
-          <h3 style={{ color: '#F1F5F2' }} className="text-2xl font-black mt-2">{activeSourcingCount} contracts</h3>
-          <p style={{ color: '#81958A' }} className="text-[10px] font-bold mt-1">Scheduled for pickup this week</p>
+        <div className="bg-white border border-forest-100 p-6 rounded-3xl shadow-sm hover:-translate-y-1 transition-all">
+          <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Active Sourcing</span>
+          <h3 className="text-2xl font-black text-forest-950 mt-2">{activeSourcingCount} contracts</h3>
+          <p className="text-[10px] text-forest-600 font-bold mt-1">Scheduled for pickup this week</p>
         </div>
 
-        <div style={{ backgroundColor: '#12372A', borderColor: '#294237' }} className="border p-6 rounded-3xl shadow-sm hover:-translate-y-1 transition-all">
-          <span style={{ color: '#B8C8BF' }} className="text-[10px] font-extrabold uppercase tracking-wider block">Total Residue Sourced</span>
-          <h3 style={{ color: '#F1F5F2' }} className="text-2xl font-black mt-2">{totalSourcedTonnes} tonnes</h3>
-          <p style={{ color: '#81958A' }} className="text-[10px] font-bold mt-1">Diverted from stubble burning</p>
+        <div className="bg-white border border-forest-100 p-6 rounded-3xl shadow-sm hover:-translate-y-1 transition-all">
+          <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Total Residue Sourced</span>
+          <h3 className="text-2xl font-black text-forest-950 mt-2">{totalSourcedTonnes} tonnes</h3>
+          <p className="text-[10px] text-forest-600 font-bold mt-1">Diverted from stubble burning</p>
         </div>
 
-        <div style={{ backgroundColor: '#12372A', borderColor: '#294237' }} className="border p-6 rounded-3xl shadow-sm hover:-translate-y-1 transition-all">
-          <span style={{ color: '#B8C8BF' }} className="text-[10px] font-extrabold uppercase tracking-wider block">Pending Requests</span>
-          <h3 style={{ color: '#F1F5F2' }} className="text-2xl font-black mt-2">{pendingCount} pending</h3>
-          <p style={{ color: '#6FAF8A' }} className="text-[10px] font-bold mt-1">Awaiting farmer confirmation</p>
+        <div className="bg-white border border-forest-100 p-6 rounded-3xl shadow-sm hover:-translate-y-1 transition-all">
+          <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">Pending Requests</span>
+          <h3 className="text-2xl font-black text-forest-950 mt-2">{pendingCount} pending</h3>
+          <p className="text-[10px] text-clay-700 font-bold mt-1">Awaiting farmer confirmation</p>
         </div>
       </div>
 
       {/* Match Action Alert */}
       {rameshListing && (
-        <div style={{ backgroundColor: '#1C3429', borderColor: '#294237' }} className="border-2 rounded-3xl p-6 mb-10 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="bg-clay-50 border-2 border-clay-300 rounded-3xl p-6 mb-10 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
           <div>
-            <span style={{ backgroundColor: '#24563E', color: '#8BC7A3', borderColor: '#2F6B4F' }} className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider border">
+            <span className="text-[10px] bg-clay-100 text-clay-800 font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
               AI Match Alert • 94% score
             </span>
-            <h4 style={{ color: '#F1F5F2' }} className="font-extrabold text-base mt-2">
+            <h4 className="font-extrabold text-base text-forest-950 mt-2">
               Ramesh Kumar has 3.0 tonnes of Wheat Straw available in Sangrur
             </h4>
-            <p style={{ color: '#B8C8BF' }} className="text-xs mt-1">
+            <p className="text-xs text-forest-750 mt-1">
               Fulfills your bio-bedding requirement at ₹866 / Tonne. Est logistics savings: 18%.
             </p>
           </div>
           <button
             onClick={() => confirmBuyerRequirement(rameshListing.id)}
-            style={{ backgroundColor: '#B86B27', color: '#FFFFFF' }}
-            className="hover:opacity-90 font-extrabold text-xs px-6 py-3 rounded-2xl transition-all shadow shrink-0"
+            className="bg-clay-600 hover:bg-clay-700 text-white font-extrabold text-xs px-6 py-3 rounded-2xl transition-all shadow shrink-0"
           >
             Accept Match & Confirm Contract
           </button>
@@ -148,19 +145,18 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
       <div className="grid md:grid-cols-3 gap-6 mb-10">
         <div
           onClick={onNavigateToMarketplace}
-          style={{ backgroundColor: '#12372A', borderColor: '#294237' }}
-          className="border p-6 rounded-3xl shadow-sm cursor-pointer transition-all flex flex-col justify-between group hover:border-[#6FAF8A]"
+          className="bg-white border border-forest-100 hover:border-forest-300 p-6 rounded-3xl shadow-sm cursor-pointer transition-all flex flex-col justify-between group"
         >
           <div>
-            <div style={{ backgroundColor: '#1C3429', color: '#8BC7A3' }} className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-all">
+            <div className="w-12 h-12 rounded-2xl bg-forest-100 text-forest-700 flex items-center justify-center mb-4 group-hover:bg-forest-600 group-hover:text-white transition-all">
               <Sprout className="h-6 w-6" />
             </div>
-            <h4 style={{ color: '#F1F5F2' }} className="text-lg font-extrabold">Residue Marketplace</h4>
-            <p style={{ color: '#B8C8BF' }} className="text-xs mt-1 leading-relaxed">
+            <h4 className="text-lg font-extrabold text-forest-950">Residue Marketplace</h4>
+            <p className="text-xs text-forest-700 mt-1 leading-relaxed">
               Explore live crop stubble listings with 3D specs, price comparison, and instant purchase requests.
             </p>
           </div>
-          <div style={{ color: '#8BC7A3' }} className="mt-6 flex items-center text-xs font-bold gap-1 group-hover:translate-x-1 transition-transform">
+          <div className="mt-6 flex items-center text-xs font-bold text-forest-800 gap-1 group-hover:translate-x-1 transition-transform">
             <span>Browse Marketplace</span> <ArrowRight className="h-4 w-4" />
           </div>
         </div>
@@ -168,19 +164,18 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
         {onNavigateToDemand && (
           <div
             onClick={onNavigateToDemand}
-            style={{ backgroundColor: '#12372A', borderColor: '#294237' }}
-            className="border p-6 rounded-3xl shadow-sm cursor-pointer transition-all flex flex-col justify-between group hover:border-[#6FAF8A]"
+            className="bg-white border border-forest-100 hover:border-clay-300 p-6 rounded-3xl shadow-sm cursor-pointer transition-all flex flex-col justify-between group"
           >
             <div>
-              <div style={{ backgroundColor: '#1C3429', color: '#8BC7A3' }} className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-clay-100 text-clay-700 flex items-center justify-center mb-4 group-hover:bg-clay-600 group-hover:text-white transition-all">
                 <PlusCircle className="h-6 w-6" />
               </div>
-              <h4 style={{ color: '#F1F5F2' }} className="text-lg font-extrabold">Post Biomass Demand</h4>
-              <p style={{ color: '#B8C8BF' }} className="text-xs mt-1 leading-relaxed">
+              <h4 className="text-lg font-extrabold text-forest-950">Post Biomass Demand</h4>
+              <p className="text-xs text-forest-700 mt-1 leading-relaxed">
                 Specify your plant tonnage targets, maximum price limits, and let Parali match suitable farmers.
               </p>
             </div>
-            <div style={{ color: '#8BC7A3' }} className="mt-6 flex items-center text-xs font-bold gap-1 group-hover:translate-x-1 transition-transform">
+            <div className="mt-6 flex items-center text-xs font-bold text-clay-800 gap-1 group-hover:translate-x-1 transition-transform">
               <span>Create Requirement</span> <ArrowRight className="h-4 w-4" />
             </div>
           </div>
@@ -189,19 +184,18 @@ export const BuyerDashboard: React.FC<BuyerDashboardProps> = ({
         {onNavigateToMatches && (
           <div
             onClick={onNavigateToMatches}
-            style={{ backgroundColor: '#12372A', borderColor: '#294237' }}
-            className="border p-6 rounded-3xl shadow-sm cursor-pointer transition-all flex flex-col justify-between group hover:border-[#6FAF8A]"
+            className="bg-white border border-forest-100 hover:border-forest-300 p-6 rounded-3xl shadow-sm cursor-pointer transition-all flex flex-col justify-between group"
           >
             <div>
-              <div style={{ backgroundColor: '#1C3429', color: '#8BC7A3' }} className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-all">
+              <div className="w-12 h-12 rounded-2xl bg-cream-100 text-forest-800 flex items-center justify-center mb-4 group-hover:bg-forest-600 group-hover:text-white transition-all">
                 <Sparkles className="h-6 w-6" />
               </div>
-              <h4 style={{ color: '#F1F5F2' }} className="text-lg font-extrabold">Matched Farmers</h4>
-              <p style={{ color: '#B8C8BF' }} className="text-xs mt-1 leading-relaxed">
+              <h4 className="text-lg font-extrabold text-forest-950">Matched Farmers</h4>
+              <p className="text-xs text-forest-700 mt-1 leading-relaxed">
                 Review automated compatibility scores (e.g. 94% Match) and confirm pickup contracts.
               </p>
             </div>
-            <div style={{ color: '#8BC7A3' }} className="mt-6 flex items-center text-xs font-bold gap-1 group-hover:translate-x-1 transition-transform">
+            <div className="mt-6 flex items-center text-xs font-bold text-forest-800 gap-1 group-hover:translate-x-1 transition-transform">
               <span>View Matches</span> <ArrowRight className="h-4 w-4" />
             </div>
           </div>

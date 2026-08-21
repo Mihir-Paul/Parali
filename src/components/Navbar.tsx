@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { UserAvatar } from './UserAvatar';
 import { PillNav, PillNavItem } from './ui/PillNav';
-import StaggeredMenu from './ui/StaggeredMenu';
 import { Sprout, LogOut, ArrowLeftRight, ShieldAlert, Award, Sun, Moon } from 'lucide-react';
 
 interface NavbarProps {
@@ -90,17 +89,21 @@ export const Navbar: React.FC<NavbarProps> = ({
   // Logo SVG as data URI (Sprout icon approximation)
   const logoSvg = `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23E2903F' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22V12'/><path d='M17 7c0-2.76-2.24-5-5-5s-5 2.24-5 5c0 3 3 7 5 7s5-4 5-7z'/><path d='M5 11c-2.21 0-4 1.79-4 4 0 2.21 1.79 4 4 4'/><path d='M19 11c2.21 0 4 1.79 4 4 0 2.21-1.79 4-4 4'/></svg>`;
 
+  const isDark = theme === 'dark';
+
   return (
     <header
       style={{
         position: 'sticky',
         top: 0,
         zIndex: 40,
-        backgroundColor: 'rgba(15, 26, 18, 0.92)',
+        backgroundColor: isDark ? '#101F18' : '#FFFFFF',
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(246, 242, 231, 0.08)',
+        borderBottom: isDark ? '1px solid #294237' : '1px solid #D8E2DC',
+        boxShadow: isDark ? 'none' : '0 2px 12px rgba(16, 47, 36, 0.05)',
         padding: '10px 24px',
+        transition: 'all 0.2s ease',
       }}
     >
       <div
@@ -126,15 +129,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               width: 38,
               height: 38,
               borderRadius: '50%',
-              background: 'rgba(226, 144, 63, 0.15)',
-              border: '1px solid rgba(226, 144, 63, 0.35)',
+              background: isDark ? 'rgba(226, 144, 63, 0.15)' : '#EAF3ED',
+              border: isDark ? '1px solid rgba(226, 144, 63, 0.35)' : '1px solid #D8E2DC',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 12px rgba(226, 144, 63, 0.2)',
+              boxShadow: isDark ? '0 0 12px rgba(226, 144, 63, 0.2)' : 'none',
             }}
           >
-            <Sprout style={{ width: 20, height: 20, color: '#E2903F' }} />
+            <Sprout style={{ width: 20, height: 20, color: isDark ? '#E2903F' : '#174C38' }} />
           </div>
           <div style={{ lineHeight: 1 }}>
             <div
@@ -142,7 +145,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 fontFamily: "'Sora', sans-serif",
                 fontWeight: 800,
                 fontSize: 20,
-                color: '#F6F2E7',
+                color: isDark ? '#F1F5F2' : '#102F24',
                 letterSpacing: '-0.5px',
               }}
             >
@@ -151,9 +154,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             <div
               style={{
                 fontFamily: "'JetBrains Mono', monospace",
-                fontWeight: 500,
+                fontWeight: 600,
                 fontSize: 9,
-                color: '#E2903F',
+                color: isDark ? '#8BC7A3' : '#174C38',
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
               }}
@@ -171,10 +174,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               logoAlt="Parali"
               items={navItems}
               activeHref={activeHref}
-              baseColor="#17271B"
-              pillColor="#0F1A12"
-              hoveredPillTextColor="#E2903F"
-              pillTextColor="#C9CFC1"
+              baseColor={isDark ? '#183328' : '#EAF3ED'}
+              pillColor={isDark ? '#14251D' : '#FFFFFF'}
+              hoveredPillTextColor={isDark ? '#8BC7A3' : '#174C38'}
+              pillTextColor={isDark ? '#B8C8BF' : '#29483A'}
               initialLoadAnimation={false}
               onLogoClick={() => {
                 if (onNavigateLanding) onNavigateLanding();
@@ -194,12 +197,12 @@ export const Navbar: React.FC<NavbarProps> = ({
                 fontFamily: "'JetBrains Mono', monospace",
                 fontSize: 11,
                 fontWeight: 600,
-                color: '#E2903F',
+                color: isDark ? '#E2903F' : '#174C38',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 5,
-                background: 'rgba(226, 144, 63, 0.1)',
-                border: '1px solid rgba(226, 144, 63, 0.2)',
+                background: isDark ? 'rgba(226, 144, 63, 0.1)' : '#EAF3ED',
+                border: isDark ? '1px solid rgba(226, 144, 63, 0.2)' : '1px solid #D8E2DC',
                 borderRadius: 999,
                 padding: '4px 10px',
               }}
@@ -219,18 +222,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 gap: 7,
                 padding: '6px 12px 6px 6px',
                 borderRadius: 999,
-                border: currentView === 'profile'
-                  ? '1px solid rgba(226, 144, 63, 0.5)'
-                  : '1px solid rgba(246, 242, 231, 0.1)',
-                background: currentView === 'profile'
-                  ? 'rgba(226, 144, 63, 0.12)'
-                  : 'rgba(246, 242, 231, 0.05)',
+                border: isDark ? '1px solid #294237' : '1px solid #D8E2DC',
+                background: isDark ? '#14251D' : '#F1F6F3',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 fontFamily: "'Manrope', sans-serif",
                 fontWeight: 600,
                 fontSize: 12,
-                color: currentView === 'profile' ? '#E2903F' : '#C9CFC1',
+                color: isDark ? '#F1F5F2' : '#102F24',
               }}
             >
               <UserAvatar
@@ -255,13 +254,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 gap: 5,
                 padding: '7px 12px',
                 borderRadius: 999,
-                border: '1px solid rgba(246, 242, 231, 0.1)',
-                background: 'rgba(246, 242, 231, 0.04)',
+                border: isDark ? '1px solid #294237' : '1px solid #D8E2DC',
+                background: isDark ? '#14251D' : '#F1F6F3',
                 cursor: 'pointer',
                 fontFamily: "'Manrope', sans-serif",
                 fontWeight: 600,
                 fontSize: 12,
-                color: '#9BA695',
+                color: isDark ? '#B8C8BF' : '#40594D',
                 transition: 'all 0.2s ease',
               }}
             >
@@ -273,22 +272,22 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
-            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             style={{
               width: 34,
               height: 34,
               borderRadius: '50%',
-              border: '1px solid rgba(246, 242, 231, 0.12)',
-              background: theme === 'dark' ? 'rgba(111, 175, 138, 0.15)' : 'rgba(246, 242, 231, 0.08)',
+              border: isDark ? '1px solid #294237' : '1px solid #D8E2DC',
+              background: isDark ? '#183328' : '#EAF3ED',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              color: theme === 'dark' ? '#8BC7A3' : '#E2903F',
+              color: isDark ? '#8BC7A3' : '#174C38',
               transition: 'all 0.2s ease',
             }}
           >
-            {theme === 'dark' ? <Sun style={{ width: 15, height: 15 }} /> : <Moon style={{ width: 15, height: 15 }} />}
+            {isDark ? <Sun style={{ width: 15, height: 15 }} /> : <Moon style={{ width: 15, height: 15 }} />}
           </button>
 
           {/* Sign out */}
@@ -300,13 +299,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 width: 34,
                 height: 34,
                 borderRadius: '50%',
-                border: '1px solid rgba(246, 242, 231, 0.08)',
-                background: 'rgba(246, 242, 231, 0.04)',
+                border: isDark ? '1px solid #294237' : '1px solid #D8E2DC',
+                background: isDark ? '#14251D' : '#F1F6F3',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                color: '#9BA695',
+                color: isDark ? '#B8C8BF' : '#40594D',
                 transition: 'all 0.2s ease',
               }}
             >
@@ -335,26 +334,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               SIH 2026
             </span>
           )}
-          
-          {/* Staggered Menu Navigation */}
-          <StaggeredMenu
-            position="right"
-            menuButtonColor="#9BA695"
-            openMenuButtonColor="#18392C"
-            accentColor="#E2903F"
-            colors={['#8FA991', '#DCE7DC']}
-            changeMenuColorOnOpen={true}
-            items={[
-              { label: 'Home', link: '#' },
-              { label: 'Platform', link: '#platform' },
-              { label: 'Impact', link: '#impact' },
-              { label: 'Help', link: '#help' }
-            ]}
-            socialItems={[
-              { label: 'Twitter', link: 'https://twitter.com' },
-              { label: 'LinkedIn', link: 'https://linkedin.com' }
-            ]}
-          />
         </div>
       </div>
     </header>

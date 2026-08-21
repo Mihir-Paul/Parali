@@ -7,169 +7,176 @@
   line-height: 1.6;
   font-weight: 400;
   color-scheme: light;
-  background-color: #FAF9F6;
-  color: #102F24;
 
-  /* Design tokens as CSS custom properties */
-  --pine-900: #173226;
-  --pine-700: #2C5940;
-  --pine-100: #E4EEE6;
-  --soil-700: #8A5A2B;
-  --soil-100: #F1E4D3;
+  /* PARALI LIGHT THEME SPECIFICATION */
+  --background: #FAFAF7;
+  --foreground: #102F24;
+
+  --surface: #FFFFFF;
+  --surface-secondary: #F1F6F3;
+  --border: #D8E2DC;
+
+  --text-primary: #102F24;
+  --text-secondary: #40594D;
+  --text-muted: #687B72;
+
+  --primary: #174C38;
+  --primary-hover: #2F6B4F;
+  --accent: #6FAF8A;
+  --accent-light: #EAF3ED;
+
+  /* Legacy design tokens */
+  --pine-900: #174C38;
+  --pine-700: #2F6B4F;
+  --pine-100: #EAF3ED;
+  --soil-700: #B7791F;
+  --soil-100: #FEF8EC;
   --ash-500: #D98A2B;
-  --ember-600: #C1402A;
-  --paper-50: #FAF9F6;
+  --ember-600: #B84A3A;
+  --paper-50: #FAFAF7;
   --surface-0: #FFFFFF;
-  --line-200: #E3DFD5;
-  --ink-900: #211E19;
-  --ink-500: #6B6558;
+  --line-200: #D8E2DC;
+  --ink-900: #102F24;
+  --ink-500: #40594D;
 
-  /* Parali green system */
-  --parali-green-primary: #12372A;
+  --parali-green-primary: #174C38;
   --parali-green-accent: #2F6B4F;
-  --parali-green-light: #E8F1EB;
-  --parali-green-soft: #F3F7F4;
-  --parali-border: #D5E2DA;
-  --parali-card-glow: rgba(18, 55, 42, 0.06);
-  --parali-card-glow-hover: rgba(18, 55, 42, 0.10);
+  --parali-green-light: #EAF3ED;
+  --parali-green-soft: #F1F6F3;
+  --parali-border: #D8E2DC;
+  --parali-card-glow: 0 4px 16px rgba(16, 47, 36, 0.06);
+  --parali-card-glow-hover: 0 8px 24px rgba(16, 47, 36, 0.10);
 
-  /* Signature element: ash-to-green gradient */
-  --gradient-ash-to-green: linear-gradient(90deg, #D98A2B 0%, #2C5940 100%);
+  --gradient-ash-to-green: linear-gradient(90deg, #D98A2B 0%, #174C38 100%);
 }
 
-body {
+html, body, #root {
+  background-color: var(--background);
+  color: var(--foreground);
   margin: 0;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
-/* ── Base transition timing (150-200ms ease) ── */
+/* Base element styles for Light Mode */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary);
+}
+
+p, span, label {
+  color: var(--text-secondary);
+}
+
+/* Form Controls Base Style */
+input, select, textarea {
+  background-color: #FFFFFF;
+  border: 1px solid #D8E2DC;
+  color: #102F24;
+
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #7B8C84;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #6FAF8A;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(111, 175, 138, 0.18);
+}
+
+/* Base transition timing */
 button, a, input, select, textarea {
   transition: all 150ms ease;
 }
 
-/* ── Skeleton loader animation ── */
-@keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.45; }
-  50% { opacity: 0.85; }
-}
-
-.skeleton {
-  background: linear-gradient(90deg, var(--line-200) 25%, #ece8df 50%, var(--line-200) 75%);
-  background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s ease-in-out infinite;
-  border-radius: 8px;
-}
-
+/* Skeleton loader */
 @keyframes skeleton-shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
-/* ── Ash-to-green signature gradient bar ── */
+.skeleton {
+  background: linear-gradient(90deg, #EAF3ED 25%, #FAFAF7 50%, #EAF3ED 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* Ash-to-green signature bar */
 .ash-to-green-bar {
   height: 4px;
   background: var(--gradient-ash-to-green);
   border-radius: 2px;
 }
 
-/* ── Smooth route drawing animation ── */
-@keyframes dash {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-.animate-route-draw {
-  stroke-dasharray: 1000;
-  stroke-dashoffset: 1000;
-  animation: dash 5s linear forwards;
-}
-
-/* ── Slide-in panel animation ── */
-@keyframes slide-in-right {
-  from { transform: translateX(20px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-.animate-slide-in {
-  animation: slide-in-right 200ms ease forwards;
-}
-
-/* ── Scrollbar customizations ── */
+/* Scrollbar customizations */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--paper-50);
+  background: var(--background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--pine-700);
+  background: var(--primary);
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--pine-900);
-}
-
-/* ── Selection color ── */
 ::selection {
-  background: var(--pine-100);
-  color: var(--pine-900);
+  background: var(--accent-light);
+  color: var(--primary);
 }
 
-/* ═══════════════════════════════════════════════════════
-   PARALI CARD SYSTEM — green glow + hover lift
-   ═══════════════════════════════════════════════════════ */
-
+/* Card System */
 .parali-card {
   background: #FFFFFF;
-  border: 1px solid var(--parali-border, #D5E2DA);
+  border: 1px solid #D8E2DC;
   border-radius: 1.5rem;
-  box-shadow: var(--parali-card-glow, 0 4px 20px rgba(18, 55, 42, 0.06));
+  box-shadow: 0 4px 16px rgba(16, 47, 36, 0.06);
   transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
 }
 
 .parali-card:hover {
-  box-shadow: var(--parali-card-glow-hover, 0 8px 28px rgba(18, 55, 42, 0.10));
-  border-color: #9CBAA3;
+  box-shadow: 0 8px 24px rgba(16, 47, 36, 0.10);
+  border-color: #6FAF8A;
   transform: translateY(-1px);
 }
 
 .parali-card-soft {
-  background: #F3F7F4;
-  border: 1px solid var(--parali-border, #D5E2DA);
+  background: #F1F6F3;
+  border: 1px solid #D8E2DC;
   border-radius: 1.5rem;
-  box-shadow: 0 2px 12px rgba(18, 55, 42, 0.04);
-  transition: box-shadow 200ms ease, border-color 200ms ease;
+  box-shadow: 0 2px 8px rgba(16, 47, 36, 0.04);
 }
 
 /* ═══════════════════════════════════════════════════════
-   PARALI DARK THEME SPECIFICATION
-   Main Background: #0D1713
-   Navbar: #101F18
-   Primary Cards: #14251D
-   Highlight Cards: #182D23
-   Soft Surface: #1C3429
-   Primary Text: #F1F5F2
-   Secondary Text: #B8C8BF
-   Muted Text: #81958A
-   Primary Green: #6FAF8A
-   Bright Accent Green: #8BC7A3
-   Primary CTA: #24563E (Text: #F1F5F2)
-   CTA Hover: #2F6B4F
-   Borders: #294237
-   Subtle Card Glow: 0 6px 24px rgba(111, 175, 138, 0.06)
-   Subtle Glow Hover: 0 10px 30px rgba(111, 175, 138, 0.10)
+   PARALI DARK THEME SPECIFICATION (#0D1713)
    ═══════════════════════════════════════════════════════ */
 
 .dark {
   color-scheme: dark;
   background-color: #0D1713;
   color: #F1F5F2;
+
+  --background: #0D1713;
+  --foreground: #F1F5F2;
+
+  --surface: #14251D;
+  --surface-secondary: #183328;
+  --border: #294237;
+
+  --text-primary: #F1F5F2;
+  --text-secondary: #B8C8BF;
+  --text-muted: #8FA69A;
+
+  --primary: #6FAF8A;
+  --primary-hover: #8BC7A3;
+  --accent: #8BC7A3;
+  --accent-light: #1C3429;
 
   --paper-50: #0D1713;
   --surface-0: #14251D;
@@ -179,33 +186,28 @@ button, a, input, select, textarea {
   --pine-900: #182D23;
   --pine-700: #6FAF8A;
   --pine-100: #1C3429;
-
-  --parali-green-primary: #6FAF8A;
-  --parali-green-accent: #8BC7A3;
-  --parali-green-light: #1C3429;
-  --parali-green-soft: #14251D;
-  --parali-border: #294237;
-  --parali-card-glow: 0 6px 24px rgba(111, 175, 138, 0.06);
-  --parali-card-glow-hover: 0 10px 30px rgba(111, 175, 138, 0.10);
 }
 
-.dark body {
+.dark body, .dark #root {
   background-color: #0D1713;
   color: #F1F5F2;
 }
 
-/* Page Backgrounds */
+/* Dark Mode Page Backgrounds */
 .dark .bg-paper-50,
 .dark .bg-cream-50,
 .dark .bg-cream-100,
 .dark .bg-slate-50,
 .dark .bg-slate-100,
 .dark .bg-gray-50,
-.dark .bg-gray-100 {
+.dark .bg-gray-100,
+.dark [class*="bg-paper-50"],
+.dark [class*="bg-cream-50"],
+.dark [class*="bg-slate-50"] {
   background-color: #0D1713 !important;
 }
 
-/* Primary Card Surfaces */
+/* Dark Mode Primary Card Surfaces */
 .dark .bg-white,
 .dark .bg-surface-0,
 .dark .bg-slate-900\/50,
@@ -213,7 +215,7 @@ button, a, input, select, textarea {
   background-color: #14251D !important;
 }
 
-/* Secondary & Soft Green Surfaces */
+/* Dark Mode Secondary Surfaces */
 .dark .bg-forest-50,
 .dark .bg-forest-100,
 .dark .bg-emerald-50,
@@ -233,7 +235,7 @@ button, a, input, select, textarea {
   background-color: #2F6B4F !important;
 }
 
-/* Text Hierarchy */
+/* Dark Mode Text Hierarchy */
 .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
 .dark .text-forest-950,
 .dark .text-forest-900,
@@ -262,7 +264,7 @@ button, a, input, select, textarea {
 .dark .text-slate-400,
 .dark .text-gray-500,
 .dark .text-gray-400 {
-  color: #81958A !important;
+  color: #8FA69A !important;
 }
 
 .dark .text-emerald-600,
@@ -279,7 +281,7 @@ button, a, input, select, textarea {
   color: #8BC7A3 !important;
 }
 
-/* Borders & Dividers */
+/* Dark Mode Borders & Dividers */
 .dark .border-line-200,
 .dark .border-cream-200,
 .dark .border-cream-300,
@@ -297,7 +299,7 @@ button, a, input, select, textarea {
   border-color: #294237 !important;
 }
 
-/* Cards & Card Glow Effects */
+/* Dark Mode Cards */
 .dark .parali-card,
 .dark [class*="rounded-3xl"].bg-white,
 .dark [class*="rounded-2xl"].bg-white,
@@ -306,7 +308,6 @@ button, a, input, select, textarea {
   background-color: #14251D !important;
   border-color: #294237 !important;
   box-shadow: 0 6px 24px rgba(111, 175, 138, 0.06) !important;
-  transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease !important;
 }
 
 .dark .parali-card:hover,
@@ -323,7 +324,7 @@ button, a, input, select, textarea {
   border-color: #294237 !important;
 }
 
-/* Form Controls & Inputs */
+/* Dark Mode Form Controls */
 .dark input,
 .dark select,
 .dark textarea {
@@ -334,7 +335,7 @@ button, a, input, select, textarea {
 
 .dark input::placeholder,
 .dark textarea::placeholder {
-  color: #81958A !important;
+  color: #8FA69A !important;
 }
 
 .dark input:focus,
@@ -344,60 +345,3 @@ button, a, input, select, textarea {
   outline: none !important;
   box-shadow: 0 0 0 2px rgba(111, 175, 138, 0.25) !important;
 }
-
-/* Buttons */
-.dark button.bg-forest-600,
-.dark button.bg-forest-900,
-.dark button.bg-forest-950,
-.dark button.bg-emerald-600 {
-  background-color: #24563E !important;
-  color: #F1F5F2 !important;
-}
-
-.dark button.bg-forest-600:hover,
-.dark button.bg-forest-900:hover,
-.dark button.bg-forest-950:hover,
-.dark button.bg-emerald-600:hover {
-  background-color: #2F6B4F !important;
-}
-
-.dark button.bg-white,
-.dark button.bg-forest-50,
-.dark button.bg-forest-100 {
-  background-color: #1C3429 !important;
-  color: #F1F5F2 !important;
-  border-color: #294237 !important;
-}
-
-.dark button.bg-white:hover,
-.dark button.bg-forest-50:hover,
-.dark button.bg-forest-100:hover {
-  background-color: #24563E !important;
-  border-color: #6FAF8A !important;
-}
-
-/* Status Badges */
-.dark .badge-success,
-.dark .bg-emerald-100,
-.dark .bg-forest-100 {
-  background-color: #1C3429 !important;
-  color: #8BC7A3 !important;
-  border-color: #2F6B4F !important;
-}
-
-.dark .bg-amber-100,
-.dark .bg-orange-100,
-.dark .bg-yellow-100 {
-  background-color: #2D2314 !important;
-  color: #E2903F !important;
-  border-color: #4A381F !important;
-}
-
-.dark .bg-blue-100,
-.dark .bg-indigo-100,
-.dark .bg-sky-100 {
-  background-color: #142332 !important;
-  color: #7DB5EC !important;
-  border-color: #213B56 !important;
-}
-
