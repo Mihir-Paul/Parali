@@ -12,9 +12,9 @@ dotenv_path = os.path.join(root_dir, '.env')
 backend_dotenv = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
 
 if os.path.exists(dotenv_path):
-    load_dotenv(dotenv_path, override=True)
+    load_dotenv(dotenv_path, override=False)
 elif os.path.exists(backend_dotenv):
-    load_dotenv(backend_dotenv, override=True)
+    load_dotenv(backend_dotenv, override=False)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("firms_service")

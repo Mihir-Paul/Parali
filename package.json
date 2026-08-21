@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
+    "backend:install": "pip install -r backend/requirements.txt",
     "start": "npm --prefix backend start"
   },
   "dependencies": {

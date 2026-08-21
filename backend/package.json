@@ -6,6 +6,7 @@
   "main": "main.py",
   "type": "module",
   "scripts": {
+    "prestart": "pip install -r requirements.txt",
     "start": "python main.py",
     "dev": "python main.py"
   }
